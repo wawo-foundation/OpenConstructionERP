@@ -1,0 +1,35 @@
+services:
+
+
+  ${APP_NAME}-celery-redis:
+    profiles:
+      - ${APP_NAME}-celery-redis
+      - ''
+    extends:
+      file: docker-compose-be-prod.yml
+      service: lm-cebe-prod-celery-redis
+
+  ${APP_NAME}:
+    profiles: 
+      - ${APP_NAME}
+      - ''
+    extends:
+      file: docker-compose-be-prod.yml
+      service: lm-cebe-prod-py
+
+  ${APP_NAME}-celery-worker:
+    profiles:
+      - ${APP_NAME}-celery-worker
+      - ''
+    extends:
+      file: docker-compose-be-prod.yml
+      service: lm-cebe-prod-celery-worker
+
+      
+networks:
+ network_private_db :
+  external: true
+  name: net_private_db
+ network_private_web :
+  external: true
+  name: net_private_web
