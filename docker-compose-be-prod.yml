@@ -53,13 +53,12 @@ x-backend-environment: &backend-environment
   SERVE_FRONTEND: "false"
 
 x-backend-service: &backend-service
-  image: ${BACKEND_IMAGE:-openconstructionerp-be-prod:local}
+  image: ${APP_IMAGE:?Set APP_IMAGE}
   # build: *backend-build
   restart: unless-stopped
   stop_grace_period: 30s
   environment: *backend-environment
-  volumes:
-    - ${APP_VOLUME}/data:/data
+
 
 # ── Base for both Redis instances ───────────────────────────────────────────
 x-redis-base: &redis-base
