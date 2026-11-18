@@ -1,0 +1,162 @@
+name: ${BE_COMPOSE_PROJECT_NAME:-openconstructionerp-be-prod}
+
+# x-backend-build: &backend-build
+#   context: .
+#   dockerfile: deploy/docker/Dockerfile.unified
+#   target: api
+#   args:
+#     OE_EXTRAS: server,semantic-clients,s3
+
+x-backend-environment: &backend-environment
+  APP_ENV: production
+  APP_DEBUG: "false"
+  LOG_LEVEL: ${LOG_LEVEL:-INFO}
+  ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:?Set ALLOWED_ORIGINS}
+  # FRONTEND_URL: ${FRONTEND_URL:-}
+
+  JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET}
+  JWT_ALGORITHM: ${JWT_ALGORITHM:-HS256}
+  JWT_EXPIRE_MINUTES: ${JWT_EXPIRE_MINUTES:-60}
+
+  # Shared PostgreSQL 16+ server. Parts are passed separately because the
+  # backend percent-encodes passwords containing @, /, or :.
+  OE_DB_HOST: ${DB_HOST_NAME:?Set DB_HOST_NAME}
+  OE_DB_PORT: ${DB_PORT:-5432}
+  OE_DB_USER: ${DB_USER:?Set DB_USER}
+  OE_DB_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD}
+  OE_DB_NAME: ${DB:?Set DB}
+  # DATABASE_POOL_SIZE: ${DATABASE_POOL_SIZE:-24}
+  # DATABASE_MAX_OVERFLOW: ${DATABASE_MAX_OVERFLOW:-10}
+
+  # Redis defaults to the local redis service below; override for shared Redis.
+  REDIS_URL: redis://:${REDIS_CELERY_PASSWORD}@${APP_NAME}-celery-redis:6379/0
+  # Celery broker and result backend
+  OE_CELERY_BROKER_URL: redis://:${REDIS_CELERY_PASSWORD}@${APP_NAME}-celery-redis:6379/1
+  OE_CELERY_RESULT_BACKEND: redis://:${REDIS_CELERY_PASSWORD}@${APP_NAME}-celery-redis:6379/2
+
+
+  # Shared SeaweedFS through its S3-compatible endpoint.
+  STORAGE_BACKEND: s3
+  S3_ENDPOINT: ${S3_ENDPOINT:?Set S3_ENDPOINT to the SeaweedFS S3 endpoint}
+  S3_ACCESS_KEY: ${S3_ACCESS_KEY:?Set S3_ACCESS_KEY}
+  S3_SECRET_KEY: ${S3_SECRET_KEY:?Set S3_SECRET_KEY}
+  S3_BUCKET: ${S3_BUCKET:-openconstructionerp}
+  S3_REGION: ${S3_REGION:-us-east-1}
+
+  # Shared Qdrant for both generic vector collections and CWICR matching.
+  VECTOR_BACKEND: qdrant
+  QDRANT_URL: ${QDRANT_URL:?Set QDRANT_URL}
+  CWICR_QDRANT_URL: ${QDRANT_URL:?Set QDRANT_URL}
+  MATCH_BACKEND: qdrant
+
+  OE_DATA_DIR: /data
+  SERVE_FRONTEND: "false"
+
+x-backend-service: &backend-service
+  image: ${BACKEND_IMAGE:-openconstructionerp-be-prod:local}
+  # build: *backend-build
+  restart: unless-stopped
+  stop_grace_period: 30s
+  environment: *backend-environment
+  volumes:
+    - ${APP_VOLUME}/data:/data
+
+# ── Base for both Redis instances ───────────────────────────────────────────
+x-redis-base: &redis-base
+  image: redis:7.4-alpine
+  restart: unless-stopped
+  networks:
+    # - network_private_web
+    - network_private_db
+  healthcheck:
+    test: ["CMD-SHELL", 'REDISCLI_AUTH="$$REDIS_PASSWORD" redis-cli ping | grep -q PONG']
+    interval: 10s
+    timeout: 3s
+    retries: 5
+    start_period: 10s
+
+services:
+ # Celery broker and result backend
+  lm-cebe-prod-celery-redis:
+    <<: *redis-base
+    container_name: ${APP_NAME}-celery-redis
+
+    environment:
+      REDIS_PASSWORD: ${REDIS_CELERY_PASSWORD:?set REDIS_CELERY_PASSWORD (use openssl rand -hex 32)}
+
+    command:
+      - sh
+      - -c
+      - >-
+        exec redis-server
+        --requirepass "$$REDIS_PASSWORD"
+        --appendonly yes
+        --appendfsync everysec
+        --save "900 1 300 10 60 10000"
+        --databases 16
+        --maxmemory 512mb
+        --maxmemory-policy noeviction
+        --loglevel warning
+
+    mem_limit: 768m
+    volumes:
+      - ${APP_VOLUME}/redis_celery_data:/data
+    networks:
+      - network_private_db
+
+  lm-cebe-prod-py:
+    <<: *backend-service
+    container_name: ${APP_NAME}-py
+    # depends_on:
+    #   lm-cebe-prod-celery-redis:
+    #     condition: service_healthy
+    expose:
+      - "8000"
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    volumes:
+      - ${APP_VOLUME}/data:/data
+    networks:
+      - network_private_web
+      - network_private_db
+
+  lm-cebe-prod-celery-worker:
+    <<: *backend-service
+    container_name: ${APP_NAME}-celery-worker
+    # depends_on:
+    #   lm-cebe-prod-celery-redis:
+    #     condition: service_healthy
+    command:
+      - celery
+      - -A
+      - app.core.jobs
+      - worker
+      - --loglevel=info
+      - --concurrency=${CELERY_CONCURRENCY:-2}
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - 'celery -A app.core.jobs inspect ping -d "celery@$$HOSTNAME" --timeout 10'
+      interval: 60s
+      timeout: 20s
+      retries: 3
+      start_period: 60s
+    networks:
+      - network_private_db
+
+
+networks:
+  network_private_db:
+    external: true
+    name: ${PRIVATE_DB_NETWORK:-net_private_db}
+  network_private_web:
+    external: true
+    name: ${PRIVATE_WEB_NETWORK:-net_private_web}
