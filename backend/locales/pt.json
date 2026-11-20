@@ -1644,7 +1644,8 @@
         "no_rejections": "Nada foi rejeitado.",
         "sig_delivered_by": "Entregue por",
         "counterparty_tax_id": "NIF",
-        "counterparty_address": "Morada"
+        "counterparty_address": "Morada",
+        "delivery_address": "Endereço de entrega"
       },
       "labels": {
         "po_status": {
@@ -1717,7 +1718,8 @@
         "gross_settled": "Montante bruto liquidado",
         "no_withholding": "Nada foi retido neste pagamento.",
         "counterparty_tax_id": "NIF",
-        "counterparty_address": "Morada"
+        "counterparty_address": "Morada",
+        "supply_date": "Data de fornecimento"
       },
       "labels": {
         "invoice_status": {
@@ -1786,6 +1788,81 @@
         "col_min": "Mín.",
         "col_max": "Máx.",
         "col_count": "Leituras"
+      }
+    },
+    "gantt_pdf": {
+      "strings": {
+        "title": "Cronograma (gráfico de Gantt)",
+        "project": "Projeto",
+        "schedule": "Cronograma",
+        "baseline": "Linha de base",
+        "no_baseline": "nenhuma",
+        "exported": "Exportado",
+        "data_date": "Data de status",
+        "col_wbs": "EAP",
+        "col_activity": "Atividade",
+        "col_start": "Início",
+        "col_finish": "Término",
+        "col_duration": "Dias",
+        "legend_current": "Plano atual",
+        "legend_progress": "Progresso",
+        "legend_critical": "Caminho crítico",
+        "legend_baseline": "Linha de base",
+        "legend_actual": "Real",
+        "legend_milestone": "Marco",
+        "legend_summary": "Resumo",
+        "week_short": "S{n}",
+        "quarter_short": "T{n}",
+        "sheet_of": "Folha {page} de {total}",
+        "no_activities": "Este cronograma ainda não tem atividades."
+      }
+    },
+    "contracts": {
+      "strings": {
+        "doc_title": "Contrato",
+        "col_code": "Código",
+        "col_title": "Título",
+        "col_type": "Tipo de contrato",
+        "col_role": "Parte do contrato",
+        "col_counterparty": "Contraparte",
+        "col_original_value": "Valor original",
+        "col_total_value": "Valor do contrato",
+        "col_retention": "Retenção",
+        "col_start": "Data de início",
+        "col_end": "Data de término",
+        "col_signed": "Assinado em",
+        "line_code": "Código",
+        "line_description": "Descrição",
+        "line_unit": "Unidade",
+        "line_quantity": "Quantidade",
+        "line_unit_rate": "Preço unitário",
+        "lines": "Planilha de valores",
+        "signer_company": "Pela empresa"
+      },
+      "labels": {
+        "status": {
+          "draft": "Rascunho",
+          "active": "Ativo",
+          "suspended": "Suspenso",
+          "completed": "Concluído",
+          "terminated": "Rescindido"
+        },
+        "type": {
+          "lump_sum": "Preço global",
+          "gmp": "GMP",
+          "cost_plus": "Custo mais taxa",
+          "tm": "Tempo e materiais",
+          "unit_price": "Preço unitário",
+          "design_build": "Projeto e construção",
+          "combination": "Combinado",
+          "remeasurement": "Remedição",
+          "framework": "Contrato-quadro",
+          "call_off": "Pedido sob demanda"
+        },
+        "party": {
+          "client": "Contrato com o cliente",
+          "subcontractor": "Subcontrato"
+        }
       }
     }
   },
@@ -2076,7 +2153,11 @@
       "notifications.portal.message_received.title": "Nova mensagem no portal",
       "notifications.portal.message_received.body": "{buyer_name} enviou uma mensagem.",
       "dispatch.notify.plan_title": "Your daily plan is ready",
-      "dispatch.notify.plan_body": "Plan for {day}: {lines} lines."
+      "dispatch.notify.plan_body": "Plan for {day}: {lines} lines.",
+      "notifications.monitoring.alert.title": "Alerta de monitorização",
+      "notifications.monitoring.action.title": "Nível de ação da monitorização",
+      "notifications.monitoring.alarm.title": "Alarme de monitorização",
+      "notifications.monitoring.crossed.body": "Ponto {point}: {displacement} mm, {rate} mm/day."
     },
     "schedule_headers": {
       "headers": {
@@ -2677,5 +2758,30 @@
         "gap": "Défice"
       }
     }
-  }
+  },
+  "monitoring.crossed.fail": "Ponto {id}: deslocamento {d} mm ou taxa {r} mm/dia ultrapassou o nível {level}",
+  "monitoring.crossed.suggestion": "Verifique o ponto e a estrutura e, depois, confirme o alerta com uma nota.",
+  "monitoring.level.ok": "OK",
+  "monitoring.level.alert": "Alerta",
+  "monitoring.level.action": "Ação",
+  "monitoring.level.alarm": "Alarme",
+  "monitoring.risk.title": "Ponto de monitorização {id} no nível {level}",
+  "monitoring.risk.description": "Deslocamento {d} mm, taxa {r} mm/dia face a {profile}. Rascunho aberto pela monitorização: reveja-o e indique um responsável.",
+  "monitoring.report.title": "Relatório de alarme de monitorização",
+  "monitoring.report.project": "Projeto",
+  "monitoring.report.crs": "Sistema de coordenadas",
+  "monitoring.report.profile": "Perfil de limites",
+  "monitoring.report.generated": "Gerado",
+  "monitoring.report.point": "Ponto",
+  "monitoring.report.baseline": "Referência (m)",
+  "monitoring.report.latest": "Última leitura (m)",
+  "monitoring.report.displacement": "Deslocamento (mm)",
+  "monitoring.report.rate": "Taxa (mm/dia)",
+  "monitoring.report.level": "Nível",
+  "monitoring.report.acknowledged": "Confirmado",
+  "monitoring.report.counts": "Alarme: {alarm} · Ação: {action} · Alerta: {alert} · OK: {ok}",
+  "monitoring.report.findings": "Conclusões",
+  "monitoring.report.no_profile": "Sem perfil, defina um",
+  "monitoring.report.ack_yes": "Sim",
+  "monitoring.report.ack_no": "Não"
 }

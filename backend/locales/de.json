@@ -764,7 +764,8 @@
         "no_rejections": "Nichts beanstandet.",
         "sig_delivered_by": "Übergeben von",
         "counterparty_tax_id": "Steuer-Nr. / USt-IdNr.",
-        "counterparty_address": "Anschrift"
+        "counterparty_address": "Anschrift",
+        "delivery_address": "Lieferadresse"
       },
       "labels": {
         "po_status": {
@@ -837,7 +838,8 @@
         "gross_settled": "Abgerechneter Bruttobetrag",
         "no_withholding": "Von dieser Zahlung wurde nichts einbehalten.",
         "counterparty_tax_id": "Steuer-Nr. / USt-IdNr.",
-        "counterparty_address": "Anschrift"
+        "counterparty_address": "Anschrift",
+        "supply_date": "Leistungsdatum"
       },
       "labels": {
         "invoice_status": {
@@ -1626,6 +1628,81 @@
         "col_max": "Höchster",
         "col_count": "Messwerte"
       }
+    },
+    "gantt_pdf": {
+      "strings": {
+        "title": "Terminplan (Balkenplan)",
+        "project": "Projekt",
+        "schedule": "Terminplan",
+        "baseline": "Basisplan",
+        "no_baseline": "keiner",
+        "exported": "Exportiert",
+        "data_date": "Stichtag",
+        "col_wbs": "PSP",
+        "col_activity": "Vorgang",
+        "col_start": "Anfang",
+        "col_finish": "Ende",
+        "col_duration": "Tage",
+        "legend_current": "Aktueller Plan",
+        "legend_progress": "Fortschritt",
+        "legend_critical": "Kritischer Pfad",
+        "legend_baseline": "Basisplan",
+        "legend_actual": "Ist",
+        "legend_milestone": "Meilenstein",
+        "legend_summary": "Sammelvorgang",
+        "week_short": "KW{n}",
+        "quarter_short": "Q{n}",
+        "sheet_of": "Blatt {page} von {total}",
+        "no_activities": "Dieser Terminplan hat noch keine Vorgänge."
+      }
+    },
+    "contracts": {
+      "strings": {
+        "doc_title": "Vertrag",
+        "col_code": "Nummer",
+        "col_title": "Bezeichnung",
+        "col_type": "Vertragsart",
+        "col_role": "Vertragsseite",
+        "col_counterparty": "Vertragspartner",
+        "col_original_value": "Ursprüngliche Summe",
+        "col_total_value": "Vertragssumme",
+        "col_retention": "Sicherheitseinbehalt",
+        "col_start": "Beginn",
+        "col_end": "Ende",
+        "col_signed": "Unterzeichnet am",
+        "line_code": "Pos.",
+        "line_description": "Beschreibung",
+        "line_unit": "Einheit",
+        "line_quantity": "Menge",
+        "line_unit_rate": "Einheitspreis",
+        "lines": "Leistungsverzeichnis",
+        "signer_company": "Für das Unternehmen"
+      },
+      "labels": {
+        "status": {
+          "draft": "Entwurf",
+          "active": "Aktiv",
+          "suspended": "Ruht",
+          "completed": "Abgeschlossen",
+          "terminated": "Gekündigt"
+        },
+        "type": {
+          "lump_sum": "Pauschalvertrag",
+          "gmp": "GMP",
+          "cost_plus": "Selbstkostenerstattung",
+          "tm": "Stundenlohn",
+          "unit_price": "Einheitspreisvertrag",
+          "design_build": "Planen und Bauen",
+          "combination": "Kombination",
+          "remeasurement": "Aufmaßvertrag",
+          "framework": "Rahmenvertrag",
+          "call_off": "Abruf"
+        },
+        "party": {
+          "client": "Auftraggebervertrag",
+          "subcontractor": "Nachunternehmervertrag"
+        }
+      }
     }
   },
   "cost_control": {
@@ -2055,7 +2132,11 @@
       "notifications.portal.message_received.title": "Neue Portalnachricht",
       "notifications.portal.message_received.body": "{buyer_name} hat eine Nachricht gesendet.",
       "dispatch.notify.plan_title": "Your daily plan is ready",
-      "dispatch.notify.plan_body": "Plan for {day}: {lines} lines."
+      "dispatch.notify.plan_body": "Plan for {day}: {lines} lines.",
+      "notifications.monitoring.alert.title": "Überwachungswarnung",
+      "notifications.monitoring.action.title": "Überwachung: Maßnahmenwert",
+      "notifications.monitoring.alarm.title": "Überwachungsalarm",
+      "notifications.monitoring.crossed.body": "Punkt {point}: {displacement} mm, {rate} mm/day."
     },
     "schedule_headers": {
       "headers": {
@@ -2674,5 +2755,30 @@
         "gap": "Deckungslücke"
       }
     }
-  }
+  },
+  "monitoring.crossed.fail": "Punkt {id}: Verschiebung {d} mm oder Geschwindigkeit {r} mm/Tag hat Stufe {level} überschritten",
+  "monitoring.crossed.suggestion": "Prüfen Sie den Punkt und das Bauwerk und bestätigen Sie den Alarm danach mit einer Notiz.",
+  "monitoring.level.ok": "OK",
+  "monitoring.level.alert": "Warnung",
+  "monitoring.level.action": "Eingriff",
+  "monitoring.level.alarm": "Alarm",
+  "monitoring.risk.title": "Überwachungspunkt {id} auf Stufe {level}",
+  "monitoring.risk.description": "Verschiebung {d} mm, Geschwindigkeit {r} mm/Tag gegen {profile}. Entwurf von der Überwachung angelegt: bitte prüfen und einen Verantwortlichen benennen.",
+  "monitoring.report.title": "Alarmbericht Überwachung",
+  "monitoring.report.project": "Projekt",
+  "monitoring.report.crs": "Koordinatensystem",
+  "monitoring.report.profile": "Grenzwertprofil",
+  "monitoring.report.generated": "Erstellt",
+  "monitoring.report.point": "Punkt",
+  "monitoring.report.baseline": "Ausgangswert (m)",
+  "monitoring.report.latest": "Letzter Wert (m)",
+  "monitoring.report.displacement": "Verschiebung (mm)",
+  "monitoring.report.rate": "Geschwindigkeit (mm/Tag)",
+  "monitoring.report.level": "Stufe",
+  "monitoring.report.acknowledged": "Bestätigt",
+  "monitoring.report.counts": "Alarm: {alarm} · Eingriff: {action} · Warnung: {alert} · OK: {ok}",
+  "monitoring.report.findings": "Befunde",
+  "monitoring.report.no_profile": "Kein Profil, bitte festlegen",
+  "monitoring.report.ack_yes": "Ja",
+  "monitoring.report.ack_no": "Nein"
 }

@@ -299,6 +299,10 @@
     "unit_exportable": {
       "fail": "項目 {ordinal}：単位「{unit}」は 4 文字の GAEB QU 欄に収まらず、エクスポート時に切り詰められます",
       "suggestion": "4 文字以内の GAEB 単位コードを使用してください（m、m2、m3、St、h、psch、kg、t）"
+    },
+    "short_text_length": {
+      "fail": "項目 {ordinal}: 短文が {length} 文字あります。GAEB エクスポートでは 70 文字に切り詰められます",
+      "suggestion": "短文を 70 文字以内に短くし、詳細は長文に記載してください"
     }
   },
   "nrm": {
@@ -412,7 +416,10 @@
       "suggestion": "9 桁の GB/T 50500 コードを割り当ててください（例: 010101001）"
     },
     "valid_code": {
-      "fail": "GB/T 50500 コード「{code}」が無効です。9 桁または 12 桁が必要です"
+      "fail": "GB/T 50500 コード「{code}」が無効です。9 桁、12 桁、または 01B001 のような補充コードが必要です"
+    },
+    "code_unique": {
+      "fail": "項目コード「{code}」が同じ単項工事内で複数回使われています"
     }
   },
   "cpwd": {
@@ -931,6 +938,36 @@
     "change_time_within_owner": {
       "fail": "{code} の下請の工期影響は合計 {sub_days} 日で、発注者が認めた {owner_days} 日を超えています",
       "suggestion": "下請業者の工期の請求を確認するか、発注者に同等の延長を依頼してください"
+    },
+    "pay_app_over_complete": {
+      "fail": "明細 {line} は今期で予定額の {percent}% に達します（{scheduled} 中 {completed}）",
+      "suggestion": "今期の金額を下げるか、予定額を超えて請求する理由を記録してください"
+    },
+    "pay_app_line_negative": {
+      "fail": "明細 {line} の累計は {completed} となり、ゼロを下回ります"
+    },
+    "pay_app_within_agreement": {
+      "fail": "出来高請求の合計 {billed} が、契約額と承認済み変更の合計 ({limit}) を超えています"
+    },
+    "pay_app_correct": {
+      "suggestion": "この出来高請求の金額を修正するか、承認済みの変更で契約額を引き上げてください"
+    },
+    "required_documents": {
+      "fail": "必須書類: {document} ({state})",
+      "suggestion": "署名済みで有効な書類を下請契約に添付してください",
+      "states": {
+        "missing": "未提出",
+        "unsigned": "未署名",
+        "expired": "期限切れ"
+      }
+    },
+    "document_roles": {
+      "terms_and_conditions": "契約条件",
+      "safety_agreement": "安全協定",
+      "safety_plan": "安全計画",
+      "insurance": "保険",
+      "method_statement": "施工方法書",
+      "other": "その他の書類"
     }
   },
   "submittal": {
@@ -2014,6 +2051,510 @@
     "crew_without_record": {
       "fail": "現場に {headcount} 人の班がいましたが、作業、検査、遅延の記録がありません。",
       "suggestion": "班の作業内容、または作業を止めた遅延を追加してください。"
+    }
+  },
+  "framework_agreement": {
+    "item_not_in_agreement": {
+      "fail": "行 {code} は契約 {agreement} の有効な項目ではありません。追加工事として登録してください。",
+      "suggestion": "発注書からこの行を削除し、作業を発注書の追加工事として登録してください。"
+    },
+    "rate_deviates": {
+      "fail": "行 {code} の単価 {rate} が契約単価 {expected} と異なります。",
+      "suggestion": "発注の単価は基本契約から取得されます。単価表から行を再計算してください。"
+    },
+    "order_outside_validity": {
+      "fail": "発注日 {date} が契約期間 {from} から {to} の外にあります。",
+      "suggestion": "発注日を期間内にするか、先に契約を延長してください。"
+    },
+    "rate_period_gap": {
+      "fail": "{date} を含む単価期間がありません。",
+      "suggestion": "「単価・スライド」タブで、この日付を含む単価期間を追加してください。"
+    },
+    "escalation_unresolved": {
+      "fail": "指数 {series} の {period} の値がないため、単価を調整できません。",
+      "suggestion": "価格指数にその月の指数値を入力し、発注を再計算してください。"
+    },
+    "cap_exceeded": {
+      "fail": "この発注により契約額が上限 {cap} のうち {total} に達します。残額は {headroom} です。",
+      "suggestion": "発注を残額以内に減らすか、理由を付けた例外承認で発行してください。"
+    },
+    "cap_threshold": {
+      "fail": "契約の利用が上限の {pct} % に達しました。",
+      "suggestion": "次の契約を準備できるよう、早めに発注者へお伝えください。"
+    },
+    "item_max_qty": {
+      "fail": "項目 {code}: これまでの発注数量 {qty} が、定められた上限 {max} を超えています。",
+      "suggestion": "次の発注の前に、追加数量を発注者と合意してください。"
+    },
+    "min_at_risk": {
+      "fail": "残り {days} 日で、保証最低数量の {pct} % が発注済みです。",
+      "suggestion": "発注できるうちに、不足分を発注者と話し合ってください。"
+    },
+    "currency_mismatch": {
+      "fail": "発注の通貨 {cur} が契約通貨 {agr} と異なります。",
+      "suggestion": "発注は契約通貨で単価計算されます。"
+    },
+    "adjustment_unknown": {
+      "fail": "条件 {tag} に対応する調整がこの契約にありません。",
+      "suggestion": "「条件」タブで調整を追加するか、発注から条件を削除してください。"
+    },
+    "direct_claim": {
+      "fail": "請求は契約ではなく個別発注に対して行います。",
+      "suggestion": "作業を行った発注を開き、そこで請求してください。"
+    },
+    "duplicate_item": {
+      "fail": "項目コード {code} が単価期間 {period} で2回登録されています。",
+      "suggestion": "単価表を保存する前に、項目コードごとに1行にしてください。"
+    },
+    "measured_over_ordered": {
+      "fail": "行 {code} の実測 {m} が発注数量 {o} を超えています。追加工事を検討してください。",
+      "suggestion": "追加数量を発注の変更として登録してください。"
+    },
+    "term_over_legal_max": {
+      "fail": "期間 {years} 年が、{source}（パック）に定める {max} 年の上限を超えています。",
+      "suggestion": "期間を発注者と確認してください。上限はパックが示すもので、強制はされません。"
+    }
+  },
+  "estimate_archive": {
+    "arc_hash_mismatch": {
+      "fail": "フィンガープリントが一致しません。記録は {actual}、封印は {sealed} です。記録は改変されたものとして扱ってください。"
+    },
+    "arc_total_mismatch": {
+      "fail": "封印された合計 {seal} は契約額 {award} と {diff} 異なります。"
+    },
+    "arc_no_breakdown": {
+      "fail": "{n} 件の項目に資源内訳がなく、後で単価を追跡できません。"
+    },
+    "arc_no_markups": {
+      "fail": "見積に封印する諸経費がありません。"
+    },
+    "arc_sealed_after_signing": {
+      "fail": "契約署名の {days} 日後に封印されました。"
+    },
+    "arc_no_receipt": {
+      "fail": "相手方がまだフィンガープリントを確認していません。"
+    },
+    "arc_open_not_closed": {
+      "fail": "開封 {id} は議事録なしで {days} 日間開いたままです。"
+    },
+    "arc_open_no_reason": {
+      "fail": "開封には理由と参照が必要です。"
+    },
+    "arc_open_one_party": {
+      "fail": "当事者が一方のみです。もう一方が不在の理由を記録してください。"
+    },
+    "var_basis_no_seal": {
+      "fail": "項目 {code} は当初の基準で価格付けされていますが、封印された見積がありません。"
+    },
+    "var_basis_deviation": {
+      "fail": "項目 {code}: {field} が注記なしで {old} から {new} に変更されました。"
+    },
+    "var_new_resource_no_evidence": {
+      "fail": "新しい資源 {res} に価格日付または見積参照がありません。"
+    },
+    "var_markup_not_sealed": {
+      "fail": "項目 {code} は封印にない諸経費 {m} を適用しています。"
+    },
+    "var_abnormal_carried_rate": {
+      "fail": "繰越コスト {c} は基準値から {pct} % 乖離しています。"
+    },
+    "arc_mutation_refused": {
+      "fail": "封印済み見積は変更も削除もできません。置き換える新しい版を封印してください。"
+    },
+    "contents_locked": "正式な開封が始まるまで内容は封印されたままです。",
+    "market_off": "封印された見積はこのプロジェクトの市場プロファイルに含まれていません。",
+    "contract_required": "見積を契約の基礎として封印するには、発注者との契約が必要です。"
+  },
+  "boq_revision": {
+    "superseded_still_editable": {
+      "fail": "改訂 {label} はまだ編集できますが、その後 {later} が作成されています。ここでの変更は引き継がれません",
+      "suggestion": "{label} をロックするか、最新の改訂で作業を続けてください"
+    }
+  },
+  "schedule_baseline": {
+    "single_approved": {
+      "fail": "この工程表には承認済みの基準計画が複数あります（{baselines}）。",
+      "suggestion": "有効にする基準計画を承認してください。1つを承認すると他の承認は取り消されます。"
+    }
+  },
+  "project_catalogue": {
+    "unit_present": {
+      "fail": "単価 {code} に単位がありません。",
+      "suggestion": "単価の基準となる単位を入力してください(例: m2、m3、h)。"
+    },
+    "duplicate_code": {
+      "fail": "コード {code} はこのプロジェクトで複数の単価に使われています。",
+      "suggestion": "コードごとに単価を1つにするか、別案に独自のコードを付けてください。"
+    },
+    "currency_differs": {
+      "fail": "単価 {code} は {currency} ですが、プロジェクトは {project_currency} で積算されています。",
+      "suggestion": "単価をプロジェクト通貨に換算するか、外貨が意図したものであることを確認してください。"
+    },
+    "override_far": {
+      "fail": "{code} のローカル単価は元単価 {source_rate} から {percent} % 離れています。",
+      "suggestion": "小数点のずれがないか確認するか、このプロジェクトで別の価格が必要な理由を記録してください。"
+    },
+    "source_changed": {
+      "fail": "{code} の元単価は、プロジェクトにコピーした後に {old} から {new} に変わりました。",
+      "suggestion": "新しい元単価を採用するか、意図してローカル単価を維持してください。"
+    }
+  },
+  "schedule_mspdi_import": {
+    "task_dates": {
+      "missing_dates": "タスク {ref}「{name}」に開始日または終了日がありません。",
+      "finish_before_start": "タスク {ref}「{name}」は開始日 ({start}) より前に終了します ({finish})。",
+      "suggestion": "元の工程表で日付を修正し、再度エクスポートしてください。インポート時に日付を推測することはありません。"
+    },
+    "unique_ids": {
+      "duplicate_uid": "タスク ID {ref} が複数回出現します。最初のタスクのみ保持されます。",
+      "suggestion": "元の工程表ですべてのタスクに一意の ID を付けてください。"
+    },
+    "links_resolve": {
+      "dangling_link": "タスク {ref}「{name}」: 先行タスク {predecessor} がファイルにないため、リンクをスキップします。",
+      "duplicate_link": "タスク {ref} \"{name}\": 先行タスク {predecessor} からの 2 本目のリンクはスキップされます。ペアごとに 1 本のリンクを保持します。",
+      "self_link": "タスク {ref}「{name}」は自身にリンクされているため、リンクをスキップします。",
+      "unknown_link_type": "タスク {ref}「{name}」: リンクの種類 {type} は不明のため、終了-開始として読み込みます。",
+      "suggestion": "元の工程表の論理リンクを確認してください。"
+    },
+    "values_in_range": {
+      "percent_out_of_range": "タスク {ref}「{name}」: 達成率 {value}% が 0～100 の範囲外のため、上限で制限します。",
+      "outline_gap": "タスク {ref}「{name}」はアウトラインレベルを飛ばしています ({level})。上にある最も近いサマリータスクの下に配置します。",
+      "suggestion": "元の工程表で達成率とインデントを確認してください。"
+    },
+    "calendar_work_days": {
+      "calendar_no_work_days": "カレンダー {calendar} に稼働日がありません。",
+      "suggestion": "元の工程表でこのカレンダーの稼働日を指定してください。"
+    }
+  },
+  "schedule_pdf_import": {
+    "no_text_layer": {
+      "fail": "PDFにテキストレイヤーがないため、表を読み取れません。",
+      "suggestion": "工程表を MS Project XML、XER または Excel で書き出し、そのファイルをインポートしてください。"
+    },
+    "dates_parsed": {
+      "fail": "{row} 行目: 開始日または終了日が日付ではありません。",
+      "suggestion": "日付列と日/月の順序を確認するか、元データの日付を修正してください。"
+    },
+    "finish_before_start": {
+      "fail": "{row} 行目: 終了日が開始日より前です。",
+      "suggestion": "元の工程表の日付を修正してください。"
+    },
+    "duration_mismatch": {
+      "fail": "{row} 行目: 印刷された期間が開始日から終了日までの稼働日数と一致しません。",
+      "suggestion": "日付はそのまま使います。期間列とプロジェクトカレンダーを確認してください。"
+    },
+    "unique_ids": {
+      "fail": "{row} 行目: 作業IDが他の行と重複しています。",
+      "suggestion": "元の工程表で各作業に一意のIDを付けてください。"
+    },
+    "links_resolve": {
+      "fail": "{row} 行目: 先行作業が表の作業ではありません。",
+      "suggestion": "先行作業列を確認してください。解決できないリンクはスキップされます。"
+    }
+  },
+  "commercial_control": {
+    "ok": "確認済み、問題なし",
+    "cvr": {
+      "target_rate_basis": {
+        "fail": "単価設定済みの {total} 項目のうち {missing} 項目に目標単価がなく、販売単価で予算化されています（例: {sample}）",
+        "suggestion": "予算が現場の目標原価になるよう、これらの項目に目標原価単価を入力してください"
+      },
+      "unmapped_cost": {
+        "fail": "{kind} {label} に WBS もコストコードもありません: 発注済 {committed}、実績 {actual}",
+        "suggestion": "CVR に計上できるよう、発注明細・下請契約・請求書を WBS 要素に紐づけてください"
+      }
+    },
+    "procurement": {
+      "line_over_committed": {
+        "fail": "項目 {ordinal} は予算超過の発注です: {budget_qty} のうち {committed_qty} 発注済、予算 {budget_value} に対し {committed_value}",
+        "suggestion": "さらに発注する前に二重発注を確認するか、変更または予算振替を登録してください"
+      }
+    },
+    "approval_routes": {
+      "bands_contiguous": {
+        "gap": {
+          "fail": "{low} 以上 {high} 未満の金額はどの承認者にも届きません（ステップ {step}）",
+          "suggestion": "隣の範囲を広げるかステップを追加し、すべての金額に承認者がいるようにしてください"
+        },
+        "overlap": {
+          "fail": "ステップ {step} は下位の範囲（{low} 以上 {high} 未満）と重なっており、その金額は両方の承認者が署名します",
+          "suggestion": "両者の署名が必要な場合を除き、各範囲は前の範囲の終わりから始めてください"
+        },
+        "empty": {
+          "fail": "ステップ {step} の範囲 {low}〜{high} にはどの金額も含まれません",
+          "suggestion": "最小値を最大値より小さくするか、上限がない場合は最大値を空欄にしてください"
+        }
+      }
+    },
+    "valuation": {
+      "assessed_within_submitted": {
+        "fail": "明細 {line}: 査定数量 {assessed} が申請数量 {submitted} を超えています",
+        "suggestion": "査定は申請数量までとし、追加工事は変更として登録してください"
+      },
+      "certified_within_assessed": {
+        "fail": "明細 {line}: 認定数量 {certified} が査定数量 {assessed} を超えています",
+        "suggestion": "認定は査定数量までとするか、先に明細を再査定してください"
+      }
+    }
+  },
+  "norm_base": {
+    "code_present": {
+      "fail": "{ordinal} 行目に {base} の基準コードがありません。基準に基づく積算では各行に基準を記載します。",
+      "suggestion": "行の分類 {classification} に基準コードを入力してください。"
+    },
+    "code_shape": {
+      "fail": "{ordinal} 行目の「{code}」は {base} のコードではありません。{example} のようなコードが必要です。"
+    },
+    "legacy_prefix": {
+      "fail": "{ordinal} 行目の「{code}」は廃止された接頭辞 {old} を使っています。現行のコードは {new} です。"
+    },
+    "resource_breakdown": {
+      "fail": "基準行 {code} に労務時間または平均等級がありません。",
+      "suggestion": "単位当たりの時間と基準の平均等級を付けて労務資源を追加してください。"
+    },
+    "grade_range": {
+      "fail": "{ordinal} 行目の等級 {grade} は {min}〜{max} の範囲外か、{step} 刻みではありません。"
+    }
+  },
+  "public_funding": {
+    "markup_cap": {
+      "fail": "{funding}: {markup} は {percent} %、上限は直接費の {cap} % です ({source})。",
+      "suggestion": "上限まで率を下げるか、公的資金で支払われない工事なら資金区分を民間にしてください。"
+    },
+    "investor_exact": {
+      "fail": "{funding} による発注者積算: {markup} はちょうど {cap} % にすべきです ({source})。"
+    },
+    "material_price_evidence": {
+      "fail": "{funding}: {ordinal} 行目の材料 {material} の見積は {required} 件中 {count} 件で、価格分析がありません。",
+      "suggestion": "材料の供給者見積を記録するか、価格分析報告書を添付してください。"
+    }
+  },
+  "vat_rate": {
+    "standard_rate": {
+      "fail": "{markup} は {percent} % です。{country} の付加価値税の標準税率は {rate} % です。",
+      "suggestion": "税の行を標準税率にするか、別の税率や免税が適用される理由を見積に記録してください。"
+    }
+  },
+  "survey": {
+    "no_crs": {
+      "fail": "点群セット {name} に座標参照系がありません。土量や筆の計算の前に EPSG またはローカル座標系を指定してください。",
+      "suggestion": "プロジェクトの座標系を設定し、このファイルがどの座標系で測量されたかを指定してください。"
+    },
+    "crs_unconfirmed": {
+      "fail": "座標系を自動検出しました（信頼度 {confidence}）。使用前に確認してください。",
+      "suggestion": "「プロジェクト座標系の設定」を開き、検出された座標系を確認するか別の座標系を選んでください。"
+    },
+    "duplicate_point": {
+      "fail": "点番号 {point_id} が異なる座標で重複しています。",
+      "suggestion": "測定値を一つ残してください。誤った値を含むセットを削除し、再度インポートしてください。"
+    },
+    "traverse_misclosure": {
+      "fail": "トラバース {name} の閉合比は 1:{r} で、プロファイル最小値 1:{min} を下回っています。",
+      "suggestion": "各辺の過誤を確認し、最も弱い辺を再観測するか、プロファイル値を確認してください。"
+    },
+    "level_misclosure": {
+      "fail": "水準測量の閉合差 {f} mm が k·√km（k = {k} mm）を超えています。",
+      "suggestion": "水準測量をやり直すか、使用した水準点の標高を確認してください。"
+    }
+  },
+  "volumes": {
+    "no_overlap": {
+      "fail": "2 つのサーフェスは面積の {p} % しか重なっていません。体積は意味を持ちません。",
+      "suggestion": "両方のサーフェスが同じ座標系で同じ地面を覆っているか確認してください。"
+    },
+    "low_coverage": {
+      "fail": "両方のサーフェスにデータがあるのは面積の {c} % だけです（最小 {min} %）。",
+      "suggestion": "サーフェスがない場所に測点を追加するか、境界を覆われた範囲に狭めてください。"
+    },
+    "coarse_scan": {
+      "fail": "この体積は理由の記載なしに粗いスキャン（LOA10）から求められています。",
+      "suggestion": "測量精度のスキャンを使うか、このスキャンで十分な理由を記入してください。"
+    },
+    "bank_volume": {
+      "fail": "数量は地山土量です。ほぐし率は適用されていません。",
+      "suggestion": "内訳行がほぐし土量で計測される場合は、ほぐし切土量を送ってください。"
+    }
+  },
+  "setting_out": {
+    "stake_off": {
+      "fail": "杭 {id} のずれ {d} mm、許容差 {t} mm",
+      "suggestion": "点を再度設置して記録するか、NCR 下書きを作成してください。"
+    },
+    "record_untraceable": {
+      "fail": "丁張記録 {id} に機器または基準点がありません。",
+      "suggestion": "使用した機器と器械点を設置した基準点を入力してください。"
+    },
+    "sheet": {
+      "title": "丁張シート",
+      "project": "プロジェクト",
+      "crs": "座標系",
+      "request": "依頼",
+      "tolerance": "許容差",
+      "element": "要素",
+      "generated": "作成日時",
+      "point": "点",
+      "design_e": "設計 E",
+      "design_n": "設計 N",
+      "design_z": "設計 Z",
+      "measured_e": "実測 E",
+      "measured_n": "実測 N",
+      "verdict": "判定",
+      "by": "測定者",
+      "verdict_pass": "合格",
+      "verdict_fail": "不合格",
+      "verdict_open": "未測定",
+      "verdict_no_tolerance": "プロファイルなし",
+      "counts": "合格: {passed} · 不合格: {failed} · 未測定: {open}",
+      "findings": "指摘事項",
+      "no_profile": "プロファイルがありません。設定してください",
+      "d": "d (mm)",
+      "dz": "dZ (mm)"
+    }
+  },
+  "land_parcels": {
+    "area_mismatch": {
+      "fail": "筆 {id}: 計算面積 {a} m2 と登記面積 {l} m2 の差が許容差を超えています ({t})。",
+      "suggestion": "境界点を登記事項証明と照合するか、面積が異なる理由を記録してください。"
+    },
+    "ring_invalid": {
+      "fail": "筆 {id}: 境界が閉じていないか、自己交差しています。",
+      "suggestion": "境界点が交差せずに筆を一周するよう修正してください。"
+    },
+    "zone_not_acquired": {
+      "fail": "作業範囲が未取得の筆 {id} に掛かっています ({area} m2)。",
+      "suggestion": "工事開始前に筆を取得するか立入りを合意する、または作業範囲を移してください。"
+    },
+    "overlap": {
+      "fail": "筆 {a} と {b} が {area} m2 重なっています。",
+      "suggestion": "両方の筆が同じ点を使うよう共通の境界を修正してください。"
+    },
+    "gap": {
+      "fail": "筆 {a} と {b} の間に {gap} m の隙間があります。",
+      "suggestion": "両方の筆で同じ境界点を使うか、その帯が別の筆に属することを確認してください。"
+    },
+    "id_format": {
+      "fail": "地番 {id} は {label} の形式に合いません (例: {example})。",
+      "suggestion": "地番は登記簿の表記どおりに写してください。"
+    },
+    "pdf": {
+      "title": "用地調書",
+      "project": "プロジェクト",
+      "crs": "座標系",
+      "method": "方法",
+      "method_value": "境界座標による面積 (座標法)、小数 {decimals} 桁に丸め、m2",
+      "printed": "印刷者",
+      "legal": "登記面積 (m2)",
+      "computed": "計算面積 (m2)",
+      "diff": "差 (m2)",
+      "status": "状況",
+      "rights": "権利",
+      "cost": "費用",
+      "findings": "指摘",
+      "total": "合計 {count} 筆",
+      "acquired_of": "取得済み {acquired} / {total}",
+      "findings_title": "指摘",
+      "no_findings": "指摘はありません。",
+      "disclaimer": "所有者と権利はこのプロジェクトに記録されたとおりに示しています。本調書は法的意見でも登記事項証明でもありません。",
+      "status_needed": "必要",
+      "status_negotiating": "交渉中",
+      "status_acquired": "取得済み",
+      "status_expropriation": "収用"
+    }
+  },
+  "monitoring": {
+    "crossed": {
+      "fail": "点 {id} の変位 {d} mm または変化速度 {r} mm/day が {level} を超過",
+      "suggestion": "測点と構造物を確認のうえ、メモを添えてアラートを確認してください。"
+    },
+    "level": {
+      "ok": "正常",
+      "alert": "注意値",
+      "action": "管理値",
+      "alarm": "限界値"
+    },
+    "risk": {
+      "title": "計測点 {id}（{level}）",
+      "description": "変位 {d} mm、変化速度 {r} mm/day（{profile} 基準）。監視により下書きが作成されました。内容を確認し、担当者を指定してください。"
+    },
+    "report": {
+      "title": "計測管理 警報レポート",
+      "project": "プロジェクト",
+      "crs": "座標系",
+      "profile": "管理基準プロファイル",
+      "generated": "作成日時",
+      "point": "計測点",
+      "baseline": "基準値 (m)",
+      "latest": "最新値 (m)",
+      "displacement": "変位 (mm)",
+      "rate": "変化速度 (mm/day)",
+      "level": "レベル",
+      "acknowledged": "確認済み",
+      "counts": "限界値: {alarm} · 管理値: {action} · 注意値: {alert} · 正常: {ok}",
+      "findings": "所見",
+      "no_profile": "プロファイル未設定、設定してください",
+      "ack_yes": "はい",
+      "ack_no": "いいえ"
+    }
+  },
+  "stockpiles": {
+    "density_assumed": {
+      "fail": "密度は仮定であり実測ではありません。トン数はその推定と同程度の信頼性です。",
+      "suggestion": "試料を量るか、供給元の納品書から密度を取ってください。"
+    },
+    "variance_high": {
+      "fail": "測量は帳簿在庫と {v} % 異なり、許容値 {t} % を超えています。",
+      "suggestion": "密度と基準サーフェスを確認し、差異が実際のものなら調整を提案して確認してください。"
+    }
+  },
+  "mine_survey": {
+    "compliance_outside": {
+      "fail": "期間の達成率 {c} % が許容帯 {lo}-{hi} % の外です。",
+      "suggestion": "計画と測量を確認し、請求の前に期間メモで差の理由を説明してください。"
+    },
+    "truck_differs": {
+      "fail": "ダンプ台数による重量が測量重量と {v} % 異なり、確認値 {t} % を超えています。",
+      "suggestion": "1台あたりの積載量と密度を確認し、2つの面を再度比較してください。"
+    }
+  },
+  "hongkong": {
+    "sopo_applicability": {
+      "fail": "Cap. 652（支払保証）がこの契約に適用されます：請求から30日以内に支払回答、60日以内に支払い"
+    },
+    "sopo_private_scope_check": {
+      "fail": "民間契約は新築または Building Authority の承認を要する工事の場合のみ Cap. 652 の対象です：範囲を確認してください"
+    },
+    "sopo_response_late": {
+      "fail": "{date} までに支払回答が送達されていません：請求額は争議となり裁定に付すことができます"
+    },
+    "sopo_payment_term_exceeds_60": {
+      "fail": "支払期間 {n} 日は Cap. 652 が認める60日を超えています"
+    },
+    "sopo_response_term_exceeds_30": {
+      "fail": "支払回答期間 {n} 日は Cap. 652 が認める30日を超えています"
+    },
+    "sopo_adjudication_window": {
+      "fail": "支払争議が発生しました：{date} までに裁定通知を送達してください"
+    },
+    "contract_pay_when_paid": {
+      "fail": "pay-when-paid 条項：Cap. 652 は条件付き支払条項を無効とします"
+    },
+    "levy_missing": {
+      "fail": "工事は HK$3,000,000 を超えていますが、CIC 賦課金（0.5%）または CWR 賦課金（0.03%）がありません"
+    },
+    "levy_below_threshold": {
+      "fail": "工事は HK$3,000,000 以下です：CIC・CWR 賦課金は不要です"
+    },
+    "tax_nonzero": {
+      "fail": "VAT または GST の行が計上されていますが、香港にはその税はありません：ゼロにしてください"
+    },
+    "retention_over_limit": {
+      "fail": "保留金 {x} が契約上限 {limit} を超えています"
+    },
+    "pc_sum_no_attendance": {
+      "fail": "プライムコスト金額に利益とアテンダンス項目がありません"
+    },
+    "index_attribution": {
+      "fail": "ArchSD 入札価格指数に出典表示がありません：Architectural Services Department を明記してください"
     }
   }
 }

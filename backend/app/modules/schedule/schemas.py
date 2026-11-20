@@ -311,6 +311,8 @@ class ActivityCreate(BaseModel):
     installed_units: Decimal18_4 | None = Field(default=None, ge=0)
     # Contact responsible for the activity (id in the contacts module).
     assignee_id: UUID | None = None
+    # Or a person named as typed; ignored when ``assignee_id`` is given.
+    assignee_text: str | None = Field(default=None, max_length=255)
     metadata: dict[str, Any] = Field(default_factory=dict)
 
     @field_validator("cost_planned", "cost_actual", "budgeted_units", "installed_units", mode="after")
@@ -417,6 +419,9 @@ class ActivityUpdate(BaseModel):
     installed_units: Decimal18_4 | None = Field(default=None, ge=0)
     # Contact responsible for the activity; an explicit null unassigns it.
     assignee_id: UUID | None = None
+    # Or a person named as typed. Setting one clears the other; a contact id
+    # wins when both are sent, and a blank text clears the typed name.
+    assignee_text: str | None = Field(default=None, max_length=255)
     metadata: dict[str, Any] | None = None
 
     @field_validator("cost_planned", "cost_actual", "budgeted_units", "installed_units", mode="after")
@@ -490,6 +495,8 @@ class ActivityResponse(BaseModel):
     calendar_id: UUID | None = None
     # Contact responsible for the activity. None -> unassigned.
     assignee_id: UUID | None = None
+    # A responsible person named as typed, when not a contact.
+    assignee_text: str | None = None
 
     # ── Cost-loaded / progress-rigor columns ──────────────────────────────
     # ``cost_planned`` is the activity's share of BAC, so a client that cannot
@@ -714,8 +721,10 @@ class GanttActivity(BaseModel):
     # Contact responsible for the activity, read by the table's assignee cell.
     assignee_id: UUID | None = None
     # That contact's display name, resolved on the server so every project
-    # member sees it, not only the one whose contact list holds it.
+    # member sees it, not only the one whose contact list holds it; for a
+    # person named as typed, that text.
     assignee_name: str | None = None
+    assignee_text: str | None = None
     # Shown to the client in the portal's upcoming milestones.
     client_visible: bool = False
     # Scheduling constraint, so the table and the bar's detail panel can show
@@ -1014,6 +1023,66 @@ class ImportResult(BaseModel):
     source_document_id: str | None = Field(
         default=None, description="The stored original file in the project's documents"
     )
+    baseline_id: str | None = Field(
+        default=None, description="Unapproved baseline created from the file's baseline 0 (MS Project XML only)"
+    )
+
+
+class MspdiIssueOut(BaseModel):
+    """One finding of the ``schedule_mspdi_import`` rules."""
+
+    rule_id: str
+    code: str
+    severity: str
+    ref: str = ""
+    message: str
+
+
+class MspdiPreviewTask(BaseModel):
+    """One task of an MS Project XML file as it would be imported."""
+
+    uid: str
+    name: str
+    wbs: str = ""
+    outline_level: int = 1
+    parent_uid: str | None = None
+    start: str | None = None
+    finish: str | None = None
+    duration_days: int | None = None
+    percent_complete: float = 0.0
+    activity_type: str = "task"
+    baseline_start: str | None = None
+    baseline_finish: str | None = None
+    predecessor_count: int = 0
+
+
+class MspdiPreviewCalendar(BaseModel):
+    uid: str
+    name: str
+    work_days: list[int] = Field(default_factory=list)
+    holiday_count: int = 0
+
+
+class MspdiPreviewResponse(BaseModel):
+    """What an MS Project XML file would import, and whether it may be applied."""
+
+    filename: str = ""
+    name: str = ""
+    minutes_per_day: int = 480
+    task_count: int = 0
+    summary_count: int = 0
+    milestone_count: int = 0
+    link_count: int = 0
+    calendar_count: int = 0
+    baseline_task_count: int = 0
+    start: str | None = None
+    finish: str | None = None
+    error_count: int = 0
+    warning_count: int = 0
+    can_apply: bool = False
+    issues: list[MspdiIssueOut] = Field(default_factory=list)
+    calendars: list[MspdiPreviewCalendar] = Field(default_factory=list)
+    tasks: list[MspdiPreviewTask] = Field(default_factory=list)
 
 
 # ── Schedule Relationship schemas (Phase 13) ──────────────────────────────
@@ -1127,6 +1196,38 @@ class BaselineUpdate(BaseModel):
     model_config = ConfigDict(str_strip_whitespace=True)
 
     is_active: bool | None = None
+
+
+class BaselineCaptureRequest(BaseModel):
+    """Capture the live schedule as the next programme baseline (B0, B1, ...).
+
+    The server builds the snapshot itself, so the stored plan is exactly what
+    the schedule held at that moment. ``approve`` publishes it at once as the
+    schedule's one approved baseline; otherwise it is a saved version that can
+    be reviewed with the diff and approved later.
+    """
+
+    model_config = ConfigDict(str_strip_whitespace=True)
+
+    name: str | None = Field(default=None, max_length=255, description="Defaults to the next B<n> label")
+    approve: bool = False
+    note: str | None = Field(default=None, max_length=1000)
+
+
+class RevisionImpactResponse(BaseModel):
+    """Revised activities between a baseline and the live plan (or a later baseline), with BOQ and variations.
+
+    Each activity row carries before/after dates, finish movement, duration and
+    planned-cost deltas, the linked BOQ positions and the variation requests on
+    them. Money values are decimal strings.
+    """
+
+    schedule_id: UUID
+    base_baseline_id: UUID
+    base_label: str
+    target_label: str
+    activities: list[dict[str, Any]] = Field(default_factory=list)
+    summary: dict[str, Any] = Field(default_factory=dict)
 
 
 class BaselineResponse(BaseModel):

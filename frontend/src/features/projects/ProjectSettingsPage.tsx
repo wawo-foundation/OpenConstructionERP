@@ -43,6 +43,8 @@ import { MethodologyActiveCard } from '../methodology/MethodologyActiveCard';
 import { ProjectSubdivisionCard } from './ProjectSubdivisionCard';
 import { ProjectFolderLinkCard } from './ProjectFolderLinkCard';
 import { ProjectComponentTaxCard } from './ProjectComponentTaxCard';
+import { NormPricingCard } from '../norm-pricing/NormPricingCard';
+import { ProjectCompanyCard } from '../legal-entities/ProjectCompanyCard';
 import { ruleSetLabel } from '../validation/ruleSetLabels';
 import {
   listComplianceRulePacks,
@@ -901,6 +903,9 @@ export function ProjectSettingsPage() {
         editProjectId={project.id}
       />
 
+      {/* Company and site; renders only once the group has two companies. */}
+      <ProjectCompanyCard projectId={project.id} canEdit />
+
       {/* ── Client: public buyer or private (retention law follows it) ─── */}
       <Card padding="lg">
         <div className="max-w-md">
@@ -1204,6 +1209,9 @@ export function ProjectSettingsPage() {
 
       {/* ── Optional input tax on assembly components ──────────────────── */}
       <ProjectComponentTaxCard project={project} />
+
+      {/* ── Norm-based pricing, only where the country pack supplies it ── */}
+      <NormPricingCard projectId={project.id} />
 
       {/* ── Estimating methodology (active switcher) ────────────────────── */}
       {/* The id="methodology" anchor is the deep-link target from the

@@ -299,6 +299,10 @@
     "unit_exportable": {
       "fail": "항목 {ordinal}: 단위 '{unit}'이(가) 4자 GAEB QU 필드에 맞지 않아 내보낼 때 잘립니다",
       "suggestion": "4자 이하의 GAEB 단위 코드를 사용하세요 (m, m2, m3, St, h, psch, kg, t)"
+    },
+    "short_text_length": {
+      "fail": "항목 {ordinal}: 짧은 텍스트가 {length}자입니다. GAEB 내보내기에서 70자로 잘립니다",
+      "suggestion": "짧은 텍스트를 70자 이내로 줄이고 세부 내용은 긴 텍스트에 두십시오"
     }
   },
   "nrm": {
@@ -412,7 +416,10 @@
       "suggestion": "9자리 GB/T 50500 코드를 지정하세요(예: 010101001)"
     },
     "valid_code": {
-      "fail": "GB/T 50500 코드 '{code}'가 유효하지 않습니다. 9자리 또는 12자리여야 합니다"
+      "fail": "GB/T 50500 코드 '{code}'가 유효하지 않습니다. 9자리, 12자리 또는 01B001 같은 보충 코드여야 합니다"
+    },
+    "code_unique": {
+      "fail": "항목 코드 '{code}'가 같은 하위 공사에서 두 번 이상 사용되었습니다"
     }
   },
   "cpwd": {
@@ -931,6 +938,36 @@
     "change_time_within_owner": {
       "fail": "{code}의 하도급 공기 영향은 총 {sub_days}일로, 발주자가 인정한 {owner_days}일보다 많습니다",
       "suggestion": "하도급업체의 공기 청구를 확인하거나 발주자에게 동일한 연장을 요청하십시오"
+    },
+    "pay_app_over_complete": {
+      "fail": "{line} 항목은 이번 기간 이후 예정 금액의 {percent}%에 도달합니다 ({scheduled} 중 {completed})",
+      "suggestion": "이번 기간 금액을 낮추거나 예정 금액을 초과해 청구하는 사유를 기록하세요"
+    },
+    "pay_app_line_negative": {
+      "fail": "{line} 항목의 누계는 {completed}이(가) 되어 0보다 작습니다"
+    },
+    "pay_app_within_agreement": {
+      "fail": "기성 청구 합계 {billed}이(가) 계약 금액과 승인된 변경의 합({limit})을 초과합니다"
+    },
+    "pay_app_correct": {
+      "suggestion": "이 기성 청구의 금액을 수정하거나 승인된 변경으로 계약 금액을 늘리세요"
+    },
+    "required_documents": {
+      "fail": "필수 문서: {document} ({state})",
+      "suggestion": "서명되고 유효한 문서를 하도급 계약에 첨부하세요",
+      "states": {
+        "missing": "없음",
+        "unsigned": "서명되지 않음",
+        "expired": "만료됨"
+      }
+    },
+    "document_roles": {
+      "terms_and_conditions": "계약 조건",
+      "safety_agreement": "안전 협약",
+      "safety_plan": "안전 계획",
+      "insurance": "보험",
+      "method_statement": "시공 방법서",
+      "other": "기타 문서"
     }
   },
   "submittal": {
@@ -2014,6 +2051,510 @@
     "crew_without_record": {
       "fail": "현장에 {headcount}명의 작업반이 있었지만 작업, 검사, 지연이 기록되지 않았습니다.",
       "suggestion": "작업반이 한 일 또는 작업을 멈춘 지연을 추가하세요."
+    }
+  },
+  "framework_agreement": {
+    "item_not_in_agreement": {
+      "fail": "항목 {code}는 계약 {agreement}의 활성 항목이 아닙니다. 추가 공사로 등록하세요.",
+      "suggestion": "발주서에서 해당 행을 삭제하고, 작업을 발주서의 추가 공사로 등록하세요."
+    },
+    "rate_deviates": {
+      "fail": "항목 {code}의 단가 {rate}가 계약 단가 {expected}와 다릅니다.",
+      "suggestion": "발주 단가는 기본계약에서 가져옵니다. 단가표에서 해당 행의 단가를 다시 산정하세요."
+    },
+    "order_outside_validity": {
+      "fail": "발주일 {date}이(가) 계약 기간 {from}~{to}을(를) 벗어났습니다.",
+      "suggestion": "발주일을 계약 기간 안으로 맞추거나, 먼저 계약을 연장하세요."
+    },
+    "rate_period_gap": {
+      "fail": "{date}을(를) 포함하는 단가 기간이 없습니다.",
+      "suggestion": "단가·물가연동 탭에서 이 날짜를 포함하는 단가 기간을 추가하세요."
+    },
+    "escalation_unresolved": {
+      "fail": "지수 {series}에 {period} 값이 없어 단가를 조정할 수 없습니다.",
+      "suggestion": "물가지수에 해당 월의 지수 값을 입력한 뒤 발주를 다시 산정하세요."
+    },
+    "cap_exceeded": {
+      "fail": "이 발주로 계약 누계가 상한 {cap}의 {total}에 이릅니다. 잔여 한도는 {headroom}입니다.",
+      "suggestion": "발주를 잔여 한도 이내로 줄이거나, 사유를 밝힌 예외 승인으로 발행하세요."
+    },
+    "cap_threshold": {
+      "fail": "계약 사용액이 상한의 {pct} %에 도달했습니다.",
+      "suggestion": "후속 계약을 준비할 수 있도록 발주처에 미리 알리세요."
+    },
+    "item_max_qty": {
+      "fail": "항목 {code}: 현재까지 {qty}을(를) 발주했으며, 명시된 최대 수량 {max}을(를) 넘었습니다.",
+      "suggestion": "다음 발주 전에 추가 수량을 발주처와 합의하세요."
+    },
+    "min_at_risk": {
+      "fail": "남은 기간 {days}일, 보장 최소 물량의 {pct} %가 발주되었습니다.",
+      "suggestion": "발주가 가능한 동안 부족분을 발주처와 협의하세요."
+    },
+    "currency_mismatch": {
+      "fail": "발주 통화 {cur}이(가) 계약 통화 {agr}과(와) 다릅니다.",
+      "suggestion": "발주는 계약 통화로 단가가 산정됩니다."
+    },
+    "adjustment_unknown": {
+      "fail": "조건 {tag}에 대한 조정이 이 계약에 없습니다.",
+      "suggestion": "조건 탭에 조정을 추가하거나, 발주에서 해당 조건을 삭제하세요."
+    },
+    "direct_claim": {
+      "fail": "청구는 기본계약이 아니라 개별 발주에서 합니다.",
+      "suggestion": "작업이 수행된 발주를 열고 그곳에서 청구하세요."
+    },
+    "duplicate_item": {
+      "fail": "항목 코드 {code}이(가) 단가 기간 {period}에 두 번 나타납니다.",
+      "suggestion": "단가표를 저장하기 전에 항목 코드마다 한 행만 남기세요."
+    },
+    "measured_over_ordered": {
+      "fail": "라인 {code}의 실측 {m}이(가) 발주 {o}을(를) 초과합니다. 추가 공사를 검토하세요.",
+      "suggestion": "추가 수량은 발주 변경으로 등록하세요."
+    },
+    "term_over_legal_max": {
+      "fail": "계약 기간 {years}년이 {source}(패키지)의 {max}년 한도를 넘습니다.",
+      "suggestion": "계약 기간을 발주처와 확인하세요. 한도는 패키지가 안내하는 값이며 강제되지 않습니다."
+    }
+  },
+  "estimate_archive": {
+    "arc_hash_mismatch": {
+      "fail": "지문이 일치하지 않습니다: 기록은 {actual}, 봉인은 {sealed}입니다. 기록이 변경된 것으로 간주하십시오."
+    },
+    "arc_total_mismatch": {
+      "fail": "봉인된 합계 {seal}이(가) 계약 금액 {award}과(와) {diff} 차이 납니다."
+    },
+    "arc_no_breakdown": {
+      "fail": "{n}개 항목에 자원 내역이 없어 나중에 단가를 추적할 수 없습니다."
+    },
+    "arc_no_markups": {
+      "fail": "견적에 봉인할 할증이 없습니다."
+    },
+    "arc_sealed_after_signing": {
+      "fail": "계약 서명 {days}일 후에 봉인되었습니다."
+    },
+    "arc_no_receipt": {
+      "fail": "상대방이 아직 지문을 확인하지 않았습니다."
+    },
+    "arc_open_not_closed": {
+      "fail": "개봉 {id}이(가) 회의록 없이 {days}일째 열려 있습니다."
+    },
+    "arc_open_no_reason": {
+      "fail": "개봉에는 사유와 참조가 필요합니다."
+    },
+    "arc_open_one_party": {
+      "fail": "한쪽 당사자만 있습니다. 다른 쪽이 없는 이유를 기록하십시오."
+    },
+    "var_basis_no_seal": {
+      "fail": "항목 {code}은(는) 원래 기준으로 산정되었지만 봉인된 견적이 없습니다."
+    },
+    "var_basis_deviation": {
+      "fail": "항목 {code}: {field}이(가) 메모 없이 {old}에서 {new}(으)로 변경되었습니다."
+    },
+    "var_new_resource_no_evidence": {
+      "fail": "새 자원 {res}에 가격 일자나 견적 참조가 없습니다."
+    },
+    "var_markup_not_sealed": {
+      "fail": "항목 {code}이(가) 봉인에 없는 할증 {m}을(를) 적용합니다."
+    },
+    "var_abnormal_carried_rate": {
+      "fail": "이월 비용 {c}이(가) 기준에서 {pct} % 벗어납니다."
+    },
+    "arc_mutation_refused": {
+      "fail": "봉인된 견적은 변경하거나 삭제할 수 없습니다. 이를 대체하는 새 버전을 봉인하십시오."
+    },
+    "contents_locked": "공식 개봉이 시작될 때까지 내용은 봉인 상태로 유지됩니다.",
+    "market_off": "봉인 견적은 이 프로젝트의 시장 프로필에 포함되지 않습니다.",
+    "contract_required": "견적을 계약 기준으로 봉인하려면 고객 계약이 필요합니다."
+  },
+  "boq_revision": {
+    "superseded_still_editable": {
+      "fail": "{label} 개정은 아직 편집할 수 있지만 이후 {later}이(가) 생성되었습니다. 여기서의 변경은 반영되지 않습니다",
+      "suggestion": "{label}을(를) 잠그거나 최신 개정에서 계속 작업하세요"
+    }
+  },
+  "schedule_baseline": {
+    "single_approved": {
+      "fail": "이 공정표에는 승인된 기준 계획이 둘 이상 있습니다({baselines}).",
+      "suggestion": "적용할 기준 계획을 승인하세요. 하나를 승인하면 나머지의 승인이 철회됩니다."
+    }
+  },
+  "project_catalogue": {
+    "unit_present": {
+      "fail": "단가 {code}에 단위가 없습니다.",
+      "suggestion": "단가의 기준 단위를 입력하세요. 예: m2, m3, h."
+    },
+    "duplicate_code": {
+      "fail": "코드 {code}가 이 프로젝트에서 둘 이상의 단가에 사용되고 있습니다.",
+      "suggestion": "코드당 단가를 하나만 두거나 변형 항목에 별도 코드를 지정하세요."
+    },
+    "currency_differs": {
+      "fail": "단가 {code}는 {currency} 기준이지만 프로젝트는 {project_currency}로 산정됩니다.",
+      "suggestion": "단가를 프로젝트 통화로 환산하거나 외화 사용이 의도된 것인지 확인하세요."
+    },
+    "override_far": {
+      "fail": "{code}의 로컬 단가가 원본 단가 {source_rate}와 {percent} % 차이가 납니다.",
+      "suggestion": "소수점이 잘못 찍혔는지 확인하거나 이 프로젝트에 다른 가격이 필요한 이유를 기록하세요."
+    },
+    "source_changed": {
+      "fail": "{code}의 원본 단가가 프로젝트에 복사된 후 {old}에서 {new}로 바뀌었습니다.",
+      "suggestion": "새 원본 단가를 적용하거나 로컬 단가를 의도적으로 유지하세요."
+    }
+  },
+  "schedule_mspdi_import": {
+    "task_dates": {
+      "missing_dates": "작업 {ref} \"{name}\"에 시작일 또는 종료일이 없습니다.",
+      "finish_before_start": "작업 {ref} \"{name}\"이(가) 시작일({start})보다 먼저 종료됩니다({finish}).",
+      "suggestion": "원본 공정표에서 날짜를 수정한 뒤 다시 내보내세요. 가져오기에서 날짜를 추측하지 않습니다."
+    },
+    "unique_ids": {
+      "duplicate_uid": "작업 ID {ref}이(가) 두 번 이상 나옵니다. 첫 번째 작업만 유지됩니다.",
+      "suggestion": "원본 공정표에서 모든 작업에 고유 ID를 부여하세요."
+    },
+    "links_resolve": {
+      "dangling_link": "작업 {ref} \"{name}\": 선행 작업 {predecessor}이(가) 파일에 없어 연결을 건너뜁니다.",
+      "duplicate_link": "작업 {ref} \"{name}\": 선행 작업 {predecessor}의 두 번째 연결은 건너뜁니다. 쌍마다 연결 하나만 유지합니다.",
+      "self_link": "작업 {ref} \"{name}\"이(가) 자기 자신과 연결되어 있어 연결을 건너뜁니다.",
+      "unknown_link_type": "작업 {ref} \"{name}\": 연결 유형 {type}을(를) 알 수 없어 완료-시작으로 읽습니다.",
+      "suggestion": "원본 공정표의 논리 연결을 확인하세요."
+    },
+    "values_in_range": {
+      "percent_out_of_range": "작업 {ref} \"{name}\": 진행률 {value}%가 0-100 범위를 벗어나 제한됩니다.",
+      "outline_gap": "작업 {ref} \"{name}\"이(가) 개요 수준을 건너뜁니다({level}). 위쪽의 가장 가까운 요약 작업 아래에 배치됩니다.",
+      "suggestion": "원본 공정표에서 진행률과 들여쓰기를 확인하세요."
+    },
+    "calendar_work_days": {
+      "calendar_no_work_days": "달력 {calendar}에 근무일이 없습니다.",
+      "suggestion": "원본 공정표에서 이 달력의 근무일을 지정하세요."
+    }
+  },
+  "schedule_pdf_import": {
+    "no_text_layer": {
+      "fail": "PDF에 텍스트 레이어가 없어 표를 읽을 수 없습니다.",
+      "suggestion": "일정을 MS Project XML, XER 또는 Excel로 내보낸 뒤 그 파일을 가져오세요."
+    },
+    "dates_parsed": {
+      "fail": "{row}행: 시작일 또는 종료일이 날짜가 아닙니다.",
+      "suggestion": "날짜 열과 일/월 순서를 확인하거나 원본의 날짜를 수정하세요."
+    },
+    "finish_before_start": {
+      "fail": "{row}행: 종료일이 시작일보다 앞섭니다.",
+      "suggestion": "원본 공정표의 날짜를 수정하세요."
+    },
+    "duration_mismatch": {
+      "fail": "{row}행: 인쇄된 기간이 시작일과 종료일 사이의 작업일 수와 다릅니다.",
+      "suggestion": "날짜는 유지됩니다. 기간 열과 프로젝트 달력을 확인하세요."
+    },
+    "unique_ids": {
+      "fail": "{row}행: 작업 ID가 다른 행에서 사용 중입니다.",
+      "suggestion": "원본 공정표에서 모든 작업에 고유 ID를 지정하세요."
+    },
+    "links_resolve": {
+      "fail": "{row}행: 선행 작업이 표에 있는 작업이 아닙니다.",
+      "suggestion": "선행 작업 열을 확인하세요. 확인되지 않는 연결은 건너뜁니다."
+    }
+  },
+  "commercial_control": {
+    "ok": "확인 완료, 문제 없음",
+    "cvr": {
+      "target_rate_basis": {
+        "fail": "단가가 있는 {total}개 항목 중 {missing}개에 목표 단가가 없어 판매 단가로 예산이 잡혔습니다 (예: {sample})",
+        "suggestion": "예산이 현장이 지켜야 할 원가가 되도록 이 항목들에 목표 원가 단가를 입력하세요"
+      },
+      "unmapped_cost": {
+        "fail": "{kind} {label}에 WBS나 원가 코드가 없습니다: 약정 {committed}, 실적 {actual}",
+        "suggestion": "CVR이 배치할 수 있도록 발주 행, 하도급 또는 송장을 WBS 요소에 연결하세요"
+      }
+    },
+    "procurement": {
+      "line_over_committed": {
+        "fail": "항목 {ordinal}이(가) 초과 약정되었습니다: {budget_qty} 중 {committed_qty} 발주, 예산 {budget_value} 대비 {committed_value}",
+        "suggestion": "추가 약정 전에 중복 발주를 확인하거나 변경 또는 예산 전용을 등록하세요"
+      }
+    },
+    "approval_routes": {
+      "bands_contiguous": {
+        "gap": {
+          "fail": "{low} 이상 {high} 미만 금액은 어떤 승인자에게도 가지 않습니다 (단계 {step})",
+          "suggestion": "인접 구간을 넓히거나 단계를 추가하여 모든 금액에 승인자가 있게 하세요"
+        },
+        "overlap": {
+          "fail": "단계 {step}이(가) 하위 구간 {low} 이상 {high} 미만과 겹쳐 두 승인자가 모두 해당 금액에 서명합니다",
+          "suggestion": "둘 다 서명해야 하는 경우가 아니라면 각 구간은 이전 구간이 끝나는 곳에서 시작하세요"
+        },
+        "empty": {
+          "fail": "단계 {step}의 구간 {low}~{high}에는 어떤 금액도 포함되지 않습니다",
+          "suggestion": "최소값을 최대값보다 작게 하거나 상한이 없으면 최대값을 비워 두세요"
+        }
+      }
+    },
+    "valuation": {
+      "assessed_within_submitted": {
+        "fail": "행 {line}: 사정 수량 {assessed}이(가) 청구 수량 {submitted}보다 큽니다",
+        "suggestion": "청구한 수량까지만 사정하고 추가 작업은 변경으로 등록하세요"
+      },
+      "certified_within_assessed": {
+        "fail": "행 {line}: 확인 수량 {certified}이(가) 사정 수량 {assessed}보다 큽니다",
+        "suggestion": "사정한 수량까지만 확인하거나 먼저 행을 다시 사정하세요"
+      }
+    }
+  },
+  "norm_base": {
+    "code_present": {
+      "fail": "{ordinal}행에 {base} 기준 코드가 없습니다. 기준에 따른 적산은 모든 행에 기준을 기재합니다.",
+      "suggestion": "행의 {classification} 분류에 기준 코드를 입력하세요."
+    },
+    "code_shape": {
+      "fail": "{ordinal}행의 \"{code}\"는 {base} 코드가 아닙니다. {example} 같은 코드가 필요합니다."
+    },
+    "legacy_prefix": {
+      "fail": "{ordinal}행의 \"{code}\"는 폐지된 접두어 {old}를 사용합니다. 현행 코드는 {new}입니다."
+    },
+    "resource_breakdown": {
+      "fail": "기준 행 {code}에 노무 시간 또는 평균 등급이 없습니다.",
+      "suggestion": "단위당 시간과 기준의 평균 등급을 포함한 노무 자원을 추가하세요."
+    },
+    "grade_range": {
+      "fail": "{ordinal}행의 등급 {grade}는 {min}~{max} 범위를 벗어나거나 {step} 단위가 아닙니다."
+    }
+  },
+  "public_funding": {
+    "markup_cap": {
+      "fail": "{funding}: {markup}는 {percent} %이며, 상한은 직접비의 {cap} %입니다 ({source}).",
+      "suggestion": "요율을 상한까지 낮추거나, 공공 자금으로 지급되지 않는 공사라면 자금 구분을 민간으로 설정하세요."
+    },
+    "investor_exact": {
+      "fail": "{funding} 발주자 적산: {markup}는 정확히 {cap} %여야 합니다 ({source})."
+    },
+    "material_price_evidence": {
+      "fail": "{funding}: {ordinal}행의 자재 {material}는 견적 {required}건 중 {count}건이며 가격 분석이 없습니다.",
+      "suggestion": "자재의 공급업체 견적을 기록하거나 가격 분석 보고서를 첨부하세요."
+    }
+  },
+  "vat_rate": {
+    "standard_rate": {
+      "fail": "{markup}이(가) {percent} %입니다. {country}의 표준 부가가치세율은 {rate} %입니다.",
+      "suggestion": "세금 행을 표준 세율로 설정하거나, 다른 세율이나 면세가 적용되는 이유를 견적에 기록하십시오."
+    }
+  },
+  "survey": {
+    "no_crs": {
+      "fail": "점 세트 {name}에 좌표계가 없습니다. 토량이나 필지 계산 전에 EPSG 또는 로컬 좌표계를 지정하세요.",
+      "suggestion": "프로젝트 좌표계를 설정한 다음 이 파일이 어떤 좌표계로 측량되었는지 지정하세요."
+    },
+    "crs_unconfirmed": {
+      "fail": "좌표계가 자동으로 감지되었습니다(신뢰도 {confidence}). 사용 전에 확인하세요.",
+      "suggestion": "프로젝트 좌표계 설정을 열어 감지된 좌표계를 확인하거나 다른 좌표계를 선택하세요."
+    },
+    "duplicate_point": {
+      "fail": "점 번호 {point_id}이(가) 서로 다른 좌표로 중복되었습니다.",
+      "suggestion": "측정값 하나만 남기세요. 잘못된 값이 있는 세트를 삭제하고 다시 가져오세요."
+    },
+    "traverse_misclosure": {
+      "fail": "트래버스 {name}의 폐합비는 1:{r}로 프로필 최소값 1:{min}보다 낮습니다.",
+      "suggestion": "각 변의 과대오차를 확인하고, 가장 약한 변을 재관측하거나 프로필 값을 확인하세요."
+    },
+    "level_misclosure": {
+      "fail": "수준측량 폐합차 {f} mm가 k·√km(k = {k} mm)를 초과합니다.",
+      "suggestion": "수준측량을 다시 하거나 사용한 수준점 표고를 확인하세요."
+    }
+  },
+  "volumes": {
+    "no_overlap": {
+      "fail": "두 표면은 면적의 {p} %에서만 겹칩니다: 체적은 의미가 없습니다.",
+      "suggestion": "두 표면이 같은 좌표계에 있고 같은 지면을 덮는지 확인하세요."
+    },
+    "low_coverage": {
+      "fail": "면적의 {c} %에만 두 표면 모두 데이터가 있습니다(최소 {min} %).",
+      "suggestion": "표면이 없는 곳에 측점을 추가하거나 경계를 덮인 영역으로 줄이세요."
+    },
+    "coarse_scan": {
+      "fail": "이 체적은 사유 없이 거친 스캔(LOA10)에서 계산되었습니다.",
+      "suggestion": "측량 등급 스캔을 사용하거나 이 스캔으로 충분한 이유를 적으세요."
+    },
+    "bank_volume": {
+      "fail": "수량은 자연상태 체적(지반 내)이며 팽창계수는 적용되지 않았습니다.",
+      "suggestion": "내역 항목이 흐트러진 상태로 계량되면 흐트러진 절토량을 보내세요."
+    }
+  },
+  "setting_out": {
+    "stake_off": {
+      "fail": "측설점 {id} 편차 {d} mm, 허용오차 {t} mm",
+      "suggestion": "점을 다시 측설하고 기록하거나 NCR 초안을 만드세요."
+    },
+    "record_untraceable": {
+      "fail": "측설 기록 {id}에 장비나 기준점이 없습니다.",
+      "suggestion": "장비와 기계점을 설치한 기준점을 입력하세요."
+    },
+    "sheet": {
+      "title": "측설 시트",
+      "project": "프로젝트",
+      "crs": "좌표계",
+      "request": "요청",
+      "tolerance": "허용오차",
+      "element": "부재",
+      "generated": "생성",
+      "point": "점",
+      "design_e": "설계 E",
+      "design_n": "설계 N",
+      "design_z": "설계 Z",
+      "measured_e": "측정 E",
+      "measured_n": "측정 N",
+      "verdict": "판정",
+      "by": "측정자",
+      "verdict_pass": "합격",
+      "verdict_fail": "불합격",
+      "verdict_open": "미측정",
+      "verdict_no_tolerance": "프로필 없음",
+      "counts": "합격: {passed} · 불합격: {failed} · 미측정: {open}",
+      "findings": "지적 사항",
+      "no_profile": "프로필이 없습니다. 설정하세요",
+      "d": "d (mm)",
+      "dz": "dZ (mm)"
+    }
+  },
+  "land_parcels": {
+    "area_mismatch": {
+      "fail": "필지 {id}: 계산 면적 {a} m2가 대장 면적 {l} m2와 허용 오차보다 크게 다릅니다 ({t}).",
+      "suggestion": "경계점을 등록부 등본과 대조하거나 면적이 다른 이유를 기록하세요."
+    },
+    "ring_invalid": {
+      "fail": "필지 {id}: 경계가 닫히지 않았거나 스스로 교차합니다.",
+      "suggestion": "경계점이 교차 없이 필지를 한 바퀴 돌도록 고치세요."
+    },
+    "zone_not_acquired": {
+      "fail": "작업 구역이 아직 취득하지 않은 필지 {id}에 걸칩니다 ({area} m2).",
+      "suggestion": "공사 전에 필지를 취득하거나 출입을 합의하거나, 작업 구역을 옮기세요."
+    },
+    "overlap": {
+      "fail": "필지 {a}와 {b}가 {area} m2 겹칩니다.",
+      "suggestion": "두 필지가 같은 점을 쓰도록 공통 경계를 고치세요."
+    },
+    "gap": {
+      "fail": "필지 {a}와 {b} 사이에 {gap} m 틈이 있습니다.",
+      "suggestion": "두 필지가 같은 경계점을 쓰게 하거나 그 띠가 다른 필지에 속함을 확인하세요."
+    },
+    "id_format": {
+      "fail": "지번 {id}이(가) {label} 형식과 맞지 않습니다 (예: {example}).",
+      "suggestion": "지번을 등록부에 적힌 그대로 옮기세요."
+    },
+    "pdf": {
+      "title": "필지 조서",
+      "project": "프로젝트",
+      "crs": "좌표계",
+      "method": "방법",
+      "method_value": "경계 좌표로 면적 계산 (좌표법), 소수 {decimals}자리 반올림, m2",
+      "printed": "인쇄자",
+      "legal": "대장 면적 (m2)",
+      "computed": "계산 면적 (m2)",
+      "diff": "차이 (m2)",
+      "status": "상태",
+      "rights": "권리",
+      "cost": "비용",
+      "findings": "지적 사항",
+      "total": "합계, {count}필지",
+      "acquired_of": "취득 {acquired} / {total}",
+      "findings_title": "지적 사항",
+      "no_findings": "지적 사항이 없습니다.",
+      "disclaimer": "소유자와 권리는 이 프로젝트에 기록된 대로 표시됩니다. 이 조서는 법률 의견이나 등록부 등본이 아닙니다.",
+      "status_needed": "필요",
+      "status_negotiating": "협의 중",
+      "status_acquired": "취득",
+      "status_expropriation": "수용"
+    }
+  },
+  "monitoring": {
+    "crossed": {
+      "fail": "점 {id}의 변위 {d} mm 또는 변화율 {r} mm/day가 {level} 기준을 초과했습니다",
+      "suggestion": "측점과 구조물을 점검한 뒤 메모와 함께 경보를 확인하십시오."
+    },
+    "level": {
+      "ok": "정상",
+      "alert": "주의",
+      "action": "관리",
+      "alarm": "경보"
+    },
+    "risk": {
+      "title": "계측점 {id}, {level} 단계",
+      "description": "변위 {d} mm, 변화율 {r} mm/day ({profile} 기준). 모니터링이 초안을 열었습니다. 검토하고 담당자를 지정하십시오."
+    },
+    "report": {
+      "title": "계측 경보 보고서",
+      "project": "프로젝트",
+      "crs": "좌표계",
+      "profile": "기준값 프로파일",
+      "generated": "생성일",
+      "point": "계측점",
+      "baseline": "기준값 (m)",
+      "latest": "최신값 (m)",
+      "displacement": "변위 (mm)",
+      "rate": "변화율 (mm/day)",
+      "level": "단계",
+      "acknowledged": "확인됨",
+      "counts": "경보: {alarm} · 관리: {action} · 주의: {alert} · 정상: {ok}",
+      "findings": "발견 사항",
+      "no_profile": "프로파일이 없습니다. 설정하십시오",
+      "ack_yes": "예",
+      "ack_no": "아니오"
+    }
+  },
+  "stockpiles": {
+    "density_assumed": {
+      "fail": "밀도는 가정이며 실측이 아닙니다. 톤은 그 추정만큼만 믿을 수 있습니다.",
+      "suggestion": "시료를 달아 보거나 공급업체 납품서에서 밀도를 가져오세요."
+    },
+    "variance_high": {
+      "fail": "측량이 장부 재고와 {v} % 다르며 허용치 {t} %를 넘습니다.",
+      "suggestion": "밀도와 기준 표면을 확인한 뒤, 차이가 실제라면 조정을 제안하고 확인하세요."
+    }
+  },
+  "mine_survey": {
+    "compliance_outside": {
+      "fail": "기간 달성률 {c} %가 허용 범위 {lo}-{hi} %를 벗어났습니다.",
+      "suggestion": "계획과 측량을 확인하고 청구 전에 기간 메모에 차이의 이유를 적으세요."
+    },
+    "truck_differs": {
+      "fail": "트럭 대수 기준 톤수가 측량 톤수와 {v} % 차이 나며 점검 기준 {t} %를 넘습니다.",
+      "suggestion": "회당 적재량과 밀도를 확인한 뒤 두 표면을 다시 비교하세요."
+    }
+  },
+  "hongkong": {
+    "sopo_applicability": {
+      "fail": "Cap. 652(지급보장)가 이 계약에 적용됩니다: 청구 후 30일 이내 지급 회신, 60일 이내 지급"
+    },
+    "sopo_private_scope_check": {
+      "fail": "민간 계약은 신축 또는 Building Authority 승인이 필요한 공사일 때만 Cap. 652 대상입니다: 범위를 확인하세요"
+    },
+    "sopo_response_late": {
+      "fail": "{date}까지 지급 회신이 송달되지 않았습니다: 청구액은 분쟁 상태이며 재정에 회부할 수 있습니다"
+    },
+    "sopo_payment_term_exceeds_60": {
+      "fail": "지급 기간 {n}일이 Cap. 652가 허용하는 60일을 초과합니다"
+    },
+    "sopo_response_term_exceeds_30": {
+      "fail": "지급 회신 기간 {n}일이 Cap. 652가 허용하는 30일을 초과합니다"
+    },
+    "sopo_adjudication_window": {
+      "fail": "지급 분쟁이 발생했습니다: {date}까지 재정 신청 통지를 송달하세요"
+    },
+    "contract_pay_when_paid": {
+      "fail": "pay-when-paid 조항: Cap. 652는 조건부 지급 조항을 무효로 합니다"
+    },
+    "levy_missing": {
+      "fail": "공사가 HK$3,000,000을 초과하지만 내역서에 CIC 부담금(0.5%) 또는 CWR 부담금(0.03%)이 없습니다"
+    },
+    "levy_below_threshold": {
+      "fail": "공사가 HK$3,000,000 이하입니다: CIC 및 CWR 부담금이 없습니다"
+    },
+    "tax_nonzero": {
+      "fail": "VAT 또는 GST 행이 부과되었으나 홍콩에는 해당 세금이 없습니다: 0으로 설정하세요"
+    },
+    "retention_over_limit": {
+      "fail": "유보금 {x}이 계약 한도 {limit}를 초과합니다"
+    },
+    "pc_sum_no_attendance": {
+      "fail": "프라임 코스트 금액에 이윤 및 관리(attendance) 항목이 없습니다"
+    },
+    "index_attribution": {
+      "fail": "ArchSD 입찰가격지수에 출처 표시가 없습니다: Architectural Services Department를 명시하세요"
     }
   }
 }

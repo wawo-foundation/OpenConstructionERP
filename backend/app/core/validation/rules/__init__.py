@@ -1619,6 +1619,57 @@ class GAEBUnitExportable(ValidationRule):
         return results
 
 
+class GAEBShortTextLength(ValidationRule):
+    """Flags a Kurztext that GAEB export would cut to 70 characters.
+
+    A position with a Langtext travels as Kurztext (``OutlTxt``) plus Langtext;
+    the Kurztext is cut at 70 characters on export, so the issuer reads a
+    different label than the estimator typed.
+    """
+
+    rule_id = "gaeb.short_text_length"
+    name = "GAEB Kurztext length"
+    standard = "gaeb"
+    severity = Severity.WARNING
+    category = RuleCategory.COMPLIANCE
+    description = "The Kurztext of a position with a Langtext should fit the 70 GAEB characters."
+
+    MAX_SHORT_TEXT_CHARS = 70
+
+    async def validate(self, context: ValidationContext) -> list[RuleResult]:
+        locale = _get_locale(context)
+        results: list[RuleResult] = []
+        for pos in _get_positions(context):
+            meta = _position_metadata(pos)
+            if meta.get("gaeb_is_section") or str(pos.get("type") or "").lower() == "section":
+                continue
+            if not str(meta.get("gaeb_long_text") or "").strip():
+                continue
+            short = " ".join(str(pos.get("description") or "").split())
+            passed = len(short) <= self.MAX_SHORT_TEXT_CHARS
+            results.append(
+                RuleResult(
+                    rule_id=self.rule_id,
+                    rule_name=self.name,
+                    severity=self.severity,
+                    category=self.category,
+                    passed=passed,
+                    message=_ok(locale)
+                    if passed
+                    else translate(
+                        "gaeb.short_text_length.fail",
+                        locale=locale,
+                        ordinal=pos.get("ordinal", "?"),
+                        length=len(short),
+                    ),
+                    element_ref=pos.get("id"),
+                    details={"length": len(short), "limit": self.MAX_SHORT_TEXT_CHARS},
+                    suggestion=None if passed else translate("gaeb.short_text_length.suggestion", locale=locale),
+                )
+            )
+        return results
+
+
 def _count_decimal_places(value: Any) -> int | None:
     """Count trailing decimal places in ``value``.
 
@@ -4688,22 +4739,51 @@ class GBT50500CodeRequired(ValidationRule):
         return results
 
 
+def _gb50500_project_scope(context: ValidationContext) -> tuple[str | None, str | None]:
+    """The bill's standard edition and the project's subdivision, when known."""
+    data = context.data if isinstance(context.data, dict) else {}
+    record = data.get("project_record") if isinstance(data.get("project_record"), dict) else {}
+    edition = record.get("standard_edition") if isinstance(record, dict) else None
+    subdivision = record.get("subdivision_code") if isinstance(record, dict) else None
+    return (str(edition) if edition else None, str(subdivision) if subdivision else None)
+
+
+def _gb50500_sub_project(pos: dict[str, Any]) -> str:
+    """The sub-project (单项工程) a line belongs to; blank means the whole bill."""
+    meta = pos.get("metadata") if isinstance(pos.get("metadata"), dict) else {}
+    classification = pos.get("classification") if isinstance(pos.get("classification"), dict) else {}
+    return str(meta.get("sub_project") or classification.get("sub_project") or "")
+
+
 class GBT50500ValidCode(ValidationRule):
+    """The code matches a national, supplementary or provincial pattern.
+
+    Patterns come from ``country_data/item_code_patterns.json`` per edition, so
+    a supplementary code such as ``01B001`` passes, and a Shanghai prefix
+    ``沪`` passes only on a project located in Shanghai.
+    """
+
     rule_id = "gbt50500.valid_code"
     name = "Valid GB/T 50500 Code"
     standard = "gbt50500"
     severity = Severity.WARNING
     category = RuleCategory.COMPLIANCE
-    description = "GB/T 50500 codes should be 9-digit or 12-digit numeric codes"
+    description = (
+        "GB/T 50500 codes must match a national (9 or 12 digits), supplementary (0xB001) or provincial pattern"
+    )
 
     async def validate(self, context: ValidationContext) -> list[RuleResult]:
+        from app.core.item_codes import code_patterns  # noqa: PLC0415
+
         locale = _get_locale(context)
+        edition, subdivision = _gb50500_project_scope(context)
+        patterns = [re.compile(p) for p in code_patterns("gb50500", edition, subdivision)]
         results: list[RuleResult] = []
         for pos in _get_positions(context):
-            code = _gb50500_code(pos)
+            code = _gb50500_code(pos).strip()
             if not code:
                 continue
-            passed = code.isdigit() and len(code) in (9, 12)
+            passed = any(p.fullmatch(code) for p in patterns)
             message = (
                 _ok(locale)
                 if passed
@@ -4722,7 +4802,62 @@ class GBT50500ValidCode(ValidationRule):
                     passed=passed,
                     message=message,
                     element_ref=pos.get("id"),
-                    details={"given_code": code},
+                    details={"given_code": code, "edition": edition or "", "subdivision": subdivision or ""},
+                )
+            )
+        return results
+
+
+class GBT50500CodeUnique(ValidationRule):
+    """A twelve-digit code is used once per sub-project (单项工程).
+
+    The last three digits are assigned by whoever compiles the bill precisely
+    so that each item is addressable; a code used twice makes a priced item
+    ambiguous in a tender comparison and at settlement.
+    """
+
+    rule_id = "gbt50500.code_unique"
+    name = "GB/T 50500 Code Unique"
+    standard = "gbt50500"
+    severity = Severity.ERROR
+    category = RuleCategory.CONSISTENCY
+    description = "A GB/T 50500 item code may appear only once within one sub-project"
+
+    async def validate(self, context: ValidationContext) -> list[RuleResult]:
+        from app.core.line_tax import check_item_codes  # noqa: PLC0415
+
+        locale = _get_locale(context)
+        entries = [
+            (str(pos.get("id") or pos.get("ordinal") or ""), _gb50500_code(pos), _gb50500_sub_project(pos))
+            for pos in _get_leaf_positions(context)
+        ]
+        from app.core.item_codes import shared_code_patterns  # noqa: PLC0415
+
+        shared = shared_code_patterns("gb50500")
+        duplicates = {f.ref: f for f in check_item_codes(entries, [], shared) if f.kind == "duplicate"}
+        results: list[RuleResult] = []
+        for ref, code, scope in entries:
+            if not code.strip():
+                continue
+            finding = duplicates.get(ref)
+            results.append(
+                RuleResult(
+                    rule_id=self.rule_id,
+                    rule_name=self.name,
+                    severity=self.severity,
+                    category=self.category,
+                    passed=finding is None,
+                    message=(
+                        _ok(locale)
+                        if finding is None
+                        else translate("gbt50500.code_unique.fail", locale=locale, code=code.strip())
+                    ),
+                    element_ref=ref or None,
+                    details={
+                        "given_code": code.strip(),
+                        "sub_project": scope,
+                        "first_ref": finding.other_refs[0] if finding else "",
+                    },
                 )
             )
         return results
@@ -12291,6 +12426,119 @@ class SubcontractContactLinked(_SubcontractRule):
     check_name = "check_contact_linked"
 
 
+# ── Subcontract pay applications (progress billing) and required documents ──
+#
+# One pay application is judged against the schedule of values of its
+# agreement: a line over 100 percent warns (the person says why and goes on),
+# a negative cumulative or a total above the agreement value plus approved
+# variations is an error. Required documents warn by default and block when
+# the tenant's policy says so, at agreement activation and at pay application
+# approval.
+
+
+class _SubcontractPayAppRule(_SubcontractRule):
+    """Pay application rule: shares one suggestion where the fix is the same."""
+
+    def _message_key(self, suffix: str) -> str:
+        if suffix == "suggestion" and self.severity is Severity.ERROR:
+            return "subcontract.pay_app_correct.suggestion"
+        return super()._message_key(suffix)
+
+
+class SubcontractPayAppLineOverComplete(_SubcontractPayAppRule):
+    """This period must not take a schedule-of-values line above 100 percent."""
+
+    rule_id = "subcontract.pay_app_over_complete"
+    name = "Subcontract Pay Application Line Over 100 Percent"
+    severity = Severity.WARNING
+    category = RuleCategory.CONSISTENCY
+    description = "Flags a line whose total completed to date exceeds its scheduled value, unless a reason is recorded."
+    check_name = "check_pay_app_line_over_complete"
+
+
+class SubcontractPayAppLineNegative(_SubcontractPayAppRule):
+    """The cumulative amount of a line cannot go negative."""
+
+    rule_id = "subcontract.pay_app_line_negative"
+    name = "Subcontract Pay Application Line Not Negative"
+    severity = Severity.ERROR
+    category = RuleCategory.CONSISTENCY
+    description = "Flags a line whose total completed to date is below zero."
+    check_name = "check_pay_app_line_negative"
+
+
+class SubcontractPayAppWithinAgreement(_SubcontractPayAppRule):
+    """All pay applications together stay within the agreement value plus approved variations."""
+
+    rule_id = "subcontract.pay_app_within_agreement"
+    name = "Subcontract Pay Applications Within Agreement Value"
+    severity = Severity.ERROR
+    category = RuleCategory.CONSISTENCY
+    description = "Flags pay applications that together bill more than the agreement value plus approved variations."
+    check_name = "check_pay_app_within_agreement"
+
+
+class SubcontractRequiredDocuments(ValidationRule):
+    """A required subcontract document must be on file, signed where asked, and not expired.
+
+    Warns by default; the payload's ``enforcement`` set to ``block`` turns each
+    finding into an error, which stops the agreement going live or the pay
+    application being approved.
+    """
+
+    rule_id = "subcontract.required_documents"
+    name = "Subcontract Required Documents"
+    severity = Severity.WARNING
+    category = RuleCategory.COMPLIANCE
+    standard = "subcontract"
+    description = "Flags a required subcontract document that is missing, unsigned or expired."
+
+    async def validate(self, context: ValidationContext) -> list[RuleResult]:
+        locale = _get_locale(context)
+        payload = context.data if isinstance(context.data, dict) else {}
+        if not payload or not payload.get("required_documents"):
+            return []
+        from app.modules.subcontractors import validators as sub_checks
+
+        severity = Severity.ERROR if payload.get("enforcement") == "block" else Severity.WARNING
+        findings = sub_checks.check_required_documents(payload)
+        if not findings:
+            return [
+                RuleResult(
+                    rule_id=self.rule_id,
+                    rule_name=self.name,
+                    severity=severity,
+                    category=self.category,
+                    passed=True,
+                    message=_ok(locale),
+                )
+            ]
+        results: list[RuleResult] = []
+        for finding in findings:
+            role = finding.params["role"]
+            role_key = f"subcontract.document_roles.{role}"
+            document = translate(role_key, locale=locale)
+            if document == role_key:
+                document = role.replace("_", " ")
+            state = translate(f"subcontract.required_documents.states.{finding.params['state']}", locale=locale)
+            results.append(
+                RuleResult(
+                    rule_id=self.rule_id,
+                    rule_name=self.name,
+                    severity=severity,
+                    category=self.category,
+                    passed=False,
+                    message=translate(
+                        "subcontract.required_documents.fail", locale=locale, document=document, state=state
+                    ),
+                    element_ref=finding.element_ref,
+                    details=dict(finding.details),
+                    suggestion=translate("subcontract.required_documents.suggestion", locale=locale),
+                )
+            )
+        return results
+
+
 # ── Submittals (submission gate) ────────────────────────────────────────────
 #
 # Submission is where a submittal stops being a draft and starts consuming
@@ -12832,12 +13080,16 @@ def register_builtin_rules() -> None:
     # locale, position and currency helpers from this package, so a top-level
     # import would run before those names exist.
     from app.core.validation.rules.broker_licence import BROKER_LICENCE_RULES
+    from app.core.validation.rules.commercial_control import COMMERCIAL_CONTROL_RULES
     from app.core.validation.rules.field_clock import FIELD_CLOCK_RULES
     from app.core.validation.rules.field_productivity import PRODUCTIVITY_RULES
+    from app.core.validation.rules.hongkong import HONGKONG_RULES
     from app.core.validation.rules.italy_prezzario import ITALY_PREZZARIO_RULES
+    from app.core.validation.rules.norm_base import NORM_BASE_RULES
     from app.core.validation.rules.pakistan_boq import PAKISTAN_RULES
     from app.core.validation.rules.peru_presupuesto import PERU_RULES
     from app.core.validation.rules.project_completeness import PROJECT_COMPLETENESS_RULES
+    from app.core.validation.rules.vat_rate import VAT_RATE_RULES
 
     rules: list[tuple[ValidationRule, list[str] | None]] = [
         # BOQ Quality (universal)
@@ -12876,6 +13128,7 @@ def register_builtin_rules() -> None:
         (GAEBProvisWithoutTotal(), None),
         (GAEBOrdinalChanged(), None),
         (GAEBUnitExportable(), None),
+        (GAEBShortTextLength(), None),
         # NRM (UK)
         (NRMClassificationRequired(), None),
         (NRMValidElement(), None),
@@ -12916,6 +13169,7 @@ def register_builtin_rules() -> None:
         # GB/T 50500 (China)
         (GBT50500CodeRequired(), None),
         (GBT50500ValidCode(), None),
+        (GBT50500CodeUnique(), None),
         # CPWD (India)
         (CPWDCodeRequired(), None),
         (CPWDMeasurementUnits(), None),
@@ -13016,6 +13270,9 @@ def register_builtin_rules() -> None:
         (OfflineSyncMergeComplete(), ["offline_sync"]),
         (FieldCaptureOpFresh(), ["field_diary_capture"]),
         *((rule, None) for rule in FIELD_CLOCK_RULES),
+        # Commercial control: budget at target cost, commitments per bill line,
+        # CVR by WBS, approval amount bands, valuation quantity stages.
+        *((rule, ["commercial_control"]) for rule in COMMERCIAL_CONTROL_RULES),
         *((rule, None) for rule in PRODUCTIVITY_RULES),
         # Estimate Audit (curated cross-checks: wrong unit, near-duplicate,
         # missing companion, catalogue-benchmarked rate outlier)
@@ -13083,6 +13340,11 @@ def register_builtin_rules() -> None:
         (SubcontractInsuranceValidAtStart(), ["subcontract"]),
         (SubcontractUnlinkedContractTwin(), ["subcontract"]),
         (SubcontractContactLinked(), ["subcontract"]),
+        (SubcontractRequiredDocuments(), ["subcontract", "subcontract_pay_app"]),
+        # Subcontract pay applications (progress billing against the schedule of values)
+        (SubcontractPayAppLineOverComplete(), ["subcontract_pay_app"]),
+        (SubcontractPayAppLineNegative(), ["subcontract_pay_app"]),
+        (SubcontractPayAppWithinAgreement(), ["subcontract_pay_app"]),
         # Subcontract changes (owner change -> subcontract change chain)
         (SubcontractChangeOwnerLinked(), ["subcontract_change"]),
         (SubcontractChangeAmountSet(), ["subcontract_change"]),
@@ -13144,8 +13406,13 @@ def register_builtin_rules() -> None:
         *((rule_class(), None) for rule_class in ITALY_PREZZARIO_RULES),
         # Pakistan (sales tax line and rate)
         *((rule_class(), None) for rule_class in PAKISTAN_RULES),
+        *((rule_class(), None) for rule_class in HONGKONG_RULES),
         # Peru (IGV line and rate, gastos generales and utilidad)
         *((rule_class(), None) for rule_class in PERU_RULES),
+        # Norm bases and public funding caps (neutral; values from the country pack)
+        *((rule_class(), None) for rule_class in NORM_BASE_RULES),
+        # Tax line at the standard VAT rate of the dated tax seed (neutral)
+        *((rule_class(), None) for rule_class in VAT_RATE_RULES),
     ]
 
     for rule, sets in rules:

@@ -14,6 +14,43 @@ PACK_CONFIG: dict[str, Any] = {
     "paper_size": "Letter",
     "date_format": "MM/DD/YYYY",
     "number_format": "1,234.56",
+    # ── Exchange layouts: column names only, never rates, codes or values ────
+    "equipment_rate_layout": {
+        "label_key": "packs.us.equipment_layout",
+        "interest_convention": "average_annual_investment",
+        "decimal_comma": False,
+        "mapping": {
+            "code": "Code",
+            "name": "Description",
+            "category": "Category",
+            "size_key": "Size",
+            "value": "Purchase price",
+            "residual": "Resale value",
+            "life_years": "Life years",
+            "months_per_year": "Months per year",
+            "interest": "Interest",
+            "repair": "Repair",
+            "hours_per_month": "Hours per month",
+        },
+    },
+    "payroll_profile": {
+        "label_key": "packs.us.payroll_profile",
+        "name": "Payroll US",
+        "delimiter": ",",
+        "decimal": ".",
+        "date_format": "MM/DD/YYYY",
+        "encoding": "utf-8",
+        "grouping": "week",
+        "week_start": 0,
+        "columns": [
+            {"header": "Employee ID", "source": "worker_ref"},
+            {"header": "Week ending", "source": "date"},
+            {"header": "Job", "source": "project_code"},
+            {"header": "Cost code", "source": "cost_code"},
+            {"header": "Pay code", "source": "pay_code"},
+            {"header": "Hours", "source": "hours"},
+        ],
+    },
     # ── Standards ────────────────────────────────────────────────────────────
     # Division numbers are interoperability facts. The "scope" strings are our
     # own descriptions of the work each division covers - the proprietary
@@ -246,6 +283,29 @@ PACK_CONFIG: dict[str, Any] = {
                 "source": "industry_practice",
                 "statute_reference": "AIA A201-2017 § 9.3.1",
                 "effective_date": "2017",
+                # Optional subcontract document roles a US general contractor
+                # often asks for. Offered as presets on the document policy;
+                # nothing is required until the tenant adds one to its list.
+                "document_presets": [
+                    {
+                        "role": "osha_safety_program",
+                        "signed": False,
+                        "label": "OSHA safety and health program",
+                        "reference": "29 CFR 1926.20",
+                    },
+                    {
+                        "role": "osha_training_records",
+                        "signed": False,
+                        "label": "OSHA training records",
+                        "reference": "29 CFR 1926.21",
+                    },
+                    {
+                        "role": "w9_tax_form",
+                        "signed": True,
+                        "label": "IRS Form W-9",
+                        "reference": "IRS Form W-9",
+                    },
+                ],
                 "requirements": [
                     {
                         "code": "insurance_certificate",

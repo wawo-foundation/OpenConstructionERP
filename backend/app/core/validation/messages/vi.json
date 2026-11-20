@@ -299,6 +299,10 @@
     "unit_exportable": {
       "fail": "Hạng mục {ordinal}: đơn vị '{unit}' không vừa trường GAEB QU 4 ký tự và sẽ bị cắt khi xuất",
       "suggestion": "Dùng mã đơn vị GAEB tối đa 4 ký tự (m, m2, m3, St, h, psch, kg, t)"
+    },
+    "short_text_length": {
+      "fail": "Hạng mục {ordinal}: văn bản ngắn có {length} ký tự; xuất GAEB sẽ cắt còn 70",
+      "suggestion": "Rút gọn văn bản ngắn còn 70 ký tự và giữ chi tiết trong văn bản dài"
     }
   },
   "nrm": {
@@ -412,7 +416,10 @@
       "suggestion": "Gán mã GB/T 50500 gồm 9 chữ số (ví dụ 010101001)"
     },
     "valid_code": {
-      "fail": "Mã GB/T 50500 '{code}' không hợp lệ; yêu cầu 9 hoặc 12 chữ số"
+      "fail": "Mã GB/T 50500 '{code}' không hợp lệ; yêu cầu 9 hoặc 12 chữ số hoặc mã bổ sung như 01B001"
+    },
+    "code_unique": {
+      "fail": "Mã hạng mục '{code}' được dùng nhiều lần trong cùng một hạng mục công trình"
     }
   },
   "cpwd": {
@@ -931,6 +938,36 @@
     "change_time_within_owner": {
       "fail": "Tác động thời gian của các thầu phụ cho {code} tổng cộng {sub_days} ngày, nhiều hơn {owner_days} ngày chủ đầu tư đã chấp thuận",
       "suggestion": "Kiểm tra các yêu cầu về thời gian của thầu phụ hoặc đề nghị chủ đầu tư gia hạn tương ứng"
+    },
+    "pay_app_over_complete": {
+      "fail": "Hạng mục {line} sau kỳ này đạt {percent}% giá trị theo lịch ({completed} trên {scheduled})",
+      "suggestion": "Giảm số tiền của kỳ này hoặc ghi lại lý do thanh toán vượt giá trị theo lịch"
+    },
+    "pay_app_line_negative": {
+      "fail": "Hạng mục {line} sẽ có tổng lũy kế {completed}, tức là nhỏ hơn không"
+    },
+    "pay_app_within_agreement": {
+      "fail": "Các đề nghị thanh toán cộng lại là {billed}, vượt giá trị hợp đồng cộng các thay đổi đã duyệt ({limit})"
+    },
+    "pay_app_correct": {
+      "suggestion": "Sửa số tiền trong đề nghị thanh toán này hoặc tăng giá trị hợp đồng bằng một thay đổi đã duyệt"
+    },
+    "required_documents": {
+      "fail": "Tài liệu bắt buộc: {document} ({state})",
+      "suggestion": "Đính kèm tài liệu, đã ký và còn hiệu lực, vào hợp đồng thầu phụ",
+      "states": {
+        "missing": "thiếu",
+        "unsigned": "chưa ký",
+        "expired": "hết hạn"
+      }
+    },
+    "document_roles": {
+      "terms_and_conditions": "Điều khoản và điều kiện",
+      "safety_agreement": "Thỏa thuận an toàn",
+      "safety_plan": "Kế hoạch an toàn",
+      "insurance": "Bảo hiểm",
+      "method_statement": "Biện pháp thi công",
+      "other": "Tài liệu khác"
     }
   },
   "submittal": {
@@ -2014,6 +2051,510 @@
     "crew_without_record": {
       "fail": "Tổ đội {headcount} người có mặt nhưng không ghi công việc, kiểm tra hay chậm trễ.",
       "suggestion": "Thêm việc tổ đã làm, hoặc chậm trễ đã dừng công việc."
+    }
+  },
+  "framework_agreement": {
+    "item_not_in_agreement": {
+      "fail": "Dòng {code} không phải hạng mục đang hiệu lực của thỏa thuận {agreement}; hãy ghi nhận như phát sinh.",
+      "suggestion": "Xóa dòng khỏi đơn hàng và ghi công việc vào đơn hàng như phát sinh."
+    },
+    "rate_deviates": {
+      "fail": "Đơn giá {rate} của dòng {code} khác đơn giá trong thỏa thuận {expected}.",
+      "suggestion": "Đơn giá đơn hàng lấy từ thỏa thuận khung; hãy tính lại đơn giá dòng theo bảng giá."
+    },
+    "order_outside_validity": {
+      "fail": "Ngày đơn hàng {date} nằm ngoài thời hạn thỏa thuận từ {from} đến {to}.",
+      "suggestion": "Ghi ngày đơn hàng trong thời hạn, hoặc gia hạn thỏa thuận trước."
+    },
+    "rate_period_gap": {
+      "fail": "Không có kỳ đơn giá nào bao phủ {date}.",
+      "suggestion": "Thêm kỳ đơn giá bao phủ ngày này ở thẻ Đơn giá và điều chỉnh giá."
+    },
+    "escalation_unresolved": {
+      "fail": "Chỉ số {series} chưa có giá trị cho {period}; không thể điều chỉnh đơn giá.",
+      "suggestion": "Nhập giá trị chỉ số của tháng đó trong Chỉ số giá, rồi tính lại đơn hàng."
+    },
+    "cap_exceeded": {
+      "fail": "Đơn hàng này đưa thỏa thuận lên {total} trên mức trần {cap}; còn lại {headroom}.",
+      "suggestion": "Giảm đơn hàng xuống phần còn lại, hoặc phát hành kèm ngoại lệ có lý do."
+    },
+    "cap_threshold": {
+      "fail": "Việc sử dụng thỏa thuận đã đạt {pct} % mức trần.",
+      "suggestion": "Thông báo sớm cho chủ đầu tư để chuẩn bị thỏa thuận kế tiếp."
+    },
+    "item_max_qty": {
+      "fail": "Hạng mục {code}: đã đặt {qty} đến nay, vượt mức tối đa {max}.",
+      "suggestion": "Thống nhất khối lượng phát sinh với chủ đầu tư trước đơn hàng tiếp theo."
+    },
+    "min_at_risk": {
+      "fail": "Còn {days} ngày và {pct} % khối lượng tối thiểu cam kết đã được đặt.",
+      "suggestion": "Trao đổi với chủ đầu tư về phần thiếu khi vẫn còn thời gian đặt hàng."
+    },
+    "currency_mismatch": {
+      "fail": "Tiền tệ đơn hàng {cur} khác tiền tệ thỏa thuận {agr}.",
+      "suggestion": "Đơn hàng được định giá bằng tiền tệ của thỏa thuận."
+    },
+    "adjustment_unknown": {
+      "fail": "Điều kiện {tag} không có điều chỉnh trong thỏa thuận này.",
+      "suggestion": "Thêm điều chỉnh ở thẻ Điều kiện, hoặc xóa điều kiện khỏi đơn hàng."
+    },
+    "direct_claim": {
+      "fail": "Yêu cầu thanh toán được lập trên đơn hàng, không lập trên thỏa thuận khung.",
+      "suggestion": "Mở đơn hàng đã thực hiện công việc và lập yêu cầu thanh toán tại đó."
+    },
+    "duplicate_item": {
+      "fail": "Mã hạng mục {code} xuất hiện hai lần trong kỳ đơn giá {period}.",
+      "suggestion": "Trước khi lưu bảng giá, giữ một dòng cho mỗi mã hạng mục."
+    },
+    "measured_over_ordered": {
+      "fail": "Khối lượng đo {m} vượt khối lượng đã đặt {o} ở dòng {code}; cân nhắc phát sinh.",
+      "suggestion": "Ghi khối lượng thêm như một thay đổi của đơn hàng."
+    },
+    "term_over_legal_max": {
+      "fail": "Thời hạn {years} năm vượt giới hạn {max} năm theo {source} (gói).",
+      "suggestion": "Kiểm tra thời hạn với chủ đầu tư; giới hạn do gói đưa ra nhưng không bắt buộc."
+    }
+  },
+  "estimate_archive": {
+    "arc_hash_mismatch": {
+      "fail": "Dấu vân tay không khớp: bản ghi cho {actual}, niêm phong ghi {sealed}. Coi bản ghi là đã bị sửa."
+    },
+    "arc_total_mismatch": {
+      "fail": "Tổng niêm phong {seal} khác giá trúng thầu {award} một khoản {diff}."
+    },
+    "arc_no_breakdown": {
+      "fail": "{n} hạng mục không có phân tích nguồn lực; đơn giá của chúng sau này không thể truy vết."
+    },
+    "arc_no_markups": {
+      "fail": "Dự toán không có khoản phụ phí nào để niêm phong."
+    },
+    "arc_sealed_after_signing": {
+      "fail": "Niêm phong {days} ngày sau khi ký hợp đồng."
+    },
+    "arc_no_receipt": {
+      "fail": "Bên kia chưa xác nhận dấu vân tay."
+    },
+    "arc_open_not_closed": {
+      "fail": "Lần mở {id} đã mở {days} ngày mà không có biên bản."
+    },
+    "arc_open_no_reason": {
+      "fail": "Việc mở cần có lý do và tham chiếu."
+    },
+    "arc_open_one_party": {
+      "fail": "Chỉ có một bên; hãy ghi lý do bên kia vắng mặt."
+    },
+    "var_basis_no_seal": {
+      "fail": "Hạng mục {code} được định giá theo cơ sở gốc, nhưng không có dự toán niêm phong."
+    },
+    "var_basis_deviation": {
+      "fail": "Hạng mục {code}: {field} đổi từ {old} thành {new} mà không có ghi chú."
+    },
+    "var_new_resource_no_evidence": {
+      "fail": "Nguồn lực mới {res} không có ngày giá hoặc tham chiếu báo giá."
+    },
+    "var_markup_not_sealed": {
+      "fail": "Hạng mục {code} áp dụng phụ phí {m} không có trong niêm phong."
+    },
+    "var_abnormal_carried_rate": {
+      "fail": "Chi phí chuyển sang {c} lệch {pct} % so với mức tham chiếu."
+    },
+    "arc_mutation_refused": {
+      "fail": "Dự toán đã niêm phong không thể sửa hoặc xóa. Hãy niêm phong phiên bản mới thay thế."
+    },
+    "contents_locked": "Nội dung vẫn được niêm phong cho đến khi bắt đầu mở chính thức.",
+    "market_off": "Dự toán niêm phong không thuộc hồ sơ thị trường của dự án này.",
+    "contract_required": "Cần có hợp đồng với khách hàng trước khi niêm phong dự toán làm cơ sở hợp đồng."
+  },
+  "boq_revision": {
+    "superseded_still_editable": {
+      "fail": "Bản sửa đổi {label} vẫn có thể chỉnh sửa dù {later} đã được tạo sau đó; thay đổi ở đây không được chuyển sang",
+      "suggestion": "Khóa {label} hoặc tiếp tục làm việc trong bản sửa đổi mới nhất"
+    }
+  },
+  "schedule_baseline": {
+    "single_approved": {
+      "fail": "Tiến độ này có nhiều hơn một đường cơ sở đã duyệt ({baselines}).",
+      "suggestion": "Hãy duyệt đường cơ sở cần áp dụng; duyệt một đường sẽ rút lại phê duyệt của các đường khác."
+    }
+  },
+  "project_catalogue": {
+    "unit_present": {
+      "fail": "Đơn giá {code} không có đơn vị tính.",
+      "suggestion": "Nhập đơn vị mà giá áp dụng, ví dụ m2, m3 hoặc giờ."
+    },
+    "duplicate_code": {
+      "fail": "Mã {code} được dùng cho nhiều hơn một đơn giá trong dự án này.",
+      "suggestion": "Giữ một đơn giá cho mỗi mã, hoặc đặt mã riêng cho phương án."
+    },
+    "currency_differs": {
+      "fail": "Đơn giá {code} tính bằng {currency}, nhưng dự án được lập giá bằng {project_currency}.",
+      "suggestion": "Quy đổi đơn giá sang tiền tệ của dự án, hoặc xác nhận việc dùng ngoại tệ là có chủ ý."
+    },
+    "override_far": {
+      "fail": "Đơn giá cục bộ của {code} lệch {percent} % so với đơn giá nguồn {source_rate}.",
+      "suggestion": "Kiểm tra dấu thập phân bị lệch, hoặc ghi lý do dự án cần một mức giá khác."
+    },
+    "source_changed": {
+      "fail": "Đơn giá nguồn của {code} đã đổi từ {old} thành {new} kể từ khi dự án sao chép.",
+      "suggestion": "Áp dụng đơn giá nguồn mới, hoặc chủ động giữ đơn giá cục bộ."
+    }
+  },
+  "schedule_mspdi_import": {
+    "task_dates": {
+      "missing_dates": "Công việc {ref} \"{name}\" không có ngày bắt đầu hoặc kết thúc.",
+      "finish_before_start": "Công việc {ref} \"{name}\" kết thúc ({finish}) trước khi bắt đầu ({start}).",
+      "suggestion": "Sửa ngày trong tiến độ nguồn và xuất lại. Ngày không bao giờ được đoán khi nhập."
+    },
+    "unique_ids": {
+      "duplicate_uid": "Mã công việc {ref} xuất hiện nhiều lần; chỉ giữ công việc đầu tiên.",
+      "suggestion": "Gán cho mỗi công việc một mã duy nhất trong tiến độ nguồn."
+    },
+    "links_resolve": {
+      "dangling_link": "Công việc {ref} \"{name}\": công việc trước {predecessor} không có trong tệp, liên kết bị bỏ qua.",
+      "duplicate_link": "Công việc {ref} \"{name}\": bỏ qua liên kết thứ hai từ công việc trước {predecessor}, mỗi cặp chỉ giữ một liên kết.",
+      "self_link": "Công việc {ref} \"{name}\" liên kết với chính nó, liên kết bị bỏ qua.",
+      "unknown_link_type": "Công việc {ref} \"{name}\": loại liên kết {type} không xác định và được đọc là kết thúc-bắt đầu.",
+      "suggestion": "Kiểm tra các liên kết logic trong tiến độ nguồn."
+    },
+    "values_in_range": {
+      "percent_out_of_range": "Công việc {ref} \"{name}\": {value}% hoàn thành nằm ngoài 0-100 và được giới hạn.",
+      "outline_gap": "Công việc {ref} \"{name}\" bỏ qua một cấp phân cấp ({level}); được đặt dưới công việc tổng hợp gần nhất phía trên.",
+      "suggestion": "Kiểm tra % hoàn thành và thụt lề trong tiến độ nguồn."
+    },
+    "calendar_work_days": {
+      "calendar_no_work_days": "Lịch {calendar} không có ngày làm việc nào.",
+      "suggestion": "Đánh dấu các ngày làm việc của lịch này trong tiến độ nguồn."
+    }
+  },
+  "schedule_pdf_import": {
+    "no_text_layer": {
+      "fail": "PDF không có lớp văn bản nên không thể đọc bảng.",
+      "suggestion": "Hãy xuất tiến độ dưới dạng MS Project XML, XER hoặc Excel và nhập tệp đó."
+    },
+    "dates_parsed": {
+      "fail": "Dòng {row}: ngày bắt đầu hoặc kết thúc không phải là ngày.",
+      "suggestion": "Kiểm tra các cột ngày và thứ tự ngày/tháng, hoặc sửa ngày trong nguồn."
+    },
+    "finish_before_start": {
+      "fail": "Dòng {row}: ngày kết thúc trước ngày bắt đầu.",
+      "suggestion": "Sửa các ngày trong tiến độ gốc."
+    },
+    "duration_mismatch": {
+      "fail": "Dòng {row}: thời lượng in ra khác số ngày làm việc giữa bắt đầu và kết thúc.",
+      "suggestion": "Các ngày được giữ nguyên; kiểm tra cột thời lượng và lịch dự án."
+    },
+    "unique_ids": {
+      "fail": "Dòng {row}: mã công việc đã được dòng khác sử dụng.",
+      "suggestion": "Đặt mã duy nhất cho mỗi công việc trong tiến độ gốc."
+    },
+    "links_resolve": {
+      "fail": "Dòng {row}: một công việc trước không thuộc bảng.",
+      "suggestion": "Kiểm tra cột công việc trước; các liên kết không xác định sẽ bị bỏ qua."
+    }
+  },
+  "commercial_control": {
+    "ok": "Đã kiểm tra, không có vấn đề",
+    "cvr": {
+      "target_rate_basis": {
+        "fail": "{missing} trong {total} hạng mục đã định giá chưa có đơn giá mục tiêu và đang lập ngân sách theo giá bán (ví dụ {sample})",
+        "suggestion": "Nhập đơn giá chi phí mục tiêu cho các hạng mục này để ngân sách là chi phí công trường phải tuân theo"
+      },
+      "unmapped_cost": {
+        "fail": "{kind} {label} không có WBS hay mã chi phí: cam kết {committed}, thực tế {actual}",
+        "suggestion": "Gán dòng đơn hàng, hợp đồng thầu phụ hoặc hóa đơn vào một phần tử WBS để CVR có thể xếp nó"
+      }
+    },
+    "procurement": {
+      "line_over_committed": {
+        "fail": "Hạng mục {ordinal} cam kết vượt: đã đặt {committed_qty} trên {budget_qty}, {committed_value} so với ngân sách {budget_value}",
+        "suggestion": "Kiểm tra đặt hàng trùng, hoặc ghi nhận thay đổi hay điều chuyển ngân sách trước khi cam kết thêm"
+      }
+    },
+    "approval_routes": {
+      "bands_contiguous": {
+        "gap": {
+          "fail": "Các khoản từ {low} đến dưới {high} không đến người phê duyệt nào (bước {step})",
+          "suggestion": "Mở rộng khoảng liền kề hoặc thêm một bước để mỗi khoản đều có người phê duyệt"
+        },
+        "overlap": {
+          "fail": "Bước {step} chồng lấn khoảng thấp hơn từ {low} đến dưới {high}; cả hai người phê duyệt đều ký các khoản đó",
+          "suggestion": "Để mỗi khoản bắt đầu nơi khoản trước kết thúc, trừ khi cả hai cần ký"
+        },
+        "empty": {
+          "fail": "Bước {step} có khoảng từ {low} đến {high} không chứa khoản tiền nào",
+          "suggestion": "Đặt mức tối thiểu dưới mức tối đa, hoặc để trống mức tối đa nếu không có trần"
+        }
+      }
+    },
+    "valuation": {
+      "assessed_within_submitted": {
+        "fail": "Dòng {line}: khối lượng thẩm định {assessed} vượt khối lượng đề nghị {submitted}",
+        "suggestion": "Thẩm định tối đa phần đã đề nghị và ghi công việc thêm thành thay đổi"
+      },
+      "certified_within_assessed": {
+        "fail": "Dòng {line}: khối lượng xác nhận {certified} vượt khối lượng thẩm định {assessed}",
+        "suggestion": "Xác nhận tối đa phần đã thẩm định, hoặc thẩm định lại dòng trước"
+      }
+    }
+  },
+  "norm_base": {
+    "code_present": {
+      "fail": "Dòng {ordinal} không ghi mã định mức {base}. Dự toán theo định mức ghi định mức ở mọi dòng.",
+      "suggestion": "Nhập mã định mức vào phân loại {classification} của dòng."
+    },
+    "code_shape": {
+      "fail": "\"{code}\" ở dòng {ordinal} không phải mã {base}. Mã cần có dạng như {example}."
+    },
+    "legacy_prefix": {
+      "fail": "\"{code}\" ở dòng {ordinal} dùng tiền tố đã bãi bỏ {old}. Mã hiện hành là {new}."
+    },
+    "resource_breakdown": {
+      "fail": "Dòng định mức {code} không có giờ công hoặc bậc thợ bình quân.",
+      "suggestion": "Thêm nguồn lực nhân công với giờ công trên một đơn vị và bậc thợ bình quân của định mức."
+    },
+    "grade_range": {
+      "fail": "Bậc {grade} ở dòng {ordinal} nằm ngoài {min} đến {max} hoặc không theo bước {step}."
+    }
+  },
+  "public_funding": {
+    "markup_cap": {
+      "fail": "{funding}: {markup} là {percent} %, mức trần là {cap} % chi phí trực tiếp ({source}).",
+      "suggestion": "Giảm tỷ lệ về mức trần, hoặc đặt nguồn vốn là tư nhân nếu công việc không dùng vốn công."
+    },
+    "investor_exact": {
+      "fail": "Dự toán chủ đầu tư bằng {funding}: {markup} phải đúng {cap} % ({source})."
+    },
+    "material_price_evidence": {
+      "fail": "{funding}: vật liệu {material} ở dòng {ordinal} có {count} trên {required} báo giá và không có phân tích giá.",
+      "suggestion": "Ghi nhận báo giá của nhà cung cấp cho vật liệu hoặc đính kèm báo cáo phân tích giá."
+    }
+  },
+  "vat_rate": {
+    "standard_rate": {
+      "fail": "{markup} là {percent} %; thuế suất VAT tiêu chuẩn tại {country} là {rate} %.",
+      "suggestion": "Đặt dòng thuế về thuế suất tiêu chuẩn, hoặc ghi trong dự toán lý do áp dụng thuế suất khác hay miễn thuế."
+    }
+  },
+  "survey": {
+    "no_crs": {
+      "fail": "Tập điểm {name} chưa có hệ tọa độ: khai báo EPSG hoặc lưới cục bộ trước khi tính khối lượng hoặc thửa đất.",
+      "suggestion": "Đặt hệ tọa độ của dự án, rồi cho biết tệp này được đo trong hệ nào."
+    },
+    "crs_unconfirmed": {
+      "fail": "Hệ tọa độ được phát hiện tự động (độ tin cậy {confidence}); hãy xác nhận trước khi dùng.",
+      "suggestion": "Mở Đặt hệ tọa độ dự án và xác nhận hệ đã phát hiện hoặc chọn hệ khác."
+    },
+    "duplicate_point": {
+      "fail": "Mã điểm {point_id} bị trùng với tọa độ khác nhau.",
+      "suggestion": "Giữ một lần đo: xóa tập điểm chứa giá trị sai và nhập lại."
+    },
+    "traverse_misclosure": {
+      "fail": "Đường chuyền {name} khép ở 1:{r}, dưới mức tối thiểu của hồ sơ 1:{min}.",
+      "suggestion": "Kiểm tra các cạnh tìm sai số thô, đo lại cạnh yếu nhất hoặc xác nhận giá trị hồ sơ."
+    },
+    "level_misclosure": {
+      "fail": "Sai số khép thủy chuẩn {f} mm vượt k·√km với k = {k} mm.",
+      "suggestion": "Đo lại thủy chuẩn hoặc kiểm tra cao độ các mốc đã dùng."
+    }
+  },
+  "volumes": {
+    "no_overlap": {
+      "fail": "Hai bề mặt chỉ chồng lên nhau trên {p} % diện tích: khối lượng không có ý nghĩa.",
+      "suggestion": "Kiểm tra hai bề mặt cùng một hệ tọa độ và phủ cùng một khu đất."
+    },
+    "low_coverage": {
+      "fail": "Chỉ {c} % diện tích có dữ liệu ở cả hai bề mặt (tối thiểu {min} %).",
+      "suggestion": "Thêm điểm đo nơi thiếu bề mặt hoặc thu hẹp ranh giới về vùng được phủ."
+    },
+    "coarse_scan": {
+      "fail": "Một bản quét thô (LOA10) tạo ra khối lượng này mà không nêu lý do.",
+      "suggestion": "Dùng bản quét đạt độ chính xác trắc địa hoặc ghi lý do bản quét này đủ dùng."
+    },
+    "bank_volume": {
+      "fail": "Khối lượng là thể tích nguyên thổ (trong đất); hệ số nở rời chưa được áp dụng.",
+      "suggestion": "Gửi khối lượng đào nở rời nếu hạng mục dự toán được đo theo vật liệu rời."
+    }
+  },
+  "setting_out": {
+    "stake_off": {
+      "fail": "Điểm cắm mốc {id} lệch {d} mm, dung sai {t} mm",
+      "suggestion": "Cắm lại điểm và ghi nhận, hoặc tạo bản nháp NCR."
+    },
+    "record_untraceable": {
+      "fail": "Bản ghi cắm mốc {id} không có máy đo hoặc điểm khống chế.",
+      "suggestion": "Nhập máy đo và các điểm khống chế nơi đặt trạm máy."
+    },
+    "sheet": {
+      "title": "Phiếu cắm mốc",
+      "project": "Dự án",
+      "crs": "Hệ tọa độ",
+      "request": "Yêu cầu",
+      "tolerance": "Dung sai",
+      "element": "Cấu kiện",
+      "generated": "Ngày tạo",
+      "point": "Điểm",
+      "design_e": "E thiết kế",
+      "design_n": "N thiết kế",
+      "design_z": "Z thiết kế",
+      "measured_e": "E đo",
+      "measured_n": "N đo",
+      "verdict": "Kết quả",
+      "by": "Người đo",
+      "verdict_pass": "Đạt",
+      "verdict_fail": "Không đạt",
+      "verdict_open": "Mở",
+      "verdict_no_tolerance": "Không có hồ sơ",
+      "counts": "Đạt: {passed} · Không đạt: {failed} · Mở: {open}",
+      "findings": "Phát hiện",
+      "no_profile": "Chưa có hồ sơ dung sai, hãy đặt một",
+      "d": "d (mm)",
+      "dz": "dZ (mm)"
+    }
+  },
+  "land_parcels": {
+    "area_mismatch": {
+      "fail": "Thửa {id}: diện tích tính toán {a} m2 chênh với diện tích pháp lý {l} m2 quá dung sai ({t}).",
+      "suggestion": "Đối chiếu các điểm ranh giới với trích lục sổ đăng ký, hoặc ghi lại lý do hai diện tích khác nhau."
+    },
+    "ring_invalid": {
+      "fail": "Thửa {id}: ranh giới chưa khép kín hoặc tự cắt.",
+      "suggestion": "Sửa các điểm ranh giới để chúng đi quanh thửa một lần mà không cắt nhau."
+    },
+    "zone_not_acquired": {
+      "fail": "Vùng thi công chồng lên thửa {id} chưa thu hồi ({area} m2).",
+      "suggestion": "Thu hồi thửa hoặc thỏa thuận lối vào trước khi thi công, hoặc dời vùng thi công."
+    },
+    "overlap": {
+      "fail": "Thửa {a} và {b} chồng lấn {area} m2.",
+      "suggestion": "Sửa ranh giới chung để cả hai thửa dùng cùng các điểm."
+    },
+    "gap": {
+      "fail": "Khe hở {gap} m giữa thửa {a} và {b}.",
+      "suggestion": "Cho cả hai thửa dùng cùng điểm ranh giới, hoặc xác nhận dải đất thuộc thửa khác."
+    },
+    "id_format": {
+      "fail": "Số thửa {id} không đúng định dạng {label} (ví dụ {example}).",
+      "suggestion": "Chép số thửa đúng như sổ đăng ký ghi."
+    },
+    "pdf": {
+      "title": "Danh sách thửa đất",
+      "project": "Dự án",
+      "crs": "Hệ tọa độ",
+      "method": "Phương pháp",
+      "method_value": "Diện tích từ tọa độ ranh giới (công thức Gauss), làm tròn {decimals} chữ số thập phân, m2",
+      "printed": "Người in",
+      "legal": "Diện tích pháp lý (m2)",
+      "computed": "Tính toán (m2)",
+      "diff": "Chênh lệch (m2)",
+      "status": "Trạng thái",
+      "rights": "Quyền",
+      "cost": "Chi phí",
+      "findings": "Phát hiện",
+      "total": "Tổng, {count} thửa",
+      "acquired_of": "Đã thu hồi {acquired} / {total}",
+      "findings_title": "Phát hiện",
+      "no_findings": "Không có phát hiện.",
+      "disclaimer": "Chủ sở hữu và quyền được hiển thị như đã ghi trong dự án này. Danh sách này không phải ý kiến pháp lý hay trích lục sổ đăng ký.",
+      "status_needed": "Cần",
+      "status_negotiating": "Đang thương lượng",
+      "status_acquired": "Đã thu hồi",
+      "status_expropriation": "Trưng thu"
+    }
+  },
+  "monitoring": {
+    "crossed": {
+      "fail": "Điểm {id}: dịch chuyển {d} mm hoặc tốc độ {r} mm/day vượt ngưỡng {level}",
+      "suggestion": "Kiểm tra điểm đo và kết cấu, sau đó xác nhận cảnh báo kèm ghi chú."
+    },
+    "level": {
+      "ok": "Bình thường",
+      "alert": "Cảnh báo",
+      "action": "Hành động",
+      "alarm": "Báo động"
+    },
+    "risk": {
+      "title": "Điểm quan trắc {id} ở mức {level}",
+      "description": "Dịch chuyển {d} mm, tốc độ {r} mm/day so với {profile}. Bản nháp do quan trắc mở: hãy xem xét và chỉ định người phụ trách."
+    },
+    "report": {
+      "title": "Báo cáo cảnh báo quan trắc",
+      "project": "Dự án",
+      "crs": "Hệ tọa độ",
+      "profile": "Hồ sơ ngưỡng",
+      "generated": "Thời điểm tạo",
+      "point": "Điểm",
+      "baseline": "Giá trị ban đầu (m)",
+      "latest": "Giá trị mới nhất (m)",
+      "displacement": "Dịch chuyển (mm)",
+      "rate": "Tốc độ (mm/day)",
+      "level": "Mức",
+      "acknowledged": "Đã xác nhận",
+      "counts": "Báo động: {alarm} · Hành động: {action} · Cảnh báo: {alert} · Bình thường: {ok}",
+      "findings": "Phát hiện",
+      "no_profile": "Chưa có hồ sơ, hãy thiết lập",
+      "ack_yes": "Có",
+      "ack_no": "Không"
+    }
+  },
+  "stockpiles": {
+    "density_assumed": {
+      "fail": "Khối lượng riêng là giả định, không phải đo được: số tấn chỉ đáng tin bằng ước lượng đó.",
+      "suggestion": "Cân một mẫu hoặc lấy khối lượng riêng từ phiếu giao hàng của nhà cung cấp."
+    },
+    "variance_high": {
+      "fail": "Lần đo lệch {v} % so với tồn kho sổ sách, vượt dung sai {t} %.",
+      "suggestion": "Kiểm tra khối lượng riêng và mặt nền, rồi đề xuất điều chỉnh và xác nhận nếu chênh lệch là thật."
+    }
+  },
+  "mine_survey": {
+    "compliance_outside": {
+      "fail": "Mức thực hiện của kỳ {c} % nằm ngoài dải {lo}-{hi} %.",
+      "suggestion": "Kiểm tra kế hoạch và số liệu đo, rồi giải thích chênh lệch trong ghi chú kỳ trước khi thanh toán."
+    },
+    "truck_differs": {
+      "fail": "Số tấn theo đếm xe chênh {v} % so với số tấn đo, vượt ngưỡng kiểm tra {t} %.",
+      "suggestion": "Kiểm tra tải trọng mỗi chuyến và khối lượng riêng, rồi so sánh lại hai bề mặt."
+    }
+  },
+  "hongkong": {
+    "sopo_applicability": {
+      "fail": "Hợp đồng này thuộc Cap. 652 (Security of Payment): phản hồi trong 30 ngày, thanh toán trong 60 ngày kể từ yêu cầu"
+    },
+    "sopo_private_scope_check": {
+      "fail": "Hợp đồng tư nhân chỉ thuộc Cap. 652 khi là công trình mới hoặc công việc cần Building Authority phê duyệt: xác nhận phạm vi"
+    },
+    "sopo_response_late": {
+      "fail": "Chưa tống đạt phản hồi thanh toán trước {date}: số tiền yêu cầu bị tranh chấp và có thể đưa ra phân xử"
+    },
+    "sopo_payment_term_exceeds_60": {
+      "fail": "Thời hạn thanh toán {n} ngày vượt quá 60 ngày Cap. 652 cho phép"
+    },
+    "sopo_response_term_exceeds_30": {
+      "fail": "Thời hạn phản hồi {n} ngày vượt quá 30 ngày Cap. 652 cho phép"
+    },
+    "sopo_adjudication_window": {
+      "fail": "Đã phát sinh tranh chấp thanh toán: tống đạt thông báo phân xử trước {date}"
+    },
+    "contract_pay_when_paid": {
+      "fail": "Điều khoản pay-when-paid: Cap. 652 khiến thanh toán có điều kiện không có hiệu lực thi hành"
+    },
+    "levy_missing": {
+      "fail": "Công việc vượt HK$3,000,000 nhưng dự toán thiếu phí CIC (0,5%) hoặc phí CWR (0,03%)"
+    },
+    "levy_below_threshold": {
+      "fail": "Công việc không quá HK$3,000,000: không phải nộp phí CIC hoặc CWR"
+    },
+    "tax_nonzero": {
+      "fail": "Có dòng VAT hoặc GST, nhưng Hồng Kông không có thuế này: đặt bằng không"
+    },
+    "retention_over_limit": {
+      "fail": "Tiền giữ lại {x} vượt giới hạn hợp đồng {limit}"
+    },
+    "pc_sum_no_attendance": {
+      "fail": "Khoản prime cost thiếu hạng mục lợi nhuận và phục vụ"
+    },
+    "index_attribution": {
+      "fail": "Chỉ số giá ArchSD thiếu ghi nguồn: ghi Architectural Services Department"
     }
   }
 }

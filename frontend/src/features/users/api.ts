@@ -6,7 +6,7 @@
 
 import { apiGet, apiPatch, apiPost, apiDelete } from '@/shared/lib/api';
 
-export type UserRole = 'admin' | 'manager' | 'editor' | 'viewer';
+export type UserRole = 'admin' | 'manager' | 'editor' | 'surveyor' | 'viewer';
 export type ModuleAccessLevel = 'none' | 'view' | 'edit' | 'full';
 
 export interface User {
@@ -74,6 +74,11 @@ export async function fetchUsers(params?: {
 
 export async function updateUser(id: string, data: UserAdminUpdate): Promise<User> {
   return apiPatch<User>(`/v1/users/${id}`, data);
+}
+
+/** Confirmation link of a pending self-registered account, for an admin to pass on. */
+export async function getVerificationLink(id: string): Promise<{ url: string; expires_in_hours: number }> {
+  return apiGet<{ url: string; expires_in_hours: number }>(`/v1/users/${id}/verification-link/`);
 }
 
 /**

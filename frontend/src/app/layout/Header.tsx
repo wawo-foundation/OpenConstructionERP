@@ -22,6 +22,8 @@ import { ProcessesButton } from '@/features/processes/ProcessesButton';
 import { HeaderNewsButton } from '@/shared/ui/HeaderNewsButton';
 import { ModuleBuilderButton } from '@/features/module-builder';
 import { fetchProjectList } from '@/shared/lib/projectList';
+import { EMPTY_FACETS, applyProjectFacets, isFacetFilterActive, type ProjectFacetFilters } from '@/shared/lib/projectFacets';
+import { ProjectFacetSelects } from '@/shared/ui/ProjectFacetSelects';
 import { projectColor } from '@/shared/lib/projectColor';
 import { useActiveProjectColor } from '@/shared/hooks/useActiveProjectColor';
 import { copyToClipboard } from '@/shared/lib/browser';
@@ -47,6 +49,8 @@ import { useIconOverridesVersion } from './menuIcons';
 import { resolveStaleProject } from './staleProject';
 import { isModuleI18nKey } from '@/modules/_i18n';
 import { EstimateCrumb } from '@/shared/ui/EstimateCrumb';
+
+type HeaderProjectRow = { id: string; name: string; color?: string | null; phase?: string | null; project_type?: string | null };
 
 /**
  * Map the English page titles passed from App.tsx routes to i18n keys.
@@ -97,6 +101,7 @@ export const TITLE_I18N_MAP: Record<string, string> = {
   // only catch a module that still ships the English literal.
   'GAEB Exchange': 'nav.gaeb_exchange',
   'Resource Catalog': 'catalog.title',
+  'Project Catalogue': 'project_catalogue.title',
   'Assemblies': 'nav.assemblies',
   'New Assembly': 'assemblies.new_assembly',
   // No locale names the single-assembly editor, so it takes the module's own
@@ -130,10 +135,13 @@ export const TITLE_I18N_MAP: Record<string, string> = {
   'CRM': 'nav.crm',
   'Bid outcomes': 'winloss.title',
   'Contracts': 'nav.contracts',
+  'Framework Agreements': 'framework.title',
   'Subcontractors': 'nav.subcontractors',
   'Bid Management': 'nav.bid_management',
   'Tendering': 'nav.tendering',
   'Variations': 'nav.variations',
+  'Sealed estimates': 'nav.estimate_archive',
+  'Sealed estimate': 'estimate_archive.term.neutral',
   'Supplier Catalogs': 'nav.supplier_catalogs',
   'Change Orders': 'nav.change_orders',
   // Property development
@@ -322,6 +330,7 @@ export const TITLE_I18N_MAP: Record<string, string> = {
   'E-Signatures': 'signing.title',
   // Finance & analytics
   'Payment Clock': 'nav.payment_clock',
+  'China VAT': 'nav.china_tax',
   'Cost-Value Reconciliation': 'nav.cvr',
   'Earned Value': 'nav.full_evm',
   'EAC Block Editor': 'eac.editor.title',
@@ -1409,6 +1418,7 @@ const ROUTE_COMPONENT_MAP: ReadonlyArray<readonly [string, string]> = [
   ['/templates', 'BOQ Templates'],
   ['/costs', 'Cost Database'],
   ['/catalog', 'Resource Catalog'],
+  ['/project-catalogue', 'Project Catalogue'],
   ['/assemblies', 'Assemblies'],
   ['/validation', 'Validation'],
   // `/compliance` itself mounts nothing; it is the prefix the Rule Builder
@@ -1463,8 +1473,10 @@ const ROUTE_COMPONENT_MAP: ReadonlyArray<readonly [string, string]> = [
   ['/portal', 'Client & Partner Portal'],
   ['/resources', 'Resources & Crew'],
   ['/contracts', 'Contracts'],
+  ['/framework-agreements', 'Framework Agreements'],
   ['/payment-clock', 'Payment Clock'],
   ['/tax-withholding', 'Withholding Tax'],
+  ['/china-tax', 'China VAT'],
   ['/einvoice-clearance', 'E-invoice Clearance'],
   ['/inbound-email', 'Email Delay Scan'],
   ['/cost-match', 'Cost Match'],
@@ -1805,6 +1817,8 @@ function ProjectSwitcher() {
   const clearProject = useProjectContextStore((s) => s.clearProject);
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  // Narrows the list only; the active project stays whatever it was.
+  const [facets, setFacets] = useState<ProjectFacetFilters>(EMPTY_FACETS);
   // "Show all" toggle — collapsed by default to keep the dropdown tidy
   // when the user has dozens of projects; explicit opt-in to expand.
   const [expanded, setExpanded] = useState(false);
@@ -1819,7 +1833,7 @@ function ProjectSwitcher() {
   // ['projects'] may cache a partial list or an empty one on error.
   const { data: projects, isLoading, isError, isFetching, refetch } = useQuery({
     queryKey: ['projects'],
-    queryFn: () => fetchProjectList<Array<{ id: string; name: string; color?: string | null }>>(),
+    queryFn: () => fetchProjectList<HeaderProjectRow[]>(),
     staleTime: 60_000,
     // Enabled as soon as the component mounts — the Header is always on
     // screen after login, so the list is warm by the time the user clicks.
@@ -1836,13 +1850,13 @@ function ProjectSwitcher() {
   // is a list we can't show, not a reason to stop rendering. Same reasoning for
   // the name — `.toLowerCase()` on a missing field is the identical throw.
   const projectList = Array.isArray(projects) ? projects : [];
-  const filteredProjects = projectList.filter((p) =>
+  const filteredProjects = applyProjectFacets(projectList, facets).filter((p) =>
     String(p?.name ?? '').toLowerCase().includes(searchQuery.toLowerCase()),
   );
   // When the user is actively searching, show every hit — typing is an
   // implicit "show all that match". The collapse/expand affordance only
   // applies to the default, unfiltered listing.
-  const showEverything = expanded || searchQuery.trim().length > 0;
+  const showEverything = expanded || searchQuery.trim().length > 0 || isFacetFilterActive(facets);
   const visibleProjects = showEverything
     ? filteredProjects
     : filteredProjects.slice(0, MAX_VISIBLE);
@@ -1851,6 +1865,7 @@ function ProjectSwitcher() {
   useEffect(() => {
     if (!open) {
       setSearchQuery('');
+      setFacets(EMPTY_FACETS);
       setExpanded(false);
       return;
     }
@@ -2035,6 +2050,14 @@ function ProjectSwitcher() {
                 className="oe-input ps-8"
               />
             </div>
+            <div className="mt-2 flex gap-2 empty:hidden">
+              <ProjectFacetSelects
+                projects={projectList}
+                value={facets}
+                onChange={setFacets}
+                selectClassName="oe-select min-w-0 flex-1 text-xs"
+              />
+            </div>
           </div>
           <div className="max-h-64 overflow-y-auto py-1">
             {isLoading && (
@@ -2058,7 +2081,7 @@ function ProjectSwitcher() {
             )}
             {!isLoading && !isError && visibleProjects.length === 0 && (
               <p className="px-4 py-4 text-sm text-content-tertiary text-center">
-                {searchQuery
+                {searchQuery || isFacetFilterActive(facets)
                   ? t('common.no_results', { defaultValue: 'No projects found' })
                   : t('projects.none', { defaultValue: 'No projects yet' })}
               </p>

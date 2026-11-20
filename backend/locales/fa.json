@@ -788,7 +788,8 @@
         "no_rejections": "هیچ قلمی مردود نشد.",
         "sig_delivered_by": "تحویل‌دهنده",
         "counterparty_tax_id": "شناسه مالیاتی",
-        "counterparty_address": "نشانی"
+        "counterparty_address": "نشانی",
+        "delivery_address": "نشانی تحویل"
       },
       "labels": {
         "po_status": {
@@ -861,7 +862,8 @@
         "gross_settled": "مبلغ ناخالص تسویه‌شده",
         "no_withholding": "از این پرداخت چیزی کسر نشده است.",
         "counterparty_tax_id": "شناسه مالیاتی",
-        "counterparty_address": "نشانی"
+        "counterparty_address": "نشانی",
+        "supply_date": "تاریخ تحویل"
       },
       "labels": {
         "invoice_status": {
@@ -1647,6 +1649,81 @@
         "col_max": "بیشترین",
         "col_count": "قرائت‌ها"
       }
+    },
+    "gantt_pdf": {
+      "strings": {
+        "title": "برنامه زمان‌بندی (نمودار گانت)",
+        "project": "پروژه",
+        "schedule": "برنامه زمان‌بندی",
+        "baseline": "خط مبنا",
+        "no_baseline": "هیچ",
+        "exported": "تاریخ خروجی",
+        "data_date": "تاریخ داده",
+        "col_wbs": "WBS",
+        "col_activity": "فعالیت",
+        "col_start": "شروع",
+        "col_finish": "پایان",
+        "col_duration": "روز",
+        "legend_current": "برنامه فعلی",
+        "legend_progress": "پیشرفت",
+        "legend_critical": "مسیر بحرانی",
+        "legend_baseline": "برنامه مبنا",
+        "legend_actual": "واقعی",
+        "legend_milestone": "نقطه عطف",
+        "legend_summary": "خلاصه",
+        "week_short": "ه{n}",
+        "quarter_short": "ف{n}",
+        "sheet_of": "برگه {page} از {total}",
+        "no_activities": "این برنامه هنوز فعالیتی ندارد."
+      }
+    },
+    "contracts": {
+      "strings": {
+        "doc_title": "قرارداد",
+        "col_code": "کد",
+        "col_title": "عنوان",
+        "col_type": "نوع قرارداد",
+        "col_role": "سمت قرارداد",
+        "col_counterparty": "طرف مقابل",
+        "col_original_value": "مبلغ اولیه",
+        "col_total_value": "مبلغ قرارداد",
+        "col_retention": "کسورات حسن انجام کار",
+        "col_start": "تاریخ شروع",
+        "col_end": "تاریخ پایان",
+        "col_signed": "تاریخ امضا",
+        "line_code": "کد",
+        "line_description": "شرح",
+        "line_unit": "واحد",
+        "line_quantity": "مقدار",
+        "line_unit_rate": "بهای واحد",
+        "lines": "جدول ارزش اقلام",
+        "signer_company": "از طرف شرکت"
+      },
+      "labels": {
+        "status": {
+          "draft": "پیش‌نویس",
+          "active": "فعال",
+          "suspended": "معلق",
+          "completed": "تکمیل‌شده",
+          "terminated": "فسخ‌شده"
+        },
+        "type": {
+          "lump_sum": "مبلغ مقطوع",
+          "gmp": "GMP",
+          "cost_plus": "هزینه به‌علاوه",
+          "tm": "زمان و مصالح",
+          "unit_price": "قیمت واحد",
+          "design_build": "طرح و ساخت",
+          "combination": "ترکیبی",
+          "remeasurement": "متره مجدد",
+          "framework": "قرارداد چارچوب",
+          "call_off": "سفارش بر پایه قرارداد چارچوب"
+        },
+        "party": {
+          "client": "قرارداد با کارفرما",
+          "subcontractor": "قرارداد با پیمانکار جزء"
+        }
+      }
     }
   },
   "cost_control": {
@@ -2076,7 +2153,11 @@
       "notifications.portal.message_received.title": "پیام جدید در پورتال",
       "notifications.portal.message_received.body": "{buyer_name} پیامی ارسال کرد.",
       "dispatch.notify.plan_title": "Your daily plan is ready",
-      "dispatch.notify.plan_body": "Plan for {day}: {lines} lines."
+      "dispatch.notify.plan_body": "Plan for {day}: {lines} lines.",
+      "notifications.monitoring.alert.title": "هشدار پایش",
+      "notifications.monitoring.action.title": "سطح اقدام پایش",
+      "notifications.monitoring.alarm.title": "آلارم پایش",
+      "notifications.monitoring.crossed.body": "نقطه {point}: {displacement} mm، {rate} mm/day."
     },
     "schedule_headers": {
       "headers": {
@@ -2699,5 +2780,30 @@
         "gap": "شکاف"
       }
     }
-  }
+  },
+  "monitoring.crossed.fail": "نقطه‌ی {id}: جابه‌جایی {d} میلی‌متر یا نرخ {r} میلی‌متر/روز از سطح {level} گذشت",
+  "monitoring.crossed.suggestion": "نقطه و سازه را بررسی کنید، سپس هشدار را با یادداشت تأیید کنید.",
+  "monitoring.level.ok": "OK",
+  "monitoring.level.alert": "هشدار",
+  "monitoring.level.action": "اقدام",
+  "monitoring.level.alarm": "هشدار بحرانی",
+  "monitoring.risk.title": "نقطه‌ی پایش {id} در سطح {level}",
+  "monitoring.risk.description": "جابه‌جایی {d} میلی‌متر، نرخ {r} میلی‌متر/روز نسبت به {profile}. پیش‌نویس توسط پایش باز شد: بررسی کنید و مسئول تعیین کنید.",
+  "monitoring.report.title": "گزارش هشدار پایش",
+  "monitoring.report.project": "پروژه",
+  "monitoring.report.crs": "سیستم مختصات",
+  "monitoring.report.profile": "پروفایل حدها",
+  "monitoring.report.generated": "تولیدشده",
+  "monitoring.report.point": "نقطه",
+  "monitoring.report.baseline": "مقدار پایه (متر)",
+  "monitoring.report.latest": "آخرین مقدار (متر)",
+  "monitoring.report.displacement": "جابه‌جایی (میلی‌متر)",
+  "monitoring.report.rate": "نرخ (میلی‌متر/روز)",
+  "monitoring.report.level": "سطح",
+  "monitoring.report.acknowledged": "تأییدشده",
+  "monitoring.report.counts": "هشدار: {alarm} · اقدام: {action} · هشدار: {alert} · OK: {ok}",
+  "monitoring.report.findings": "یافته‌ها",
+  "monitoring.report.no_profile": "پروفایلی نیست، یکی تعیین کنید",
+  "monitoring.report.ack_yes": "بله",
+  "monitoring.report.ack_no": "خیر"
 }

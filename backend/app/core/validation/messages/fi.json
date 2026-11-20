@@ -299,6 +299,10 @@
     "unit_exportable": {
       "fail": "Nimike {ordinal}: yksikkö '{unit}' ei mahdu 4 merkin GAEB-kenttään QU ja katkaistaan viennissä",
       "suggestion": "Käytä enintään 4 merkin GAEB-yksikkökoodia (m, m2, m3, St, h, psch, kg, t)"
+    },
+    "short_text_length": {
+      "fail": "Nimike {ordinal}: lyhyessä tekstissä on {length} merkkiä; GAEB-vienti lyhentää sen 70 merkkiin",
+      "suggestion": "Lyhennä lyhyt teksti 70 merkkiin ja jätä yksityiskohdat pitkään tekstiin"
     }
   },
   "nrm": {
@@ -412,7 +416,10 @@
       "suggestion": "Määritä yhdeksännumeroinen GB/T 50500 -koodi (esim. 010101001)"
     },
     "valid_code": {
-      "fail": "Virheellinen GB/T 50500 -koodi '{code}'; odotetaan 9 tai 12 numeroa"
+      "fail": "Virheellinen GB/T 50500 -koodi '{code}'; odotetaan 9 tai 12 numeroa tai lisäkoodia kuten 01B001"
+    },
+    "code_unique": {
+      "fail": "Nimikekoodia '{code}' käytetään samassa osahankkeessa useammin kuin kerran"
     }
   },
   "cpwd": {
@@ -931,6 +938,36 @@
     "change_time_within_owner": {
       "fail": "Aliurakoitsijoiden aikavaikutukset kohteessa {code} ovat yhteensä {sub_days} päivää, enemmän kuin tilaajan myöntämät {owner_days} päivää",
       "suggestion": "Tarkista aliurakoitsijoiden aikavaatimukset tai pyydä tilaajalta vastaava jatkoaika"
+    },
+    "pay_app_over_complete": {
+      "fail": "Rivi {line} saavuttaa tämän jakson jälkeen {percent} % suunnitellusta arvostaan ({completed} / {scheduled})",
+      "suggestion": "Pienennä tämän jakson summaa tai kirjaa syy laskutukseen suunnitellun arvon yli"
+    },
+    "pay_app_line_negative": {
+      "fail": "Rivin {line} summa olisi tähän mennessä {completed}, eli alle nollan"
+    },
+    "pay_app_within_agreement": {
+      "fail": "Maksuerät yhteensä {billed}, mikä ylittää sopimusarvon ja hyväksytyt muutokset ({limit})"
+    },
+    "pay_app_correct": {
+      "suggestion": "Korjaa tämän maksuerän summat tai korota sopimusarvoa hyväksytyllä muutoksella"
+    },
+    "required_documents": {
+      "fail": "Vaadittu asiakirja: {document} ({state})",
+      "suggestion": "Liitä asiakirja, allekirjoitettuna ja voimassa olevana, alihankintasopimukseen",
+      "states": {
+        "missing": "puuttuu",
+        "unsigned": "allekirjoittamaton",
+        "expired": "vanhentunut"
+      }
+    },
+    "document_roles": {
+      "terms_and_conditions": "Sopimusehdot",
+      "safety_agreement": "Turvallisuussopimus",
+      "safety_plan": "Turvallisuussuunnitelma",
+      "insurance": "Vakuutus",
+      "method_statement": "Työselostus",
+      "other": "Muu asiakirja"
     }
   },
   "submittal": {
@@ -2014,6 +2051,510 @@
     "crew_without_record": {
       "fail": "Työmaalla oli {headcount} hengen ryhmä, mutta työtä, tarkastusta tai viivästystä ei ole kirjattu.",
       "suggestion": "Lisää, mitä ryhmä teki, tai viivästys, joka pysäytti työn."
+    }
+  },
+  "framework_agreement": {
+    "item_not_in_agreement": {
+      "fail": "Rivi {code} ei ole sopimuksen {agreement} aktiivinen kohta; lisää se lisätyönä.",
+      "suggestion": "Poista rivi tilauksesta ja kirjaa työ tilaukselle lisätyönä."
+    },
+    "rate_deviates": {
+      "fail": "Rivin {code} hinta {rate} poikkeaa sopimushinnasta {expected}.",
+      "suggestion": "Tilauksen hinnat tulevat puitesopimuksesta; hinnoittele rivi uudelleen hinnastosta."
+    },
+    "order_outside_validity": {
+      "fail": "Tilauspäivä {date} on sopimuskauden {from}–{to} ulkopuolella.",
+      "suggestion": "Päivää tilaus sopimuskauden sisälle tai pidennä sopimusta ensin."
+    },
+    "rate_period_gap": {
+      "fail": "Mikään hintakausi ei kata päivää {date}.",
+      "suggestion": "Lisää välilehdelle Hinnat ja indeksikorotus hintakausi, joka kattaa tämän päivän."
+    },
+    "escalation_unresolved": {
+      "fail": "Indeksillä {series} ei ole arvoa kaudelle {period}; hintaa ei voi tarkistaa.",
+      "suggestion": "Syötä kuukauden indeksiarvo Hintaindeksi-kohtaan ja hinnoittele tilaus uudelleen."
+    },
+    "cap_exceeded": {
+      "fail": "Tämä tilaus nostaa sopimuksen käytön {total} tasolle, kun katto on {cap}; jäljellä {headroom}.",
+      "suggestion": "Pienennä tilaus jäljelle jäävään määrään tai tee se perustellulla poikkeuksella."
+    },
+    "cap_threshold": {
+      "fail": "Sopimuksen käyttö on saavuttanut {pct} % katosta.",
+      "suggestion": "Ilmoita asiakkaalle ajoissa, jotta seuraava sopimus voidaan valmistella."
+    },
+    "item_max_qty": {
+      "fail": "Kohde {code}: tilattu tähän mennessä {qty} ylittää ilmoitetun enimmäismäärän {max}.",
+      "suggestion": "Sovi lisämäärästä asiakkaan kanssa ennen seuraavaa tilausta."
+    },
+    "min_at_risk": {
+      "fail": "Aikaa on {days} päivää ja {pct} % taatusta vähimmäismäärästä on tilattu.",
+      "suggestion": "Ota vajaus esille asiakkaan kanssa, kun tilaamiseen on vielä aikaa."
+    },
+    "currency_mismatch": {
+      "fail": "Tilauksen valuutta {cur} poikkeaa sopimuksen valuutasta {agr}.",
+      "suggestion": "Tilaukset hinnoitellaan sopimuksen valuutassa."
+    },
+    "adjustment_unknown": {
+      "fail": "Ehdolle {tag} ei ole tämän sopimuksen mukaista korjausta.",
+      "suggestion": "Lisää korjaus välilehdelle Ehdot tai poista ehto tilaukselta."
+    },
+    "direct_claim": {
+      "fail": "Vaatimukset tehdään tilauksille, ei puitesopimukselle.",
+      "suggestion": "Avaa tilaus, jonka alla työ tehtiin, ja tee vaatimus siellä."
+    },
+    "duplicate_item": {
+      "fail": "Kohdekoodi {code} esiintyy kahdesti hintakaudella {period}.",
+      "suggestion": "Pidä yksi rivi kutakin kohdekoodia kohden ennen hinnaston tallennusta."
+    },
+    "measured_over_ordered": {
+      "fail": "Mitattu määrä {m} ylittää tilatun {o} rivillä {code}; harkitse lisätyötä.",
+      "suggestion": "Kirjaa lisämäärä tilauksen muutoksena."
+    },
+    "term_over_legal_max": {
+      "fail": "Kesto {years} vuotta ylittää {source}-paketin mukaisen {max} vuoden rajan.",
+      "suggestion": "Tarkista kesto asiakkaan kanssa; paketti ilmoittaa rajan, mutta sitä ei valvota."
+    }
+  },
+  "estimate_archive": {
+    "arc_hash_mismatch": {
+      "fail": "Sormenjälki ei täsmää: tietue antaa {actual}, sinetti ilmoittaa {sealed}. Pidä tietuetta muutettuna."
+    },
+    "arc_total_mismatch": {
+      "fail": "Sinetöity summa {seal} poikkeaa urakkasummasta {award} määrällä {diff}."
+    },
+    "arc_no_breakdown": {
+      "fail": "{n} nimikkeellä ei ole resurssierittelyä; niiden hintoja ei voi myöhemmin jäljittää."
+    },
+    "arc_no_markups": {
+      "fail": "Laskelmassa ei ole sinetöitäviä lisiä."
+    },
+    "arc_sealed_after_signing": {
+      "fail": "Sinetöity {days} päivää sopimuksen allekirjoittamisen jälkeen."
+    },
+    "arc_no_receipt": {
+      "fail": "Vastapuoli ei ole vielä kuitannut sormenjälkeä."
+    },
+    "arc_open_not_closed": {
+      "fail": "Avaus {id} on ollut auki {days} päivää ilman pöytäkirjaa."
+    },
+    "arc_open_no_reason": {
+      "fail": "Avaus vaatii syyn ja viitteen."
+    },
+    "arc_open_one_party": {
+      "fail": "Vain yksi osapuoli on merkitty; kirjaa, miksi toinen puuttuu."
+    },
+    "var_basis_no_seal": {
+      "fail": "Nimike {code} on hinnoiteltu alkuperäisellä perusteella, mutta sinetöityä laskelmaa ei ole."
+    },
+    "var_basis_deviation": {
+      "fail": "Nimike {code}: {field} muuttui arvosta {old} arvoon {new} ilman huomautusta."
+    },
+    "var_new_resource_no_evidence": {
+      "fail": "Uudella resurssilla {res} ei ole hintapäivää eikä tarjousviitettä."
+    },
+    "var_markup_not_sealed": {
+      "fail": "Nimike {code} käyttää lisää {m}, jota ei ole sinetissä."
+    },
+    "var_abnormal_carried_rate": {
+      "fail": "Siirretty kustannus {c} poikkeaa vertailuarvosta {pct} %."
+    },
+    "arc_mutation_refused": {
+      "fail": "Sinetöityä laskelmaa ei voi muuttaa eikä poistaa. Sinetöi uusi versio, joka korvaa sen."
+    },
+    "contents_locked": "Sisältö pysyy sinetöitynä, kunnes virallinen avaus alkaa.",
+    "market_off": "Sinetöidyt laskelmat eivät kuulu tämän hankkeen markkinaprofiiliin.",
+    "contract_required": "Asiakassopimus tarvitaan, ennen kuin arvio voidaan sinetöidä sopimuksen perusteeksi."
+  },
+  "boq_revision": {
+    "superseded_still_editable": {
+      "fail": "Revisio {label} on yhä muokattavissa, vaikka sen jälkeen on luotu {later}; täällä tehdyt muutokset eivät siirry",
+      "suggestion": "Lukitse {label} tai jatka työtä uusimmassa revisiossa"
+    }
+  },
+  "schedule_baseline": {
+    "single_approved": {
+      "fail": "Tällä aikataululla on useampi kuin yksi hyväksytty perusaikataulu ({baselines}).",
+      "suggestion": "Hyväksy perusaikataulu, jonka pitää olla voimassa; yhden hyväksyminen peruu muiden hyväksynnän."
+    }
+  },
+  "project_catalogue": {
+    "unit_present": {
+      "fail": "Hinnalla {code} ei ole yksikköä.",
+      "suggestion": "Anna yksikkö, jota hinta koskee, esimerkiksi m2, m3 tai h."
+    },
+    "duplicate_code": {
+      "fail": "Koodia {code} käyttää tässä projektissa useampi kuin yksi hinta.",
+      "suggestion": "Pidä yksi hinta koodia kohden tai anna variantille oma koodi."
+    },
+    "currency_differs": {
+      "fail": "Hinta {code} on valuutassa {currency}, mutta projekti lasketaan valuutassa {project_currency}.",
+      "suggestion": "Muunna hinta projektin valuuttaan tai vahvista, että vieras valuutta on tarkoituksellinen."
+    },
+    "override_far": {
+      "fail": "Kohteen {code} paikallinen hinta poikkeaa {percent} % lähdehinnasta {source_rate}.",
+      "suggestion": "Tarkista, onko desimaalierotin siirtynyt, tai kirjaa, miksi projekti tarvitsee eri hinnan."
+    },
+    "source_changed": {
+      "fail": "Kohteen {code} lähdehinta on muuttunut arvosta {old} arvoon {new} sen jälkeen, kun projekti kopioi sen.",
+      "suggestion": "Ota uusi lähdehinta käyttöön tai pidä tietoisesti paikallinen hinta."
+    }
+  },
+  "schedule_mspdi_import": {
+    "task_dates": {
+      "missing_dates": "Tehtävällä {ref} \"{name}\" ei ole alkamis- tai päättymispäivää.",
+      "finish_before_start": "Tehtävä {ref} \"{name}\" päättyy ({finish}) ennen kuin alkaa ({start}).",
+      "suggestion": "Korjaa päivämäärät lähdeaikataulussa ja vie se uudelleen. Päivämääriä ei koskaan arvata tuonnissa."
+    },
+    "unique_ids": {
+      "duplicate_uid": "Tehtävätunnus {ref} esiintyy useammin kuin kerran; vain ensimmäinen tehtävä säilytetään.",
+      "suggestion": "Anna jokaiselle tehtävälle yksilöllinen tunnus lähdeaikataulussa."
+    },
+    "links_resolve": {
+      "dangling_link": "Tehtävä {ref} \"{name}\": edeltäjää {predecessor} ei ole tiedostossa, linkki ohitetaan.",
+      "duplicate_link": "Tehtävä {ref} \"{name}\": toinen linkki edeltäjästä {predecessor} ohitetaan, paria kohden säilytetään yksi linkki.",
+      "self_link": "Tehtävä {ref} \"{name}\" on linkitetty itseensä, linkki ohitetaan.",
+      "unknown_link_type": "Tehtävä {ref} \"{name}\": linkkityyppi {type} on tuntematon ja luetaan lopusta alkuun -tyypiksi.",
+      "suggestion": "Tarkista lähdeaikataulun loogiset linkit."
+    },
+    "values_in_range": {
+      "percent_out_of_range": "Tehtävä {ref} \"{name}\": valmiusaste {value} % on alueen 0-100 ulkopuolella ja rajataan.",
+      "outline_gap": "Tehtävä {ref} \"{name}\" ohittaa jäsennystason ({level}); se sijoitetaan lähimmän yläpuolisen yhteenvetotehtävän alle.",
+      "suggestion": "Tarkista valmiusaste ja sisennykset lähdeaikataulussa."
+    },
+    "calendar_work_days": {
+      "calendar_no_work_days": "Kalenterissa {calendar} ei ole työpäiviä.",
+      "suggestion": "Merkitse tämän kalenterin työpäivät lähdeaikatauluun."
+    }
+  },
+  "schedule_pdf_import": {
+    "no_text_layer": {
+      "fail": "PDF:ssä ei ole tekstikerrosta, joten taulukkoa ei voi lukea.",
+      "suggestion": "Vie aikataulu MS Project XML-, XER- tai Excel-muotoon ja tuo se tiedosto."
+    },
+    "dates_parsed": {
+      "fail": "Rivi {row}: alku tai loppu ei ole päivämäärä.",
+      "suggestion": "Tarkista päivämääräsarakkeet ja järjestys päivä/kuukausi tai korjaa päivämäärä lähteessä."
+    },
+    "finish_before_start": {
+      "fail": "Rivi {row}: loppu on ennen alkua.",
+      "suggestion": "Korjaa päivämäärät lähdeaikataulussa."
+    },
+    "duration_mismatch": {
+      "fail": "Rivi {row}: tulostettu kesto poikkeaa alun ja lopun välisistä työpäivistä.",
+      "suggestion": "Päivämäärät säilytetään; tarkista kestosarake ja projektin kalenteri."
+    },
+    "unique_ids": {
+      "fail": "Rivi {row}: tehtävän tunnus on käytössä toisella rivillä.",
+      "suggestion": "Anna jokaiselle tehtävälle yksilöllinen tunnus lähdeaikataulussa."
+    },
+    "links_resolve": {
+      "fail": "Rivi {row}: edeltäjä ei ole taulukon tehtävä.",
+      "suggestion": "Tarkista edeltäjäsarake; ratkaisemattomat linkit ohitetaan."
+    }
+  },
+  "commercial_control": {
+    "ok": "Tarkistettu, ei huomautettavaa",
+    "cvr": {
+      "target_rate_basis": {
+        "fail": "{missing}/{total} hinnoitellulla nimikkeellä ei ole tavoitehintaa, ja ne budjetoidaan myyntihintaan (esim. {sample})",
+        "suggestion": "Syötä näille nimikkeille tavoitekustannus, jotta budjetti on kustannus, johon työmaa sitoutuu"
+      },
+      "unmapped_cost": {
+        "fail": "{kind} {label}: ei WBS-elementtiä eikä kustannuskoodia, sidottu {committed}, toteutunut {actual}",
+        "suggestion": "Kohdista tilausrivi, aliurakka tai lasku WBS-elementtiin, jotta CVR voi sijoittaa sen"
+      }
+    },
+    "procurement": {
+      "line_over_committed": {
+        "fail": "Nimike {ordinal} on ylisidottu: tilattu {committed_qty}/{budget_qty}, {committed_value} budjetin ollessa {budget_value}",
+        "suggestion": "Tarkista kaksoistilaus tai kirjaa muutos tai budjettisiirto ennen kuin sidot lisää"
+      }
+    },
+    "approval_routes": {
+      "bands_contiguous": {
+        "gap": {
+          "fail": "Summat {low}–{high} eivät tavoita yhtään hyväksyjää (vaihe {step})",
+          "suggestion": "Laajenna viereistä väliä tai lisää vaihe, jotta jokaisella summalla on hyväksyjä"
+        },
+        "overlap": {
+          "fail": "Vaihe {step} menee päällekkäin alemman välin kanssa {low}–{high}; molemmat hyväksyjät allekirjoittavat nämä summat",
+          "suggestion": "Aloita kukin väli siitä, mihin edellinen päättyy, ellei molempien kuulu allekirjoittaa"
+        },
+        "empty": {
+          "fail": "Vaiheella {step} on väli {low}–{high}, johon ei mahdu yhtään summaa",
+          "suggestion": "Aseta minimi maksimia pienemmäksi tai jätä maksimi tyhjäksi, jos kattoa ei ole"
+        }
+      }
+    },
+    "valuation": {
+      "assessed_within_submitted": {
+        "fail": "Rivi {line}: arvioitu määrä {assessed} ylittää esitetyn {submitted}",
+        "suggestion": "Arvioi enintään esitetty määrä ja kirjaa lisätyöt muutoksena"
+      },
+      "certified_within_assessed": {
+        "fail": "Rivi {line}: varmennettu määrä {certified} ylittää arvioidun {assessed}",
+        "suggestion": "Varmenna enintään arvioitu määrä tai arvioi rivi ensin uudelleen"
+      }
+    }
+  },
+  "norm_base": {
+    "code_present": {
+      "fail": "Rivillä {ordinal} ei ole normikoodia ({base}). Normeihin perustuvassa laskelmassa jokainen rivi viittaa normiin.",
+      "suggestion": "Syötä normikoodi rivin luokitukseen {classification}."
+    },
+    "code_shape": {
+      "fail": "Rivin {ordinal} koodi \"{code}\" ei ole {base}-koodi. Odotettu muoto on esimerkiksi {example}."
+    },
+    "legacy_prefix": {
+      "fail": "Rivin {ordinal} koodi \"{code}\" käyttää poistunutta etuliitettä {old}. Voimassa oleva koodi on {new}."
+    },
+    "resource_breakdown": {
+      "fail": "Normirivillä {code} ei ole työtunteja tai keskimääräistä palkkaluokkaa.",
+      "suggestion": "Lisää työresurssi tunteineen yksikköä kohti ja normin keskimääräinen palkkaluokka."
+    },
+    "grade_range": {
+      "fail": "Rivin {ordinal} palkkaluokka {grade} on välin {min}–{max} ulkopuolella tai ei porrastu {step} välein."
+    }
+  },
+  "public_funding": {
+    "markup_cap": {
+      "fail": "{funding}: {markup} on {percent} %, katto on {cap} % välittömistä kustannuksista ({source}).",
+      "suggestion": "Laske lisä kattoon tai merkitse rahoitus yksityiseksi, jos julkiset varat eivät maksa työtä."
+    },
+    "investor_exact": {
+      "fail": "Tilaajan laskelma, {funding}: {markup} tulee olla tasan {cap} % ({source})."
+    },
+    "material_price_evidence": {
+      "fail": "{funding}: rivin {ordinal} materiaalilla {material} on {count}/{required} hintatarjousta eikä hinta-analyysiä.",
+      "suggestion": "Kirjaa toimittajien tarjoukset materiaalille tai liitä hinta-analyysiraportti."
+    }
+  },
+  "vat_rate": {
+    "standard_rate": {
+      "fail": "{markup} on {percent} %; yleinen arvonlisäverokanta maassa {country} on {rate} %.",
+      "suggestion": "Aseta verorivi yleiseen verokantaan tai kirjaa laskelmaan, miksi muu verokanta tai verovapaus koskee sitä."
+    }
+  },
+  "survey": {
+    "no_crs": {
+      "fail": "Pistejoukolla {name} ei ole koordinaattijärjestelmää: määritä EPSG tai paikallinen verkko ennen massoja tai kiinteistöjä.",
+      "suggestion": "Aseta projektin koordinaattijärjestelmä ja kerro sitten, missä järjestelmässä tiedosto on mitattu."
+    },
+    "crs_unconfirmed": {
+      "fail": "Koordinaattijärjestelmä tunnistettu automaattisesti (luotettavuus {confidence}); vahvista ennen käyttöä.",
+      "suggestion": "Avaa projektin koordinaattijärjestelmän asetus ja vahvista tunnistettu järjestelmä tai valitse toinen."
+    },
+    "duplicate_point": {
+      "fail": "Pistetunnus {point_id} esiintyy kahdesti eri koordinaatein.",
+      "suggestion": "Säilytä yksi mittaus: poista pistejoukko, jossa on väärä, ja tuo se uudelleen."
+    },
+    "traverse_misclosure": {
+      "fail": "Monikulmiojono {name} sulkeutuu 1:{r}, alle profiilin minimin 1:{min}.",
+      "suggestion": "Tarkista sivut karkean virheen varalta, mittaa heikoin sivu uudelleen tai vahvista profiilin arvo."
+    },
+    "level_misclosure": {
+      "fail": "Vaaituksen sulkuvirhe {f} mm ylittää k·√km, kun k = {k} mm.",
+      "suggestion": "Toista vaaitus tai tarkista käytettyjen korkeuskiintopisteiden korkeudet."
+    }
+  },
+  "volumes": {
+    "no_overlap": {
+      "fail": "Pinnat menevät päällekkäin vain {p} %:lla alueesta: tilavuus on merkityksetön.",
+      "suggestion": "Tarkista, että molemmat pinnat ovat samassa koordinaatistossa ja kattavat saman maaston."
+    },
+    "low_coverage": {
+      "fail": "Vain {c} %:lla alueesta on tietoa molemmista pinnoista (vähintään {min} %).",
+      "suggestion": "Lisää mittauspisteitä, missä pinta puuttuu, tai rajaa alue katettuun osaan."
+    },
+    "coarse_scan": {
+      "fail": "Karkea skannaus (LOA10) tuottaa tämän tilavuuden ilman ilmoitettua syytä.",
+      "suggestion": "Käytä mittaustarkkaa skannausta tai kirjoita, miksi tämä skannaus riittää."
+    },
+    "bank_volume": {
+      "fail": "Määrä on kiintotilavuutta (maassa); löyhtymiskerrointa ei ole käytetty.",
+      "suggestion": "Lähetä sen sijaan löyhä kaivumassa, jos määräluettelon nimike mitataan löyhänä."
+    }
+  },
+  "setting_out": {
+    "stake_off": {
+      "fail": "Merkintäpiste {id} poikkeaa {d} mm, toleranssi {t} mm",
+      "suggestion": "Merkitse piste uudelleen ja kirjaa mittaus tai luo NCR-luonnos."
+    },
+    "record_untraceable": {
+      "fail": "Merkintätallenteesta {id} puuttuu koje tai kiintopisteet.",
+      "suggestion": "Anna koje ja kiintopisteet, joille asema orientoitiin."
+    },
+    "sheet": {
+      "title": "Merkintäpöytäkirja",
+      "project": "Projekti",
+      "crs": "Koordinaattijärjestelmä",
+      "request": "Pyyntö",
+      "tolerance": "Toleranssi",
+      "element": "Rakenneosa",
+      "generated": "Luotu",
+      "point": "Piste",
+      "design_e": "Suunniteltu E",
+      "design_n": "Suunniteltu N",
+      "design_z": "Suunniteltu Z",
+      "measured_e": "Mitattu E",
+      "measured_n": "Mitattu N",
+      "verdict": "Tulos",
+      "by": "Mittaaja",
+      "verdict_pass": "Hyväksytty",
+      "verdict_fail": "Hylätty",
+      "verdict_open": "Avoin",
+      "verdict_no_tolerance": "Ei profiilia",
+      "counts": "Hyväksytty: {passed} · Hylätty: {failed} · Avoin: {open}",
+      "findings": "Havainnot",
+      "no_profile": "Ei profiilia, aseta se",
+      "d": "d (mm)",
+      "dz": "dZ (mm)"
+    }
+  },
+  "land_parcels": {
+    "area_mismatch": {
+      "fail": "Kiinteistö {id}: laskettu pinta-ala {a} m2 poikkeaa rekisteripinta-alasta {l} m2 enemmän kuin toleranssi ({t}).",
+      "suggestion": "Tarkista rajapisteet rekisteriotetta vasten tai kirjaa, miksi pinta-alat eroavat."
+    },
+    "ring_invalid": {
+      "fail": "Kiinteistö {id}: raja ei ole suljettu tai leikkaa itseään.",
+      "suggestion": "Korjaa rajapisteet niin, että ne kiertävät kiinteistön kerran risteämättä."
+    },
+    "zone_not_acquired": {
+      "fail": "Työalue ulottuu vielä hankkimattomalle kiinteistölle {id} ({area} m2).",
+      "suggestion": "Hanki kiinteistö tai sovi pääsystä ennen töiden alkua, tai siirrä työaluetta."
+    },
+    "overlap": {
+      "fail": "Kiinteistöt {a} ja {b} menevät päällekkäin {area} m2.",
+      "suggestion": "Korjaa yhteinen raja niin, että molemmat kiinteistöt käyttävät samoja pisteitä."
+    },
+    "gap": {
+      "fail": "{gap} m:n rako kiinteistöjen {a} ja {b} välillä.",
+      "suggestion": "Käytä molemmissa kiinteistöissä samoja rajapisteitä tai vahvista, että kaista kuuluu toiseen kiinteistöön."
+    },
+    "id_format": {
+      "fail": "Tunnus {id} ei vastaa muotoa {label} (esimerkiksi {example}).",
+      "suggestion": "Kopioi tunnus täsmälleen niin kuin rekisteri sen kirjoittaa."
+    },
+    "pdf": {
+      "title": "Kiinteistöluettelo",
+      "project": "Hanke",
+      "crs": "Koordinaattijärjestelmä",
+      "method": "Menetelmä",
+      "method_value": "Pinta-ala rajakoordinaateista (Gaussin kaava), pyöristetty {decimals} desimaaliin, m2",
+      "printed": "Tulostanut",
+      "legal": "Rekisteripinta-ala (m2)",
+      "computed": "Laskettu (m2)",
+      "diff": "Erotus (m2)",
+      "status": "Tila",
+      "rights": "Oikeudet",
+      "cost": "Kustannus",
+      "findings": "Havainnot",
+      "total": "Yhteensä, kiinteistöjä {count}",
+      "acquired_of": "Hankittu {acquired} / {total}",
+      "findings_title": "Havainnot",
+      "no_findings": "Ei havaintoja.",
+      "disclaimer": "Omistajat ja oikeudet näytetään sellaisina kuin ne on kirjattu tähän hankkeeseen. Luettelo ei ole oikeudellinen lausunto eikä rekisteriote.",
+      "status_needed": "Tarvitaan",
+      "status_negotiating": "Neuvottelu",
+      "status_acquired": "Hankittu",
+      "status_expropriation": "Lunastus"
+    }
+  },
+  "monitoring": {
+    "crossed": {
+      "fail": "Piste {id}: siirtymä {d} mm tai nopeus {r} mm/day ylitti tason {level}",
+      "suggestion": "Tarkista piste ja rakenne ja kuittaa hälytys sitten merkinnällä."
+    },
+    "level": {
+      "ok": "Normaali",
+      "alert": "Varoitustaso",
+      "action": "Toimenpidetaso",
+      "alarm": "Hälytystaso"
+    },
+    "risk": {
+      "title": "Mittauspiste {id} tasolla {level}",
+      "description": "Siirtymä {d} mm, nopeus {r} mm/day suhteessa profiiliin {profile}. Luonnoksen avasi seuranta: tarkista se ja nimeä vastuuhenkilö."
+    },
+    "report": {
+      "title": "Seurannan hälytysraportti",
+      "project": "Hanke",
+      "crs": "Koordinaatisto",
+      "profile": "Raja-arvoprofiili",
+      "generated": "Luotu",
+      "point": "Piste",
+      "baseline": "Lähtötaso (m)",
+      "latest": "Viimeisin (m)",
+      "displacement": "Siirtymä (mm)",
+      "rate": "Nopeus (mm/day)",
+      "level": "Taso",
+      "acknowledged": "Kuitattu",
+      "counts": "Hälytystaso: {alarm} · Toimenpidetaso: {action} · Varoitustaso: {alert} · Normaali: {ok}",
+      "findings": "Havainnot",
+      "no_profile": "Ei profiilia, määritä profiili",
+      "ack_yes": "Kyllä",
+      "ack_no": "Ei"
+    }
+  },
+  "stockpiles": {
+    "density_assumed": {
+      "fail": "Tiheys on oletettu, ei mitattu: tonnit ovat yhtä luotettavia kuin tämä arvio.",
+      "suggestion": "Punnitse näyte tai ota tiheys toimittajan lähetysluettelosta."
+    },
+    "variance_high": {
+      "fail": "Mittaus poikkeaa kirjanpitosaldosta {v} %, yli {t} %:n toleranssin.",
+      "suggestion": "Tarkista tiheys ja pohjapinta, ehdota sitten korjausta ja vahvista se, jos ero on todellinen."
+    }
+  },
+  "mine_survey": {
+    "compliance_outside": {
+      "fail": "Jakson toteuma {c} % on vaihteluvälin {lo}-{hi} % ulkopuolella.",
+      "suggestion": "Tarkista suunnitelma ja mittaus ja selitä ero jakson huomautuksessa ennen laskutusta."
+    },
+    "truck_differs": {
+      "fail": "Ajokertojen laskennan tonnit poikkeavat mitatuista tonneista {v} %, yli {t} % tarkistusrajan.",
+      "suggestion": "Tarkista kuorma ajoa kohti ja tiheys ja vertaa sitten kahta pintaa uudelleen."
+    }
+  },
+  "hongkong": {
+    "sopo_applicability": {
+      "fail": "Cap. 652 (Security of Payment) koskee sopimusta: vastaus 30 päivässä, maksu 60 päivässä vaatimuksesta"
+    },
+    "sopo_private_scope_check": {
+      "fail": "Yksityinen sopimus kuuluu Cap. 652:n piiriin vain uudisrakennuksessa tai Building Authorityn hyväksyntää vaativissa töissä: vahvista laajuus"
+    },
+    "sopo_response_late": {
+      "fail": "Maksuvastausta ei toimitettu {date} mennessä: vaadittu summa on riitainen ja voidaan viedä adjudikaatioon"
+    },
+    "sopo_payment_term_exceeds_60": {
+      "fail": "{n} päivän maksuaika ylittää Cap. 652:n sallimat 60 päivää"
+    },
+    "sopo_response_term_exceeds_30": {
+      "fail": "{n} päivän vastausaika ylittää Cap. 652:n sallimat 30 päivää"
+    },
+    "sopo_adjudication_window": {
+      "fail": "Maksuriita on syntynyt: toimita adjudikaatioilmoitus {date} mennessä"
+    },
+    "contract_pay_when_paid": {
+      "fail": "Pay-when-paid-ehto: Cap. 652 tekee ehdollisen maksun täytäntöönpanokelvottomaksi"
+    },
+    "levy_missing": {
+      "fail": "Työt ylittävät HK$3,000,000, mutta laskelmasta puuttuu CIC-maksu (0,5 %) tai CWR-maksu (0,03 %)"
+    },
+    "levy_below_threshold": {
+      "fail": "Työt ovat enintään HK$3,000,000: CIC- tai CWR-maksua ei makseta"
+    },
+    "tax_nonzero": {
+      "fail": "ALV- tai GST-rivi veloitetaan, mutta Hongkongissa ei ole tällaista veroa: aseta nollaksi"
+    },
+    "retention_over_limit": {
+      "fail": "Pidätys {x} ylittää sopimuksen rajan {limit}"
+    },
+    "pc_sum_no_attendance": {
+      "fail": "Prime cost -summalta puuttuvat voitto- ja avustusnimikkeet"
+    },
+    "index_attribution": {
+      "fail": "ArchSD-hintaindeksistä puuttuu lähde: mainitse Architectural Services Department"
     }
   }
 }

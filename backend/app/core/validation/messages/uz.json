@@ -299,6 +299,10 @@
     "unit_exportable": {
       "fail": "{ordinal} pozitsiyasi: '{unit}' birligi 4 belgili GAEB QU maydoniga sig'maydi va eksportda qisqartiriladi",
       "suggestion": "Ko'pi bilan 4 belgili GAEB birlik kodidan foydalaning (m, m2, m3, St, h, psch, kg, t)"
+    },
+    "short_text_length": {
+      "fail": "{ordinal}-pozitsiya: qisqa matnda {length} belgi bor; GAEB eksporti uni 70 tagacha qisqartiradi",
+      "suggestion": "Qisqa matnni 70 belgigacha qisqartiring, tafsilotlarni uzun matnda qoldiring"
     }
   },
   "nrm": {
@@ -412,7 +416,10 @@
       "suggestion": "Toʻqqiz xonali GB/T 50500 kodini tayinlang (masalan, 010101001)"
     },
     "valid_code": {
-      "fail": "GB/T 50500 '{code}' kodi yaroqsiz; 9 yoki 12 raqam kutiladi"
+      "fail": "GB/T 50500 '{code}' kodi yaroqsiz; 9 yoki 12 raqam yoki 01B001 kabi qo‘shimcha kod kutiladi"
+    },
+    "code_unique": {
+      "fail": "'{code}' pozitsiya kodi bitta kichik loyihada bir necha marta ishlatilgan"
     }
   },
   "cpwd": {
@@ -931,6 +938,36 @@
     "change_time_within_owner": {
       "fail": "{code} bo'yicha pudratchilarning vaqtga ta'siri jami {sub_days} kun, buyurtmachi bergan {owner_days} kundan ko'p",
       "suggestion": "Pudratchilarning muddat talablarini tekshiring yoki buyurtmachidan mos uzaytirishni so'rang"
+    },
+    "pay_app_over_complete": {
+      "fail": "{line} qatori shu davrdan keyin rejadagi qiymatning {percent}% ga yetadi ({scheduled} dan {completed})",
+      "suggestion": "Davr summasini kamaytiring yoki rejadagi qiymatdan oshiq hisob-kitob sababini yozing"
+    },
+    "pay_app_line_negative": {
+      "fail": "{line} qatori bugungacha {completed} bo'lardi, ya'ni noldan kam"
+    },
+    "pay_app_within_agreement": {
+      "fail": "To'lov so'rovlari jami {billed}, bu shartnoma qiymati va tasdiqlangan o'zgarishlardan ({limit}) oshadi"
+    },
+    "pay_app_correct": {
+      "suggestion": "Ushbu to'lov so'rovidagi summalarni to'g'rilang yoki tasdiqlangan o'zgarish bilan shartnoma qiymatini oshiring"
+    },
+    "required_documents": {
+      "fail": "Majburiy hujjat: {document} ({state})",
+      "suggestion": "Hujjatni, imzolangan va amaldagi holda, pudrat osti shartnomasiga biriktiring",
+      "states": {
+        "missing": "yo'q",
+        "unsigned": "imzolanmagan",
+        "expired": "muddati tugagan"
+      }
+    },
+    "document_roles": {
+      "terms_and_conditions": "Shartlar va qoidalar",
+      "safety_agreement": "Xavfsizlik kelishuvi",
+      "safety_plan": "Xavfsizlik rejasi",
+      "insurance": "Sug'urta",
+      "method_statement": "Ish usuli bayoni",
+      "other": "Boshqa hujjat"
     }
   },
   "submittal": {
@@ -2014,6 +2051,510 @@
     "crew_without_record": {
       "fail": "Obyektda {headcount} kishilik brigada bor edi, ammo ish, tekshiruv yoki toʻxtab qolish yozilmagan.",
       "suggestion": "Brigada nima qilganini yoki ishni toʻxtatgan toʻxtab qolishni qoʻshing."
+    }
+  },
+  "framework_agreement": {
+    "item_not_in_agreement": {
+      "fail": "{code} qatori {agreement} shartnomasining faol pozitsiyasi emas; uni qo'shimcha ish sifatida kiriting.",
+      "suggestion": "Qatorni buyurtmadan olib tashlang va ishni buyurtmaga qo'shimcha ish sifatida qayd eting."
+    },
+    "rate_deviates": {
+      "fail": "{code} qatorining narxi {rate} shartnoma narxi {expected} dan farq qiladi.",
+      "suggestion": "Buyurtma narxlari ramkaviy shartnomadan olinadi; qatorni narxlar ro'yxati bo'yicha qayta baholang."
+    },
+    "order_outside_validity": {
+      "fail": "Buyurtma sanasi {date} shartnoma muddatidan tashqarida: {from} dan {to} gacha.",
+      "suggestion": "Buyurtmani muddat ichidagi sanaga qo'ying yoki avval shartnomani uzaytiring."
+    },
+    "rate_period_gap": {
+      "fail": "Hech bir narx davri {date} ni qamramaydi.",
+      "suggestion": "Narxlar va indeksatsiya yorlig'iga ushbu sanani qamrab oluvchi narx davrini qo'shing."
+    },
+    "escalation_unresolved": {
+      "fail": "{series} indeksida {period} uchun qiymat yo'q; narxni tuzatib bo'lmaydi.",
+      "suggestion": "Narx indeksiga o'sha oy qiymatini kiriting, so'ng buyurtmani qayta baholang."
+    },
+    "cap_exceeded": {
+      "fail": "Bu buyurtma shartnomani {cap} limitidan {total} ga olib chiqadi; qoldiq {headroom}.",
+      "suggestion": "Buyurtmani qoldiq miqdorgacha kamaytiring yoki asoslangan istisno bilan rasmiylashtiring."
+    },
+    "cap_threshold": {
+      "fail": "Shartnomadan foydalanish limitning {pct} % iga yetdi.",
+      "suggestion": "Keyingi shartnoma tayyorlanishi uchun mijozni oldindan xabardor qiling."
+    },
+    "item_max_qty": {
+      "fail": "{code} pozitsiyasi: hozircha {qty} buyurtma berilgan, bu ko'rsatilgan {max} maksimumidan oshdi.",
+      "suggestion": "Keyingi buyurtmadan oldin qo'shimcha hajm bo'yicha mijoz bilan kelishing."
+    },
+    "min_at_risk": {
+      "fail": "{days} kun qoldi va kafolatlangan minimumning {pct} % i buyurtma qilingan.",
+      "suggestion": "Buyurtma berish imkoni qolganda kamomadni mijoz bilan muhokama qiling."
+    },
+    "currency_mismatch": {
+      "fail": "Buyurtma valyutasi {cur} shartnoma valyutasi {agr} dan farq qiladi.",
+      "suggestion": "Buyurtmalar shartnoma valyutasida narxlanadi."
+    },
+    "adjustment_unknown": {
+      "fail": "{tag} sharti ushbu shartnomada tuzatishga ega emas.",
+      "suggestion": "Tuzatishni Shartlar yorlig'iga qo'shing yoki shartni buyurtmadan olib tashlang."
+    },
+    "direct_claim": {
+      "fail": "Da'volar shartnomaga emas, chaqiriladigan buyurtmalarga beriladi.",
+      "suggestion": "Ish bajarilgan buyurtmani oching va da'voni o'sha yerda rasmiylashtiring."
+    },
+    "duplicate_item": {
+      "fail": "{code} pozitsiya kodi {period} narx davrida ikki marta uchraydi.",
+      "suggestion": "Narxlar ro'yxatini saqlashdan oldin har bir pozitsiya kodi uchun bitta qator qoldiring."
+    },
+    "measured_over_ordered": {
+      "fail": "{code} qatoridagi o'lchangan {m} buyurtma qilingan {o} dan oshadi; qo'shimcha ishni ko'rib chiqing.",
+      "suggestion": "Qo'shimcha hajmni buyurtmaga o'zgarish sifatida kiriting."
+    },
+    "term_over_legal_max": {
+      "fail": "{years} yillik muddat {source} (paket) bo'yicha {max} yillik chegaradan oshadi.",
+      "suggestion": "Muddatni mijoz bilan tekshiring; chegarani paket ko'rsatadi, lekin u majburiy emas."
+    }
+  },
+  "estimate_archive": {
+    "arc_hash_mismatch": {
+      "fail": "Barmoq izi mos emas: yozuv {actual} beradi, muhrda {sealed}. Yozuvni o'zgartirilgan deb hisoblang."
+    },
+    "arc_total_mismatch": {
+      "fail": "Muhrlangan jami {seal} shartnoma summasi {award} dan {diff} farq qiladi."
+    },
+    "arc_no_breakdown": {
+      "fail": "{n} ta pozitsiyada resurslar bo'yicha bo'linma yo'q; ularning narxlarini keyin kuzatib bo'lmaydi."
+    },
+    "arc_no_markups": {
+      "fail": "Smetada muhrlanadigan ustamalar yo'q."
+    },
+    "arc_sealed_after_signing": {
+      "fail": "Shartnoma imzolangandan {days} kun keyin muhrlandi."
+    },
+    "arc_no_receipt": {
+      "fail": "Qarama-qarshi tomon barmoq izini hali tasdiqlamadi."
+    },
+    "arc_open_not_closed": {
+      "fail": "{id} ochilishi {days} kundan beri bayonnomasiz ochiq."
+    },
+    "arc_open_no_reason": {
+      "fail": "Ochilish uchun sabab va asos kerak."
+    },
+    "arc_open_one_party": {
+      "fail": "Faqat bitta tomon ko'rsatilgan; ikkinchisi nega yo'qligini yozing."
+    },
+    "var_basis_no_seal": {
+      "fail": "{code} pozitsiyasi dastlabki asos bo'yicha baholangan, lekin muhrlangan smeta yo'q."
+    },
+    "var_basis_deviation": {
+      "fail": "{code} pozitsiyasi: {field} izohsiz {old} dan {new} ga o'zgardi."
+    },
+    "var_new_resource_no_evidence": {
+      "fail": "Yangi resurs {res} uchun narx sanasi yoki taklif havolasi yo'q."
+    },
+    "var_markup_not_sealed": {
+      "fail": "{code} pozitsiyasi muhrda yo'q {m} ustamasini qo'llaydi."
+    },
+    "var_abnormal_carried_rate": {
+      "fail": "O'tkazilgan xarajat {c} etalondan {pct} % farq qiladi."
+    },
+    "arc_mutation_refused": {
+      "fail": "Muhrlangan smetani o'zgartirib yoki o'chirib bo'lmaydi. Uning o'rniga yangi versiyani muhrlang."
+    },
+    "contents_locked": "Rasmiy ochilish boshlanguncha tarkib muhrlangan holda qoladi.",
+    "market_off": "Muhrlangan smetalar bu loyihaning bozor profiliga kirmaydi.",
+    "contract_required": "Smetani shartnoma asosi sifatida muhrlashdan oldin buyurtmachi bilan shartnoma kerak."
+  },
+  "boq_revision": {
+    "superseded_still_editable": {
+      "fail": "{label} reviziyasi hali ham tahrirlanadi, garchi undan keyin {later} yaratilgan bo'lsa ham; bu yerdagi o'zgarishlar unga o'tmaydi",
+      "suggestion": "{label} ni qulflang yoki eng so'nggi reviziyada ishlashni davom ettiring"
+    }
+  },
+  "schedule_baseline": {
+    "single_approved": {
+      "fail": "Bu jadvalda bittadan ortiq tasdiqlangan bazaviy reja bor ({baselines}).",
+      "suggestion": "Amal qilishi kerak bo'lgan bazaviy rejani tasdiqlang; bittasini tasdiqlash qolganlarining tasdig'ini bekor qiladi."
+    }
+  },
+  "project_catalogue": {
+    "unit_present": {
+      "fail": "{code} narxida o‘lchov birligi yo‘q.",
+      "suggestion": "Narx qaysi birlik uchun berilganini kiriting, masalan m2, m3 yoki soat."
+    },
+    "duplicate_code": {
+      "fail": "{code} kodi ushbu loyihada bir nechta narxda ishlatilgan.",
+      "suggestion": "Har bir kod uchun bitta narx qoldiring yoki variantga alohida kod bering."
+    },
+    "currency_differs": {
+      "fail": "{code} narxi {currency} valyutasida, loyiha esa {project_currency} valyutasida hisoblanadi.",
+      "suggestion": "Narxni loyiha valyutasiga o‘giring yoki xorijiy valyuta ataylab tanlanganini tasdiqlang."
+    },
+    "override_far": {
+      "fail": "{code} mahalliy narxi manba narxi {source_rate} dan {percent} % farq qiladi.",
+      "suggestion": "Vergul siljib ketmaganini tekshiring yoki loyihaga nega boshqa narx kerakligini yozib qo‘ying."
+    },
+    "source_changed": {
+      "fail": "{code} manba narxi loyihaga nusxalangandan beri {old} dan {new} ga o‘zgardi.",
+      "suggestion": "Yangi manba narxini qabul qiling yoki mahalliy narxni ongli ravishda saqlang."
+    }
+  },
+  "schedule_mspdi_import": {
+    "task_dates": {
+      "missing_dates": "{ref} «{name}» vazifasining boshlanish yoki tugash sanasi yoʻq.",
+      "finish_before_start": "{ref} «{name}» vazifasi boshlanishidan ({start}) oldin tugaydi ({finish}).",
+      "suggestion": "Manba jadvalidagi sanalarni tuzating va qayta eksport qiling. Import paytida sanalar hech qachon taxmin qilinmaydi."
+    },
+    "unique_ids": {
+      "duplicate_uid": "{ref} vazifa identifikatori bir necha marta uchraydi; faqat birinchi vazifa saqlanadi.",
+      "suggestion": "Manba jadvalida har bir vazifaga noyob identifikator bering."
+    },
+    "links_resolve": {
+      "dangling_link": "{ref} «{name}» vazifasi: {predecessor} oldingi vazifasi faylda yoʻq, bogʻlanish oʻtkazib yuboriladi.",
+      "duplicate_link": "Vazifa {ref} \"{name}\": {predecessor} oldingi vazifadan ikkinchi bogʻlanish oʻtkazib yuborildi, har bir juftga bitta bogʻlanish qoldiriladi.",
+      "self_link": "{ref} «{name}» vazifasi oʻziga bogʻlangan, bogʻlanish oʻtkazib yuboriladi.",
+      "unknown_link_type": "{ref} «{name}» vazifasi: {type} bogʻlanish turi nomaʼlum va tugash-boshlanish sifatida oʻqiladi.",
+      "suggestion": "Manba jadvalidagi mantiqiy bogʻlanishlarni tekshiring."
+    },
+    "values_in_range": {
+      "percent_out_of_range": "{ref} «{name}» vazifasi: {value}% bajarilish 0-100 oraligʻidan tashqarida va cheklanadi.",
+      "outline_gap": "{ref} «{name}» vazifasi tuzilma darajasini oʻtkazib yuboradi ({level}); u yuqoridagi eng yaqin umumlashtiruvchi vazifa ostiga qoʻyiladi.",
+      "suggestion": "Manba jadvalidagi bajarilish foizi va chekinishlarni tekshiring."
+    },
+    "calendar_work_days": {
+      "calendar_no_work_days": "{calendar} taqvimida ish kuni yoʻq.",
+      "suggestion": "Manba jadvalida ushbu taqvimning ish kunlarini belgilang."
+    }
+  },
+  "schedule_pdf_import": {
+    "no_text_layer": {
+      "fail": "PDF faylida matn qatlami yo'q, shuning uchun jadvalni o'qib bo'lmaydi.",
+      "suggestion": "Jadvalni MS Project XML, XER yoki Excel sifatida eksport qiling va o'sha faylni import qiling."
+    },
+    "dates_parsed": {
+      "fail": "{row}-qator: boshlanish yoki tugash sana emas.",
+      "suggestion": "Sana ustunlarini va kun/oy tartibini tekshiring yoki manbadagi sanani tuzating."
+    },
+    "finish_before_start": {
+      "fail": "{row}-qator: tugash boshlanishdan oldin.",
+      "suggestion": "Manba jadvaldagi sanalarni tuzating."
+    },
+    "duration_mismatch": {
+      "fail": "{row}-qator: bosilgan davomiylik boshlanish va tugash orasidagi ish kunlaridan farq qiladi.",
+      "suggestion": "Sanalar saqlanadi; davomiylik ustunini va loyiha taqvimini tekshiring."
+    },
+    "unique_ids": {
+      "fail": "{row}-qator: ish ID'si boshqa qatorda ishlatilgan.",
+      "suggestion": "Manba jadvalda har bir ishga noyob ID bering."
+    },
+    "links_resolve": {
+      "fail": "{row}-qator: oldingi ish jadvaldagi ish emas.",
+      "suggestion": "Oldingi ishlar ustunini tekshiring; aniqlanmagan bog'lanishlar o'tkazib yuboriladi."
+    }
+  },
+  "commercial_control": {
+    "ok": "Tekshirildi, muammo yo'q",
+    "cvr": {
+      "target_rate_basis": {
+        "fail": "Narxlangan {total} pozitsiyadan {missing} tasida maqsadli narx yo'q va sotuv narxida byudjetga kiritilgan (masalan, {sample})",
+        "suggestion": "Byudjet obyekt baholanadigan xarajat bo'lishi uchun bu pozitsiyalarga maqsadli tannarxni kiriting"
+      },
+      "unmapped_cost": {
+        "fail": "{kind} {label} uchun WBS yoki xarajat kodi yo'q: majburiyat {committed}, haqiqiy {actual}",
+        "suggestion": "CVR uni hisobga olishi uchun buyurtma qatori, subpudrat yoki hisob-fakturani WBS elementiga biriktiring"
+      }
+    },
+    "procurement": {
+      "line_over_committed": {
+        "fail": "{ordinal} pozitsiyasi byudjetdan ortiq majburiyatga ega: {budget_qty} dan {committed_qty} buyurtma qilindi, {budget_value} byudjetga nisbatan {committed_value}",
+        "suggestion": "Ko'proq majburiyat olishdan oldin ikki marta buyurtmani tekshiring yoki o'zgarish yoki byudjet o'tkazmasini qayd eting"
+      }
+    },
+    "approval_routes": {
+      "bands_contiguous": {
+        "gap": {
+          "fail": "{low} dan {high} gacha bo'lgan summalar hech bir tasdiqlovchiga yetmaydi ({step}-qadam)",
+          "suggestion": "Har bir summaning tasdiqlovchisi bo'lishi uchun qo'shni oraliqni kengaytiring yoki qadam qo'shing"
+        },
+        "overlap": {
+          "fail": "{step}-qadam {low} dan {high} gacha bo'lgan pastki oraliq bilan ustma-ust tushadi, bu summalarga ikkala tasdiqlovchi ham imzo chekadi",
+          "suggestion": "Ikkalasi ham imzo chekishi shart bo'lmasa, har bir oraliqni oldingisi tugagan joydan boshlang"
+        },
+        "empty": {
+          "fail": "{step}-qadamning {low} dan {high} gacha oralig'ida hech qanday summa yo'q",
+          "suggestion": "Minimumni maksimumdan past qo'ying yoki chegara bo'lmasa, maksimumni bo'sh qoldiring"
+        }
+      }
+    },
+    "valuation": {
+      "assessed_within_submitted": {
+        "fail": "{line} qator: baholangan miqdor {assessed} taqdim etilgan {submitted} dan ko'p",
+        "suggestion": "Ko'pi bilan taqdim etilganini baholang, qo'shimcha ishni o'zgarish sifatida qayd eting"
+      },
+      "certified_within_assessed": {
+        "fail": "{line} qator: tasdiqlangan miqdor {certified} baholangan {assessed} dan ko'p",
+        "suggestion": "Ko'pi bilan baholanganini tasdiqlang yoki avval qatorni qayta baholang"
+      }
+    }
+  },
+  "norm_base": {
+    "code_present": {
+      "fail": "{ordinal}-qatorda {base} normasi shifri yo'q. Normalarga asoslangan smetada har bir qator normaga tayanadi.",
+      "suggestion": "Norma shifrini qatorning {classification} tasnifiga kiriting."
+    },
+    "code_shape": {
+      "fail": "{ordinal}-qatordagi «{code}» {base} shifri emas. {example} kabi shifr kutiladi."
+    },
+    "legacy_prefix": {
+      "fail": "{ordinal}-qatordagi «{code}» eskirgan {old} prefiksidan foydalanadi. Amaldagi shifr: {new}."
+    },
+    "resource_breakdown": {
+      "fail": "{code} norma qatorida mehnat sarfi yoki o'rtacha razryad yo'q.",
+      "suggestion": "Birlik uchun kishi-soatlar va normaning o'rtacha razryadi bilan mehnat resursini qo'shing."
+    },
+    "grade_range": {
+      "fail": "{ordinal}-qatordagi {grade} razryadi {min}–{max} oralig'idan tashqarida yoki {step} qadamiga karrali emas."
+    }
+  },
+  "public_funding": {
+    "markup_cap": {
+      "fail": "{funding}: {markup} {percent} %, chegara to'g'ridan-to'g'ri xarajatlarning {cap} % ({source}).",
+      "suggestion": "Ustamani chegaragacha kamaytiring yoki ish davlat mablag'idan to'lanmasa, xususiy moliyalashtirishni belgilang."
+    },
+    "investor_exact": {
+      "fail": "{funding} hisobidan buyurtmachi smetasi: {markup} aynan {cap} % bo'lishi kerak ({source})."
+    },
+    "material_price_evidence": {
+      "fail": "{funding}: {ordinal}-qatordagi {material} materialida {required} ta narx taklifidan {count} tasi bor, narx tahlili yo'q.",
+      "suggestion": "Material bo'yicha yetkazib beruvchilar takliflarini qayd eting yoki narx tahlili hisobotini ilova qiling."
+    }
+  },
+  "vat_rate": {
+    "standard_rate": {
+      "fail": "{markup}: {percent} %; {country} da QQSning asosiy stavkasi {rate} %.",
+      "suggestion": "Soliq qatorini asosiy stavkaga qo'ying yoki smetada nega boshqa stavka yoki imtiyoz qo'llanishini yozing."
+    }
+  },
+  "survey": {
+    "no_crs": {
+      "fail": "{name} nuqtalar to'plamida koordinatalar tizimi yo'q: hajmlar yoki uchastkalardan oldin EPSG yoki mahalliy tizimni ko'rsating.",
+      "suggestion": "Loyiha koordinatalar tizimini o'rnating, so'ng fayl qaysi tizimda o'lchanganini ko'rsating."
+    },
+    "crs_unconfirmed": {
+      "fail": "Koordinatalar tizimi avtomatik aniqlandi (ishonchlilik {confidence}); foydalanishdan oldin tasdiqlang.",
+      "suggestion": "Loyiha koordinatalar tizimini o'rnatish oynasini ochib, aniqlangan tizimni tasdiqlang yoki boshqasini tanlang."
+    },
+    "duplicate_point": {
+      "fail": "{point_id} nuqta raqami turli koordinatalar bilan takrorlangan.",
+      "suggestion": "Bitta o'lchovni qoldiring: xatosi bor to'plamni o'chirib, qayta import qiling."
+    },
+    "traverse_misclosure": {
+      "fail": "{name} yo'li 1:{r} bilan yopiladi, profil minimumi 1:{min} dan past.",
+      "suggestion": "Tomonlarni qo'pol xatoga tekshiring, eng zaif tomonni qayta o'lchang yoki profil qiymatini tasdiqlang."
+    },
+    "level_misclosure": {
+      "fail": "Nivelirlash yopilish xatosi {f} mm k·√km qiymatidan oshadi (k = {k} mm).",
+      "suggestion": "Nivelirlashni takrorlang yoki ishlatilgan reperlar balandliklarini tekshiring."
+    }
+  },
+  "volumes": {
+    "no_overlap": {
+      "fail": "Ikki sirt maydonning faqat {p} % qismida ustma-ust tushadi: hajm ma'nosiz.",
+      "suggestion": "Ikki sirt bir koordinatalar tizimida ekanini va bir hududni qoplashini tekshiring."
+    },
+    "low_coverage": {
+      "fail": "Maydonning faqat {c} % qismida ikkala sirtda ham ma'lumot bor (minimum {min} %).",
+      "suggestion": "Sirt yo'q joyga nuqtalar qo'shing yoki chegarani qoplangan hududgacha toraytiring."
+    },
+    "coarse_scan": {
+      "fail": "Bu hajm sababsiz qo'pol skandan (LOA10) olingan.",
+      "suggestion": "Geodezik aniqlikdagi skandan foydalaning yoki bu skan nega yetarli ekanini yozing."
+    },
+    "bank_volume": {
+      "fail": "Miqdor zich holatdagi hajm (gruntda); yumshash koeffitsiyenti qo'llanilmagan.",
+      "suggestion": "Smeta bandi yumshoq material sifatida o'lchansa, yumshatilgan qazishni yuboring."
+    }
+  },
+  "setting_out": {
+    "stake_off": {
+      "fail": "Nuqta {id} {d} mm ga siljigan, ruxsat {t} mm",
+      "suggestion": "Nuqtani qayta joylashtirib, o'lchovni yozing yoki NCR qoralamasini yarating."
+    },
+    "record_untraceable": {
+      "fail": "{id} joylashtirish yozuvida asbob yoki tayanch punktlari yo'q.",
+      "suggestion": "Asbob va stansiya o'rnatilgan tayanch punktlarini kiriting."
+    },
+    "sheet": {
+      "title": "Joyga ko'chirish varag'i",
+      "project": "Loyiha",
+      "crs": "Koordinatalar tizimi",
+      "request": "So'rov",
+      "tolerance": "Ruxsat",
+      "element": "Konstruktiv element",
+      "generated": "Yaratilgan",
+      "point": "Nuqta",
+      "design_e": "Loyiha E",
+      "design_n": "Loyiha N",
+      "design_z": "Loyiha Z",
+      "measured_e": "O'lchangan E",
+      "measured_n": "O'lchangan N",
+      "verdict": "Natija",
+      "by": "O'lchagan",
+      "verdict_pass": "Ruxsat ichida",
+      "verdict_fail": "Ruxsatdan tashqari",
+      "verdict_open": "Ochiq",
+      "verdict_no_tolerance": "Profil yo'q",
+      "counts": "Ruxsat ichida: {passed} · Tashqari: {failed} · Ochiq: {open}",
+      "findings": "Kamchiliklar",
+      "no_profile": "Profil yo'q, uni belgilang",
+      "d": "d (mm)",
+      "dz": "dZ (mm)"
+    }
+  },
+  "land_parcels": {
+    "area_mismatch": {
+      "fail": "Uchastka {id}: hisoblangan maydon {a} m2 reyestr bo'yicha maydondan {l} m2 ruxsatdan ortiq farq qiladi ({t}).",
+      "suggestion": "Chegara nuqtalarini reyestr ko'chirmasi bilan solishtiring yoki maydonlar nega farq qilishini yozing."
+    },
+    "ring_invalid": {
+      "fail": "Uchastka {id}: chegara yopilmagan yoki o'zini kesadi.",
+      "suggestion": "Chegara nuqtalarini uchastkani kesishmasdan bir marta aylanib chiqadigan qilib tuzating."
+    },
+    "zone_not_acquired": {
+      "fail": "Ish hududi hali sotib olinmagan {id} uchastkasiga tushadi ({area} m2).",
+      "suggestion": "Ishlar boshlanishidan oldin uchastkani sotib oling yoki kirishni kelishing, yoki ish hududini suring."
+    },
+    "overlap": {
+      "fail": "{a} va {b} uchastkalari {area} m2 ustma-ust tushadi.",
+      "suggestion": "Ikkala uchastka bir xil nuqtalardan foydalanadigan qilib umumiy chegarani tuzating."
+    },
+    "gap": {
+      "fail": "{a} va {b} uchastkalari orasida {gap} m bo'shliq.",
+      "suggestion": "Ikkala uchastkaga bir xil chegara nuqtalarini bering yoki tasma boshqa uchastkaga tegishli ekanini tasdiqlang."
+    },
+    "id_format": {
+      "fail": "{id} raqami {label} formatiga mos kelmaydi (masalan {example}).",
+      "suggestion": "Raqamni reyestrda yozilganidek aynan ko'chiring."
+    },
+    "pdf": {
+      "title": "Uchastkalar ro'yxati",
+      "project": "Loyiha",
+      "crs": "Koordinatalar tizimi",
+      "method": "Usul",
+      "method_value": "Chegara koordinatalari bo'yicha maydon (Gauss formulasi), {decimals} xonagacha yaxlitlangan, m2",
+      "printed": "Chop etgan",
+      "legal": "Reyestr bo'yicha maydon (m2)",
+      "computed": "Hisoblangan (m2)",
+      "diff": "Farq (m2)",
+      "status": "Holati",
+      "rights": "Huquqlar",
+      "cost": "Qiymati",
+      "findings": "Izohlar",
+      "total": "Jami, uchastkalar: {count}",
+      "acquired_of": "Sotib olingan {acquired} / {total}",
+      "findings_title": "Izohlar",
+      "no_findings": "Izohlar yo'q.",
+      "disclaimer": "Mulkdorlar va huquqlar ushbu loyihada yozilganidek ko'rsatilgan. Bu ro'yxat yuridik xulosa yoki reyestr ko'chirmasi emas.",
+      "status_needed": "Kerak",
+      "status_negotiating": "Muzokara",
+      "status_acquired": "Sotib olingan",
+      "status_expropriation": "Olib qo'yish"
+    }
+  },
+  "monitoring": {
+    "crossed": {
+      "fail": "{id} nuqtada {d} mm siljish yoki {r} mm/day tezlik {level} chegarasidan oshdi",
+      "suggestion": "Nuqta va inshootni tekshiring, so'ngra ogohlantirishni izoh bilan tasdiqlang."
+    },
+    "level": {
+      "ok": "Normal",
+      "alert": "Ogohlantirish",
+      "action": "Choralar ko'rish",
+      "alarm": "Xavf signali"
+    },
+    "risk": {
+      "title": "{id} kuzatuv nuqtasi, {level} darajasida",
+      "description": "Siljish {d} mm, tezlik {r} mm/day, {profile} bo'yicha. Qoralama monitoring tomonidan ochildi: uni ko'rib chiqing va mas'ulni belgilang."
+    },
+    "report": {
+      "title": "Monitoring signallari hisoboti",
+      "project": "Loyiha",
+      "crs": "Koordinatalar tizimi",
+      "profile": "Chegaraviy qiymatlar profili",
+      "generated": "Yaratilgan",
+      "point": "Nuqta",
+      "baseline": "Boshlang'ich qiymat (m)",
+      "latest": "Oxirgi (m)",
+      "displacement": "Siljish (mm)",
+      "rate": "Tezlik (mm/day)",
+      "level": "Daraja",
+      "acknowledged": "Tasdiqlangan",
+      "counts": "Xavf signali: {alarm} · Choralar: {action} · Ogohlantirish: {alert} · Normal: {ok}",
+      "findings": "Xulosalar",
+      "no_profile": "Profil yo'q, bittasini belgilang",
+      "ack_yes": "Ha",
+      "ack_no": "Yo'q"
+    }
+  },
+  "stockpiles": {
+    "density_assumed": {
+      "fail": "Zichlik taxminiy, oʻlchangan emas: tonnalar shu taxmin qadar ishonchli.",
+      "suggestion": "Namunani tortib koʻring yoki zichlikni yetkazib beruvchining hujjatlaridan oling."
+    },
+    "variance_high": {
+      "fail": "Oʻlchov buxgalteriya qoldigʻidan {v} % farq qiladi, {t} % chegaradan oshadi.",
+      "suggestion": "Zichlik va asos sirtni tekshiring, soʻng tuzatish taklif qiling va farq haqiqiy boʻlsa, tasdiqlang."
+    }
+  },
+  "mine_survey": {
+    "compliance_outside": {
+      "fail": "Davr bajarilishi {c} % {lo}-{hi} % oraligʻidan tashqarida.",
+      "suggestion": "Reja va oʻlchovni tekshiring, daʼvodan oldin farqni davr izohida tushuntiring."
+    },
+    "truck_differs": {
+      "fail": "Yuk mashinalarini sanash boʻyicha tonna oʻlchangan tonnadan {v} % farq qiladi, bu {t} % tekshiruv chegarasidan yuqori.",
+      "suggestion": "Har bir reysdagi yuk va zichlikni tekshiring, soʻng ikki sirtni yana solishtiring."
+    }
+  },
+  "hongkong": {
+    "sopo_applicability": {
+      "fail": "Shartnomaga Cap. 652 (Security of Payment) qo'llaniladi: talabdan keyin 30 kunda javob, 60 kunda to'lov"
+    },
+    "sopo_private_scope_check": {
+      "fail": "Xususiy shartnoma faqat yangi bino yoki Building Authority tasdig'ini talab qiluvchi ishlarda Cap. 652 ga kiradi: hajmini tasdiqlang"
+    },
+    "sopo_response_late": {
+      "fail": "{date} gacha to'lov javobi topshirilmadi: talab summasi bahsli va adyudikatsiyaga berilishi mumkin"
+    },
+    "sopo_payment_term_exceeds_60": {
+      "fail": "{n} kunlik to'lov muddati Cap. 652 ruxsat bergan 60 kundan oshadi"
+    },
+    "sopo_response_term_exceeds_30": {
+      "fail": "{n} kunlik javob muddati Cap. 652 ruxsat bergan 30 kundan oshadi"
+    },
+    "sopo_adjudication_window": {
+      "fail": "To'lov nizosi yuzaga keldi: adyudikatsiya bildirishnomasini {date} gacha topshiring"
+    },
+    "contract_pay_when_paid": {
+      "fail": "pay-when-paid sharti: Cap. 652 shartli to'lovni ijro etib bo'lmaydigan qiladi"
+    },
+    "levy_missing": {
+      "fail": "Ishlar HK$3,000,000 dan oshadi, lekin smetada CIC yig'imi (0,5%) yoki CWR yig'imi (0,03%) yo'q"
+    },
+    "levy_below_threshold": {
+      "fail": "Ishlar HK$3,000,000 dan oshmaydi: CIC yoki CWR yig'imi to'lanmaydi"
+    },
+    "tax_nonzero": {
+      "fail": "QQS yoki GST qatori hisoblangan, ammo Gonkongda bunday soliq yo'q: nolga qo'ying"
+    },
+    "retention_over_limit": {
+      "fail": "Ushlab qolingan summa {x} shartnoma chegarasidan {limit} oshadi"
+    },
+    "pc_sum_no_attendance": {
+      "fail": "prime cost summasida foyda va xizmat ko'rsatish bandlari yo'q"
+    },
+    "index_attribution": {
+      "fail": "ArchSD narx indeksida manba ko'rsatilmagan: Architectural Services Department ni ko'rsating"
     }
   }
 }

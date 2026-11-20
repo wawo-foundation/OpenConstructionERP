@@ -43,6 +43,13 @@ import { manifest as ddcRvtConverter } from './ddc-rvt-converter/manifest';
 import { manifest as pipelines } from './pipelines/manifest';
 import { manifest as estimateChecks } from './estimate-checks/manifest';
 import { manifest as lessonsLearned } from './lessons-learned/manifest';
+import { manifest as survey } from './survey/manifest';
+import { manifest as surveyVolumes } from './survey-volumes/manifest';
+import { manifest as settingOut } from './setting-out/manifest';
+import { manifest as landParcels } from './land-parcels/manifest';
+import { manifest as monitoring } from './monitoring/manifest';
+import { manifest as surveyStockpiles } from './survey-stockpiles/manifest';
+import { manifest as surveyMine } from './survey-mine/manifest';
 
 /* ── Registry ──────────────────────────────────────────────────────── */
 
@@ -66,6 +73,13 @@ export const MODULE_REGISTRY: ModuleManifest[] = [
   pipelines,
   estimateChecks,
   lessonsLearned,
+  survey,
+  surveyVolumes,
+  settingOut,
+  landParcels,
+  monitoring,
+  surveyStockpiles,
+  surveyMine,
 ];
 
 /* ── Helper functions ──────────────────────────────────────────────── */

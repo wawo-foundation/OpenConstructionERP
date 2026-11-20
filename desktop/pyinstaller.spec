@@ -200,6 +200,7 @@ _MODULE_LAYERS = (
     "repairs",
     "schema",
     "billing_forms",
+    "hooks",
 )
 
 if modules_dir.is_dir():
@@ -311,6 +312,7 @@ _COMMUNITY_PACKS = (
     "france-fr",
     "germany-de",
     "greece-gr",
+    "hongkong-hk",
     "hungary-hu",
     "india-cpwd",
     "indonesia-id",

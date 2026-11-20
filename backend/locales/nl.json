@@ -1644,7 +1644,8 @@
         "no_rejections": "Er is niets afgekeurd.",
         "sig_delivered_by": "Geleverd door",
         "counterparty_tax_id": "btw-nummer",
-        "counterparty_address": "Adres"
+        "counterparty_address": "Adres",
+        "delivery_address": "Afleveradres"
       },
       "labels": {
         "po_status": {
@@ -1717,7 +1718,8 @@
         "gross_settled": "Afgewikkeld bruto bedrag",
         "no_withholding": "Van deze betaling is niets ingehouden.",
         "counterparty_tax_id": "btw-nummer",
-        "counterparty_address": "Adres"
+        "counterparty_address": "Adres",
+        "supply_date": "Leveringsdatum"
       },
       "labels": {
         "invoice_status": {
@@ -1786,6 +1788,81 @@
         "col_min": "Laagste",
         "col_max": "Hoogste",
         "col_count": "Metingen"
+      }
+    },
+    "gantt_pdf": {
+      "strings": {
+        "title": "Planning (Gantt-diagram)",
+        "project": "Project",
+        "schedule": "Planning",
+        "baseline": "Basisplanning",
+        "no_baseline": "geen",
+        "exported": "Geëxporteerd",
+        "data_date": "Peildatum",
+        "col_wbs": "WBS",
+        "col_activity": "Activiteit",
+        "col_start": "Start",
+        "col_finish": "Einde",
+        "col_duration": "Dagen",
+        "legend_current": "Huidige planning",
+        "legend_progress": "Voortgang",
+        "legend_critical": "Kritiek pad",
+        "legend_baseline": "Basisplanning",
+        "legend_actual": "Werkelijk",
+        "legend_milestone": "Mijlpaal",
+        "legend_summary": "Samenvatting",
+        "week_short": "W{n}",
+        "quarter_short": "K{n}",
+        "sheet_of": "Blad {page} van {total}",
+        "no_activities": "Deze planning heeft nog geen activiteiten."
+      }
+    },
+    "contracts": {
+      "strings": {
+        "doc_title": "Overeenkomst",
+        "col_code": "Code",
+        "col_title": "Titel",
+        "col_type": "Contracttype",
+        "col_role": "Zijde van het contract",
+        "col_counterparty": "Wederpartij",
+        "col_original_value": "Oorspronkelijke waarde",
+        "col_total_value": "Contractwaarde",
+        "col_retention": "Inhouding",
+        "col_start": "Startdatum",
+        "col_end": "Einddatum",
+        "col_signed": "Ondertekend op",
+        "line_code": "Code",
+        "line_description": "Omschrijving",
+        "line_unit": "Eenheid",
+        "line_quantity": "Hoeveelheid",
+        "line_unit_rate": "Eenheidsprijs",
+        "lines": "Waardeverdeling",
+        "signer_company": "Namens het bedrijf"
+      },
+      "labels": {
+        "status": {
+          "draft": "Concept",
+          "active": "Actief",
+          "suspended": "Opgeschort",
+          "completed": "Afgerond",
+          "terminated": "Beëindigd"
+        },
+        "type": {
+          "lump_sum": "Vaste prijs",
+          "gmp": "GMP",
+          "cost_plus": "Kostprijs plus",
+          "tm": "Regie (tijd en materiaal)",
+          "unit_price": "Eenheidsprijzen",
+          "design_build": "Ontwerp en bouw",
+          "combination": "Combinatie",
+          "remeasurement": "Nameting",
+          "framework": "Raamovereenkomst",
+          "call_off": "Afroep"
+        },
+        "party": {
+          "client": "Opdrachtgeverscontract",
+          "subcontractor": "Onderaannemingscontract"
+        }
       }
     }
   },
@@ -2076,7 +2153,11 @@
       "notifications.portal.message_received.title": "Nieuw bericht in het portaal",
       "notifications.portal.message_received.body": "{buyer_name} heeft een bericht gestuurd.",
       "dispatch.notify.plan_title": "Your daily plan is ready",
-      "dispatch.notify.plan_body": "Plan for {day}: {lines} lines."
+      "dispatch.notify.plan_body": "Plan for {day}: {lines} lines.",
+      "notifications.monitoring.alert.title": "Monitoringmelding",
+      "notifications.monitoring.action.title": "Monitoring: actieniveau",
+      "notifications.monitoring.alarm.title": "Monitoringalarm",
+      "notifications.monitoring.crossed.body": "Punt {point}: {displacement} mm, {rate} mm/day."
     },
     "schedule_headers": {
       "headers": {
@@ -2672,5 +2753,30 @@
         "gap": "Tekort"
       }
     }
-  }
+  },
+  "monitoring.crossed.fail": "Punt {id}: verplaatsing {d} mm of snelheid {r} mm/dag overschreed niveau {level}",
+  "monitoring.crossed.suggestion": "Controleer het punt en de constructie en bevestig daarna de waarschuwing met een notitie.",
+  "monitoring.level.ok": "OK",
+  "monitoring.level.alert": "Waarschuwing",
+  "monitoring.level.action": "Actie",
+  "monitoring.level.alarm": "Alarm",
+  "monitoring.risk.title": "Meetpunt {id} op niveau {level}",
+  "monitoring.risk.description": "Verplaatsing {d} mm, snelheid {r} mm/dag ten opzichte van {profile}. Concept geopend door monitoring: controleer het en wijs een verantwoordelijke aan.",
+  "monitoring.report.title": "Alarmrapport monitoring",
+  "monitoring.report.project": "Project",
+  "monitoring.report.crs": "Coördinatenstelsel",
+  "monitoring.report.profile": "Grenswaardenprofiel",
+  "monitoring.report.generated": "Gegenereerd",
+  "monitoring.report.point": "Punt",
+  "monitoring.report.baseline": "Referentie (m)",
+  "monitoring.report.latest": "Laatste waarde (m)",
+  "monitoring.report.displacement": "Verplaatsing (mm)",
+  "monitoring.report.rate": "Snelheid (mm/dag)",
+  "monitoring.report.level": "Niveau",
+  "monitoring.report.acknowledged": "Bevestigd",
+  "monitoring.report.counts": "Alarm: {alarm} · Actie: {action} · Waarschuwing: {alert} · OK: {ok}",
+  "monitoring.report.findings": "Bevindingen",
+  "monitoring.report.no_profile": "Geen profiel, stel er een in",
+  "monitoring.report.ack_yes": "Ja",
+  "monitoring.report.ack_no": "Nee"
 }

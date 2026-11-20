@@ -101,6 +101,8 @@ import { PayeeTotalsTab } from './PayeeTotalsTab';
 import { OpenItemsImportModal } from './OpenItemsImportModal';
 import { EInvoiceModal } from './EInvoiceModal';
 import { downloadInvoicePdf, downloadPaymentPdf } from './api';
+import { IssueDocumentButton } from '@/features/doc-templates/IssueDocumentButton';
+import { useLayoutCustomizer } from '@/features/doc-templates';
 import { PURCHASING_DOCUMENT_LOCALES } from '@/shared/lib/documentExport';
 import { RecordPdfButton } from '@/shared/ui/RegisterExport';
 import { financeGuide } from './financeGuide';
@@ -2103,6 +2105,10 @@ function BudgetsTab({ projectId }: { projectId: string }) {
  */
 export function InvoicesTab({ projectId }: { projectId: string }) {
   const { t } = useTranslation();
+  const invoiceLayout = useLayoutCustomizer(
+    'finance.invoice',
+    t('finance.invoice_document', { defaultValue: 'Invoice' }),
+  );
   const queryClient = useQueryClient();
   const addToast = useToastStore((s) => s.addToast);
   const { confirm, ...confirmProps } = useConfirm();
@@ -2505,6 +2511,7 @@ export function InvoicesTab({ projectId }: { projectId: string }) {
 
   return (
     <div className="space-y-4">
+      {invoiceLayout.drawer}
       {/* Explanation */}
       <p className="text-sm text-content-secondary">
         {t('finance.invoices_explanation', {
@@ -2799,7 +2806,16 @@ export function InvoicesTab({ projectId }: { projectId: string }) {
                             download={(locale) => downloadInvoicePdf(inv.id, locale, inv.invoice_number)}
                             locales={PURCHASING_DOCUMENT_LOCALES}
                             testId={`invoice-pdf-${inv.id}`}
+                            onCustomize={invoiceLayout.open({ recordId: inv.id, projectId: projectId || null })}
                           />
+                          {isReceivable(inv) && (
+                            <IssueDocumentButton
+                              kind="finance.invoice"
+                              recordId={inv.id}
+                              fallbackName={inv.invoice_number || 'invoice'}
+                              testId={`invoice-document-${inv.id}`}
+                            />
+                          )}
                           {inv.status === 'draft' && (
                             <Button
                               variant="secondary"
@@ -2917,7 +2933,16 @@ export function InvoicesTab({ projectId }: { projectId: string }) {
                         download={(locale) => downloadInvoicePdf(inv.id, locale, inv.invoice_number)}
                         locales={PURCHASING_DOCUMENT_LOCALES}
                         testId={`invoice-card-pdf-${inv.id}`}
+                        onCustomize={invoiceLayout.open({ recordId: inv.id, projectId: projectId || null })}
                       />
+                      {isReceivable(inv) && (
+                        <IssueDocumentButton
+                          kind="finance.invoice"
+                          recordId={inv.id}
+                          fallbackName={inv.invoice_number || 'invoice'}
+                          testId={`invoice-document-${inv.id}`}
+                        />
+                      )}
                     </div>
                   </div>
                   <div className="flex items-center justify-between text-xs text-content-tertiary">
@@ -3425,6 +3450,10 @@ function PaymentsTab({
   onGoToInvoices: () => void;
 }) {
   const { t } = useTranslation();
+  const paymentLayout = useLayoutCustomizer(
+    'finance.payment',
+    t('finance.payment_document', { defaultValue: 'Payment record' }),
+  );
 
   const {
     data: paymentPage,
@@ -3477,6 +3506,7 @@ function PaymentsTab({
 
   return (
     <Card padding="none">
+      {paymentLayout.drawer}
       {/* Header bar */}
       <div className="p-4 border-b border-border-light flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <p className="text-sm text-content-secondary">
@@ -3554,6 +3584,7 @@ function PaymentsTab({
                     download={(locale) => downloadPaymentPdf(p.id, locale)}
                     locales={PURCHASING_DOCUMENT_LOCALES}
                     testId={`payment-pdf-${p.id}`}
+                    onCustomize={paymentLayout.open({ recordId: p.id, projectId: projectId || null })}
                   />
                 </td>
               </tr>

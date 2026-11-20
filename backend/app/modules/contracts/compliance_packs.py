@@ -97,6 +97,15 @@ RULE_PACKS: dict[str, dict[str, Any]] = {
         "enforced_workflows": [WORKFLOW_CONTRACT_SIGNATURE],
         "rule_sets": ["boq_quality", "pakistan"],
     },
+    "hk_compliance": {
+        "id": "hk_compliance",
+        "name": "Hong Kong SAR Compliance",
+        "description": "Security of Payment Ordinance (Cap. 652) scope and payment dates, the void pay-when-paid "
+        "clause, the CIC and CWR levies over HK$3,000,000, no tax line, plus the universal quality baseline.",
+        "jurisdiction": "HK",
+        "enforced_workflows": [WORKFLOW_CONTRACT_SIGNATURE],
+        "rule_sets": ["boq_quality", "hongkong"],
+    },
     "mx_compliance": {
         "id": "mx_compliance",
         "name": "Mexico Compliance",
@@ -141,10 +150,11 @@ RULE_PACKS: dict[str, dict[str, Any]] = {
         "id": "cn_compliance",
         "name": "China Compliance",
         "description": "GB/T 50500 bill-of-quantities item codes, present and in the "
-        "9- or 12-digit national format, plus the universal quality baseline.",
+        "9- or 12-digit national format, VAT base, tax method and fapiao checks, "
+        "plus the universal quality baseline.",
         "jurisdiction": "CN",
         "enforced_workflows": [WORKFLOW_CONTRACT_SIGNATURE],
-        "rule_sets": ["boq_quality", "gbt50500"],
+        "rule_sets": ["boq_quality", "gbt50500", "cn_vat"],
     },
     "es_compliance": {
         "id": "es_compliance",
@@ -315,7 +325,7 @@ RULE_PACKS: dict[str, dict[str, Any]] = {
         "quality baseline.",
         "jurisdiction": "UA",
         "enforced_workflows": [WORKFLOW_CONTRACT_SIGNATURE],
-        "rule_sets": ["boq_quality", "din276", "ukraine"],
+        "rule_sets": ["boq_quality", "din276", "ukraine", "norm_base", "public_funding", "vat_rate"],
     },
     "eg_compliance": {
         "id": "eg_compliance",
@@ -488,6 +498,11 @@ PACK_BY_LABEL: dict[str, str] = {
     "poland": "pl_compliance",
     "polska": "pl_compliance",
     "pakistan": "pk_compliance",
+    "hong kong": "hk_compliance",
+    "hong kong sar": "hk_compliance",
+    "hongkong": "hk_compliance",
+    "香港特別行政區": "hk_compliance",
+    "香港特别行政区": "hk_compliance",
     "italy": "it_compliance",
     "italia": "it_compliance",
     "china": "cn_compliance",

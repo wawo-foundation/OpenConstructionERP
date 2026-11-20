@@ -473,10 +473,15 @@ teach identifiers that were never rule sets at all.
 | `field_productivity` | Field productivity records |
 | `sheet_intake` | Drawing sheets at intake |
 | `subcontract_change` | Subcontract change orders |
+| `subcontract_pay_app` | Subcontractor payment application: no line negative or past 100% complete, required documents on file |
 | `workforce` | Workforce records |
 | `property_dev` | Development appraisal |
 | `pipeline` | Opportunity pipeline |
+| `commercial_control` | Commercial control: commitment grid, cost value reconciliation, approval routes and valuations |
 | `offline_sync` | Offline merge from a device: every conflicting field resolved before the merge applies |
+| `vat_rate` | The bill's tax line at the country's standard VAT rate from the dated tax seed, unless the bill records its VAT treatment |
+| `norm_base` | Norm codes on leaf lines: present, shaped as the country's norm base prescribes, no retired prefix, labour grade on the scale |
+| `public_funding` | Publicly funded estimates: capped markups under the cap of the funding class, price evidence on client estimates |
 | `din276` | DIN 276 cost groups (DE) |
 | `gaeb` | GAEB LV structure and ordinals (DE) |
 | `onorm` | ÖNORM (AT) |
@@ -487,6 +492,7 @@ teach identifiers that were never rule sets at all.
 | `bc3` | FIEBDC-3 / BC3 (ES) |
 | `mexico` | Mexican estimating conventions |
 | `pakistan` | Pakistani sales tax line and known rates (federal GST, provincial services tax) (PK) |
+| `hongkong` | Hong Kong Security of Payment Ordinance (Cap. 652) scope and dates, pay-when-paid, CIC and CWR levies, zero tax, retention limit, PC sum attendance, ArchSD index attribution (HK) |
 | `sinapi` | SINAPI codes (BR) |
 | `nbr` | ABNT NBR (BR) |
 | `cpwd` | CPWD and IS 1200 (IN) |

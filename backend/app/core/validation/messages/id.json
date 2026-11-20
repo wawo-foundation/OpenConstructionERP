@@ -299,6 +299,10 @@
     "unit_exportable": {
       "fail": "Item {ordinal}: satuan '{unit}' tidak muat di kolom GAEB QU 4 karakter dan akan terpotong saat ekspor",
       "suggestion": "Gunakan kode satuan GAEB maksimal 4 karakter (m, m2, m3, St, h, psch, kg, t)"
+    },
+    "short_text_length": {
+      "fail": "Item {ordinal}: teks pendek berisi {length} karakter; ekspor GAEB memotongnya menjadi 70",
+      "suggestion": "Persingkat teks pendek menjadi 70 karakter dan simpan detail di teks panjang"
     }
   },
   "nrm": {
@@ -412,7 +416,10 @@
       "suggestion": "Tetapkan kode GB/T 50500 sembilan digit (misalnya 010101001)"
     },
     "valid_code": {
-      "fail": "Kode GB/T 50500 '{code}' tidak valid; diharapkan 9 atau 12 digit"
+      "fail": "Kode GB/T 50500 '{code}' tidak valid; diharapkan 9 atau 12 digit atau kode tambahan seperti 01B001"
+    },
+    "code_unique": {
+      "fail": "Kode item '{code}' dipakai lebih dari sekali dalam subproyek yang sama"
     }
   },
   "cpwd": {
@@ -931,6 +938,36 @@
     "change_time_within_owner": {
       "fail": "Dampak waktu subkontrak untuk {code} berjumlah {sub_days} hari, lebih dari {owner_days} hari yang diberikan pemilik",
       "suggestion": "Periksa klaim waktu subkontraktor atau minta perpanjangan yang sepadan dari pemilik"
+    },
+    "pay_app_over_complete": {
+      "fail": "Baris {line} mencapai {percent}% dari nilai terjadwalnya setelah periode ini ({completed} dari {scheduled})",
+      "suggestion": "Turunkan jumlah periode ini atau catat alasan penagihan di atas nilai terjadwal"
+    },
+    "pay_app_line_negative": {
+      "fail": "Baris {line} akan berjumlah {completed} sampai saat ini, yaitu di bawah nol"
+    },
+    "pay_app_within_agreement": {
+      "fail": "Permohonan pembayaran berjumlah {billed}, melebihi nilai perjanjian ditambah variasi yang disetujui sebesar {limit}"
+    },
+    "pay_app_correct": {
+      "suggestion": "Perbaiki jumlah pada permohonan pembayaran ini atau naikkan nilai perjanjian lewat variasi yang disetujui"
+    },
+    "required_documents": {
+      "fail": "Dokumen wajib: {document} ({state})",
+      "suggestion": "Lampirkan dokumen yang sudah ditandatangani dan berlaku pada perjanjian subkontrak",
+      "states": {
+        "missing": "tidak ada",
+        "unsigned": "belum ditandatangani",
+        "expired": "kedaluwarsa"
+      }
+    },
+    "document_roles": {
+      "terms_and_conditions": "Syarat dan ketentuan",
+      "safety_agreement": "Perjanjian keselamatan",
+      "safety_plan": "Rencana keselamatan",
+      "insurance": "Asuransi",
+      "method_statement": "Metode kerja",
+      "other": "Dokumen lain"
     }
   },
   "submittal": {
@@ -2014,6 +2051,510 @@
     "crew_without_record": {
       "fail": "Regu {headcount} orang ada di lokasi tetapi tidak ada pekerjaan, inspeksi, atau keterlambatan yang dicatat.",
       "suggestion": "Tambahkan apa yang dikerjakan regu, atau keterlambatan yang menghentikan pekerjaan."
+    }
+  },
+  "framework_agreement": {
+    "item_not_in_agreement": {
+      "fail": "Baris {code} bukan item aktif dari perjanjian {agreement}; catat sebagai pekerjaan tambahan.",
+      "suggestion": "Hapus baris dari pesanan dan catat pekerjaan sebagai tambahan pada pesanan."
+    },
+    "rate_deviates": {
+      "fail": "Harga baris {code} {rate} berbeda dengan harga perjanjian {expected}.",
+      "suggestion": "Harga pesanan berasal dari perjanjian; hitung ulang harga baris dari daftar harga."
+    },
+    "order_outside_validity": {
+      "fail": "Tanggal pesanan {date} di luar masa berlaku perjanjian {from} sampai {to}.",
+      "suggestion": "Beri tanggal pesanan dalam masa berlaku, atau perpanjang perjanjian dulu."
+    },
+    "rate_period_gap": {
+      "fail": "Tidak ada periode harga yang mencakup {date}.",
+      "suggestion": "Tambahkan periode harga yang mencakup tanggal ini di tab Harga dan eskalasi."
+    },
+    "escalation_unresolved": {
+      "fail": "Indeks {series} tidak punya nilai untuk {period}; harga tidak bisa disesuaikan.",
+      "suggestion": "Isi nilai indeks bulan tersebut di Indeks harga, lalu hitung ulang harga pesanan."
+    },
+    "cap_exceeded": {
+      "fail": "Pesanan ini membuat perjanjian mencapai {total} dari batas {cap}; sisa {headroom}.",
+      "suggestion": "Kurangi pesanan sesuai sisa, atau terbitkan dengan pengecualian beralasan."
+    },
+    "cap_threshold": {
+      "fail": "Pemakaian perjanjian sudah mencapai {pct} % dari batas.",
+      "suggestion": "Beri tahu klien lebih awal agar perjanjian lanjutan bisa disiapkan."
+    },
+    "item_max_qty": {
+      "fail": "Item {code}: {qty} sudah dipesan sampai saat ini, melebihi maksimum yang ditetapkan {max}.",
+      "suggestion": "Sepakati volume tambahan dengan klien sebelum pesanan berikutnya."
+    },
+    "min_at_risk": {
+      "fail": "Tersisa {days} hari dan {pct} % dari minimum yang dijamin sudah dipesan.",
+      "suggestion": "Sampaikan kekurangan ke klien selagi masih ada waktu untuk memesan."
+    },
+    "currency_mismatch": {
+      "fail": "Mata uang pesanan {cur} berbeda dengan mata uang perjanjian {agr}.",
+      "suggestion": "Pesanan dihargai dalam mata uang perjanjian."
+    },
+    "adjustment_unknown": {
+      "fail": "Kondisi {tag} tidak punya penyesuaian dalam perjanjian ini.",
+      "suggestion": "Tambahkan penyesuaian di tab Kondisi, atau hapus kondisi dari pesanan."
+    },
+    "direct_claim": {
+      "fail": "Klaim diajukan pada pesanan, bukan pada perjanjian kerangka.",
+      "suggestion": "Buka pesanan tempat pekerjaan dilakukan, lalu ajukan klaim di sana."
+    },
+    "duplicate_item": {
+      "fail": "Kode item {code} muncul dua kali dalam periode harga {period}.",
+      "suggestion": "Simpan satu baris per kode item sebelum menyimpan daftar harga."
+    },
+    "measured_over_ordered": {
+      "fail": "Volume terukur {m} melebihi volume dipesan {o} pada baris {code}; pertimbangkan tambahan.",
+      "suggestion": "Catat volume tambahan sebagai perubahan pada pesanan."
+    },
+    "term_over_legal_max": {
+      "fail": "Jangka waktu {years} tahun melampaui batas {max} tahun menurut {source} (paket).",
+      "suggestion": "Periksa jangka waktu dengan klien; batas tercantum di paket, tetapi tidak dipaksakan."
+    }
+  },
+  "estimate_archive": {
+    "arc_hash_mismatch": {
+      "fail": "Sidik jari tidak cocok: catatan memberi {actual}, segel menyebut {sealed}. Anggap catatan telah diubah."
+    },
+    "arc_total_mismatch": {
+      "fail": "Total tersegel {seal} berbeda dari nilai kontrak {award} sebesar {diff}."
+    },
+    "arc_no_breakdown": {
+      "fail": "{n} item tidak memiliki rincian sumber daya; harganya tidak dapat ditelusuri kemudian."
+    },
+    "arc_no_markups": {
+      "fail": "Estimasi tidak memiliki markup untuk disegel."
+    },
+    "arc_sealed_after_signing": {
+      "fail": "Disegel {days} hari setelah kontrak ditandatangani."
+    },
+    "arc_no_receipt": {
+      "fail": "Pihak lawan belum mengonfirmasi sidik jari."
+    },
+    "arc_open_not_closed": {
+      "fail": "Pembukaan {id} sudah terbuka {days} hari tanpa notulen."
+    },
+    "arc_open_no_reason": {
+      "fail": "Pembukaan memerlukan alasan dan referensi."
+    },
+    "arc_open_one_party": {
+      "fail": "Hanya satu pihak tercantum; catat mengapa pihak lain tidak hadir."
+    },
+    "var_basis_no_seal": {
+      "fail": "Item {code} dihargai berdasarkan dasar asli, tetapi tidak ada estimasi tersegel."
+    },
+    "var_basis_deviation": {
+      "fail": "Item {code}: {field} berubah dari {old} menjadi {new} tanpa catatan."
+    },
+    "var_new_resource_no_evidence": {
+      "fail": "Sumber daya baru {res} tidak memiliki tanggal harga atau referensi penawaran."
+    },
+    "var_markup_not_sealed": {
+      "fail": "Item {code} menerapkan markup {m} yang tidak ada di segel."
+    },
+    "var_abnormal_carried_rate": {
+      "fail": "Biaya yang dibawa {c} menyimpang {pct} % dari acuan."
+    },
+    "arc_mutation_refused": {
+      "fail": "Estimasi tersegel tidak dapat diubah atau dihapus. Segel versi baru yang menggantikannya."
+    },
+    "contents_locked": "Isi tetap tersegel sampai pembukaan resmi dimulai.",
+    "market_off": "Estimasi bersegel bukan bagian dari profil pasar proyek ini.",
+    "contract_required": "Diperlukan kontrak klien sebelum estimasi dapat disegel sebagai dasar kontrak."
+  },
+  "boq_revision": {
+    "superseded_still_editable": {
+      "fail": "Revisi {label} masih dapat diedit meskipun {later} sudah dibuat setelahnya; perubahan di sini tidak terbawa",
+      "suggestion": "Kunci {label} atau lanjutkan bekerja di revisi terbaru"
+    }
+  },
+  "schedule_baseline": {
+    "single_approved": {
+      "fail": "Jadwal ini memiliki lebih dari satu baseline yang disetujui ({baselines}).",
+      "suggestion": "Setujui baseline yang harus berlaku; menyetujui satu akan mencabut persetujuan yang lain."
+    }
+  },
+  "project_catalogue": {
+    "unit_present": {
+      "fail": "Tarif {code} tidak memiliki satuan.",
+      "suggestion": "Isi satuan yang menjadi dasar harga, misalnya m2, m3, atau jam."
+    },
+    "duplicate_code": {
+      "fail": "Kode {code} dipakai oleh lebih dari satu tarif dalam proyek ini.",
+      "suggestion": "Pertahankan satu tarif per kode, atau beri varian kode tersendiri."
+    },
+    "currency_differs": {
+      "fail": "Tarif {code} dalam {currency}, tetapi proyek dihitung dalam {project_currency}.",
+      "suggestion": "Konversikan tarif ke mata uang proyek, atau pastikan mata uang asing memang disengaja."
+    },
+    "override_far": {
+      "fail": "Tarif lokal {code} berselisih {percent} % dari tarif sumber {source_rate}.",
+      "suggestion": "Periksa koma desimal yang bergeser, atau catat mengapa proyek ini memerlukan harga lain."
+    },
+    "source_changed": {
+      "fail": "Tarif sumber {code} berubah dari {old} menjadi {new} sejak disalin ke proyek.",
+      "suggestion": "Ambil tarif sumber yang baru, atau pertahankan tarif lokal dengan sengaja."
+    }
+  },
+  "schedule_mspdi_import": {
+    "task_dates": {
+      "missing_dates": "Tugas {ref} \"{name}\" tidak memiliki tanggal mulai atau selesai.",
+      "finish_before_start": "Tugas {ref} \"{name}\" selesai ({finish}) sebelum dimulai ({start}).",
+      "suggestion": "Perbaiki tanggal di jadwal sumber lalu ekspor ulang. Tanggal tidak pernah ditebak saat impor."
+    },
+    "unique_ids": {
+      "duplicate_uid": "ID tugas {ref} muncul lebih dari sekali; hanya tugas pertama yang disimpan.",
+      "suggestion": "Beri setiap tugas ID unik di jadwal sumber."
+    },
+    "links_resolve": {
+      "dangling_link": "Tugas {ref} \"{name}\": pendahulu {predecessor} tidak ada di file, tautan dilewati.",
+      "duplicate_link": "Tugas {ref} \"{name}\": tautan kedua dari pendahulu {predecessor} dilewati, satu tautan per pasangan dipertahankan.",
+      "self_link": "Tugas {ref} \"{name}\" tertaut ke dirinya sendiri, tautan dilewati.",
+      "unknown_link_type": "Tugas {ref} \"{name}\": jenis tautan {type} tidak dikenal dan dibaca sebagai selesai-ke-mulai.",
+      "suggestion": "Periksa tautan logika di jadwal sumber."
+    },
+    "values_in_range": {
+      "percent_out_of_range": "Tugas {ref} \"{name}\": {value}% selesai berada di luar 0-100 dan dibatasi.",
+      "outline_gap": "Tugas {ref} \"{name}\" melewati satu tingkat kerangka ({level}); ditempatkan di bawah tugas ringkasan terdekat di atasnya.",
+      "suggestion": "Periksa % selesai dan indentasi di jadwal sumber."
+    },
+    "calendar_work_days": {
+      "calendar_no_work_days": "Kalender {calendar} tidak memiliki hari kerja.",
+      "suggestion": "Tandai hari kerja kalender ini di jadwal sumber."
+    }
+  },
+  "schedule_pdf_import": {
+    "no_text_layer": {
+      "fail": "PDF tidak memiliki lapisan teks, sehingga tabelnya tidak dapat dibaca.",
+      "suggestion": "Ekspor jadwal sebagai MS Project XML, XER, atau Excel lalu impor file tersebut."
+    },
+    "dates_parsed": {
+      "fail": "Baris {row}: tanggal mulai atau selesai bukan tanggal.",
+      "suggestion": "Periksa kolom tanggal dan urutan hari/bulan, atau perbaiki tanggal di sumber."
+    },
+    "finish_before_start": {
+      "fail": "Baris {row}: tanggal selesai sebelum tanggal mulai.",
+      "suggestion": "Perbaiki tanggal di jadwal sumber."
+    },
+    "duration_mismatch": {
+      "fail": "Baris {row}: durasi tercetak berbeda dari hari kerja antara mulai dan selesai.",
+      "suggestion": "Tanggal tetap dipakai; periksa kolom durasi dan kalender proyek."
+    },
+    "unique_ids": {
+      "fail": "Baris {row}: ID aktivitas dipakai oleh baris lain.",
+      "suggestion": "Beri setiap aktivitas ID unik di jadwal sumber."
+    },
+    "links_resolve": {
+      "fail": "Baris {row}: predecessor bukan aktivitas di tabel.",
+      "suggestion": "Periksa kolom predecessor; tautan yang tidak ditemukan dilewati."
+    }
+  },
+  "commercial_control": {
+    "ok": "Diperiksa, tidak ada masalah",
+    "cvr": {
+      "target_rate_basis": {
+        "fail": "{missing} dari {total} item berharga tidak punya harga target dan dianggarkan dengan harga jual (misalnya {sample})",
+        "suggestion": "Isi harga biaya target pada item ini agar anggaran adalah biaya yang menjadi patokan proyek"
+      },
+      "unmapped_cost": {
+        "fail": "{kind} {label} tidak punya WBS atau kode biaya: komitmen {committed}, aktual {actual}",
+        "suggestion": "Bebankan baris pesanan, subkontrak, atau faktur ke elemen WBS agar CVR dapat menempatkannya"
+      }
+    },
+    "procurement": {
+      "line_over_committed": {
+        "fail": "Item {ordinal} melebihi komitmen: dipesan {committed_qty} dari {budget_qty}, {committed_value} terhadap anggaran {budget_value}",
+        "suggestion": "Periksa pesanan ganda atau catat perubahan atau pengalihan anggaran sebelum menambah komitmen"
+      }
+    },
+    "approval_routes": {
+      "bands_contiguous": {
+        "gap": {
+          "fail": "Jumlah dari {low} hingga {high} tidak sampai ke pemberi persetujuan mana pun (langkah {step})",
+          "suggestion": "Perluas rentang di sebelahnya atau tambahkan langkah agar setiap jumlah punya pemberi persetujuan"
+        },
+        "overlap": {
+          "fail": "Langkah {step} tumpang tindih dengan rentang lebih rendah dari {low} hingga {high}; kedua pemberi persetujuan menandatangani jumlah itu",
+          "suggestion": "Mulailah tiap rentang di tempat rentang sebelumnya berakhir, kecuali keduanya memang harus menandatangani"
+        },
+        "empty": {
+          "fail": "Langkah {step} memiliki rentang dari {low} sampai {high} yang tidak memuat jumlah apa pun",
+          "suggestion": "Atur minimum di bawah maksimum, atau kosongkan maksimum jika tanpa batas atas"
+        }
+      }
+    },
+    "valuation": {
+      "assessed_within_submitted": {
+        "fail": "Baris {line}: kuantitas dinilai {assessed} melebihi yang diajukan {submitted}",
+        "suggestion": "Nilai paling banyak yang diajukan dan catat pekerjaan tambahan sebagai perubahan"
+      },
+      "certified_within_assessed": {
+        "fail": "Baris {line}: kuantitas tersertifikasi {certified} melebihi yang dinilai {assessed}",
+        "suggestion": "Sertifikasi paling banyak yang dinilai, atau nilai ulang barisnya dahulu"
+      }
+    }
+  },
+  "norm_base": {
+    "code_present": {
+      "fail": "Baris {ordinal} tidak mencantumkan kode norma {base}. Estimasi berbasis norma mencantumkan norma di setiap baris.",
+      "suggestion": "Masukkan kode norma pada klasifikasi {classification} baris tersebut."
+    },
+    "code_shape": {
+      "fail": "\"{code}\" pada baris {ordinal} bukan kode {base}. Diharapkan kode seperti {example}."
+    },
+    "legacy_prefix": {
+      "fail": "\"{code}\" pada baris {ordinal} memakai awalan lama {old}. Kode yang berlaku adalah {new}."
+    },
+    "resource_breakdown": {
+      "fail": "Baris norma {code} tidak memiliki jam kerja atau tingkat rata-rata.",
+      "suggestion": "Tambahkan sumber daya tenaga kerja dengan jam per satuan dan tingkat rata-rata norma."
+    },
+    "grade_range": {
+      "fail": "Tingkat {grade} pada baris {ordinal} di luar {min} sampai {max} atau tidak berkelipatan {step}."
+    }
+  },
+  "public_funding": {
+    "markup_cap": {
+      "fail": "{funding}: {markup} sebesar {percent} %, batasnya {cap} % dari biaya langsung ({source}).",
+      "suggestion": "Turunkan tambahan sampai batas, atau atur pendanaan swasta jika pekerjaan tidak dibayar dengan dana publik."
+    },
+    "investor_exact": {
+      "fail": "Estimasi pemilik dengan {funding}: {markup} harus tepat {cap} % ({source})."
+    },
+    "material_price_evidence": {
+      "fail": "{funding}: material {material} pada baris {ordinal} punya {count} dari {required} penawaran harga dan tanpa analisis harga.",
+      "suggestion": "Catat penawaran pemasok untuk material atau lampirkan laporan analisis harga."
+    }
+  },
+  "vat_rate": {
+    "standard_rate": {
+      "fail": "{markup} sebesar {percent} %; tarif PPN standar di {country} adalah {rate} %.",
+      "suggestion": "Atur baris pajak ke tarif standar, atau catat di RAB mengapa tarif lain atau pembebasan berlaku."
+    }
+  },
+  "survey": {
+    "no_crs": {
+      "fail": "Set titik {name} tidak memiliki CRS: tetapkan EPSG atau grid lokal sebelum volume atau persil.",
+      "suggestion": "Atur sistem koordinat proyek, lalu tentukan sistem tempat file ini diukur."
+    },
+    "crs_unconfirmed": {
+      "fail": "CRS terdeteksi otomatis (keyakinan {confidence}); konfirmasi sebelum digunakan.",
+      "suggestion": "Buka Atur CRS proyek lalu konfirmasi sistem yang terdeteksi atau pilih yang lain."
+    },
+    "duplicate_point": {
+      "fail": "ID titik {point_id} ganda dengan koordinat berbeda.",
+      "suggestion": "Simpan satu bacaan: hapus set titik yang berisi bacaan salah lalu impor ulang."
+    },
+    "traverse_misclosure": {
+      "fail": "Poligon {name} menutup pada 1:{r}, di bawah minimum profil 1:{min}.",
+      "suggestion": "Periksa sisi-sisi dari kesalahan kasar, ukur ulang sisi terlemah, atau konfirmasi nilai profil."
+    },
+    "level_misclosure": {
+      "fail": "Salah penutup sipat datar {f} mm melebihi k·√km dengan k = {k} mm.",
+      "suggestion": "Ulangi sipat datar atau periksa elevasi titik tetap yang digunakan."
+    }
+  },
+  "volumes": {
+    "no_overlap": {
+      "fail": "Kedua permukaan hanya bertumpang tindih pada {p} % area: volume tidak bermakna.",
+      "suggestion": "Periksa bahwa kedua permukaan berada di sistem koordinat yang sama dan mencakup lahan yang sama."
+    },
+    "low_coverage": {
+      "fail": "Hanya {c} % area yang memiliki data di kedua permukaan (minimum {min} %).",
+      "suggestion": "Tambahkan titik ukur di tempat permukaan tidak ada, atau persempit batas ke area yang tercakup."
+    },
+    "coarse_scan": {
+      "fail": "Pindaian kasar (LOA10) menjadi dasar volume ini tanpa alasan.",
+      "suggestion": "Gunakan pindaian berakurasi survei atau tulis mengapa pindaian ini cukup."
+    },
+    "bank_volume": {
+      "fail": "Kuantitas adalah volume asli (di dalam tanah); faktor pengembangan tidak diterapkan.",
+      "suggestion": "Kirim galian lepas jika item BOQ diukur sebagai material lepas."
+    }
+  },
+  "setting_out": {
+    "stake_off": {
+      "fail": "Titik stakeout {id} meleset {d} mm, toleransi {t} mm",
+      "suggestion": "Pasang ulang titik dan catat, atau buat draf NCR."
+    },
+    "record_untraceable": {
+      "fail": "Catatan stakeout {id} tidak memiliki alat atau titik kontrol.",
+      "suggestion": "Isi alat dan titik kontrol tempat stasiun didirikan."
+    },
+    "sheet": {
+      "title": "Lembar stakeout",
+      "project": "Proyek",
+      "crs": "Sistem koordinat",
+      "request": "Permintaan",
+      "tolerance": "Toleransi",
+      "element": "Elemen",
+      "generated": "Dibuat",
+      "point": "Titik",
+      "design_e": "E rencana",
+      "design_n": "N rencana",
+      "design_z": "Z rencana",
+      "measured_e": "E terukur",
+      "measured_n": "N terukur",
+      "verdict": "Hasil",
+      "by": "Diukur oleh",
+      "verdict_pass": "Lolos",
+      "verdict_fail": "Gagal",
+      "verdict_open": "Terbuka",
+      "verdict_no_tolerance": "Tanpa profil",
+      "counts": "Lolos: {passed} · Gagal: {failed} · Terbuka: {open}",
+      "findings": "Temuan",
+      "no_profile": "Tanpa profil, tetapkan satu",
+      "d": "d (mm)",
+      "dz": "dZ (mm)"
+    }
+  },
+  "land_parcels": {
+    "area_mismatch": {
+      "fail": "Bidang {id}: luas hasil hitung {a} m2 berbeda dari luas sertifikat {l} m2 melebihi toleransi ({t}).",
+      "suggestion": "Periksa titik batas terhadap salinan register, atau catat mengapa kedua luas berbeda."
+    },
+    "ring_invalid": {
+      "fail": "Bidang {id}: batas tidak tertutup atau berpotongan sendiri.",
+      "suggestion": "Perbaiki titik batas agar mengelilingi bidang satu kali tanpa berpotongan."
+    },
+    "zone_not_acquired": {
+      "fail": "Zona kerja tumpang tindih dengan bidang {id} yang belum diperoleh ({area} m2).",
+      "suggestion": "Peroleh bidang atau sepakati akses sebelum pekerjaan dimulai, atau geser zona kerja."
+    },
+    "overlap": {
+      "fail": "Bidang {a} dan {b} tumpang tindih {area} m2.",
+      "suggestion": "Perbaiki batas bersama agar kedua bidang memakai titik yang sama."
+    },
+    "gap": {
+      "fail": "Celah {gap} m antara bidang {a} dan {b}.",
+      "suggestion": "Gunakan titik batas yang sama untuk kedua bidang, atau pastikan jalur itu milik bidang lain."
+    },
+    "id_format": {
+      "fail": "Nomor {id} tidak sesuai format {label} (misalnya {example}).",
+      "suggestion": "Salin nomor persis seperti yang tertulis di register."
+    },
+    "pdf": {
+      "title": "Daftar bidang tanah",
+      "project": "Proyek",
+      "crs": "Sistem koordinat",
+      "method": "Metode",
+      "method_value": "Luas dari koordinat batas (rumus Gauss), dibulatkan ke {decimals} desimal, m2",
+      "printed": "Dicetak oleh",
+      "legal": "Luas sertifikat (m2)",
+      "computed": "Hasil hitung (m2)",
+      "diff": "Selisih (m2)",
+      "status": "Status bidang",
+      "rights": "Hak",
+      "cost": "Biaya",
+      "findings": "Temuan",
+      "total": "Total, {count} bidang",
+      "acquired_of": "Diperoleh {acquired} dari {total}",
+      "findings_title": "Temuan",
+      "no_findings": "Tidak ada temuan.",
+      "disclaimer": "Pemilik dan hak ditampilkan sebagaimana dicatat dalam proyek ini. Daftar ini bukan pendapat hukum maupun salinan register.",
+      "status_needed": "Dibutuhkan",
+      "status_negotiating": "Negosiasi",
+      "status_acquired": "Diperoleh",
+      "status_expropriation": "Pencabutan hak"
+    }
+  },
+  "monitoring": {
+    "crossed": {
+      "fail": "Titik {id}: pergeseran {d} mm atau laju {r} mm/day melewati {level}",
+      "suggestion": "Periksa titik dan strukturnya, lalu akui peringatan dengan catatan."
+    },
+    "level": {
+      "ok": "Normal",
+      "alert": "Peringatan",
+      "action": "Tindakan",
+      "alarm": "Batas alarm"
+    },
+    "risk": {
+      "title": "Titik monitoring {id} pada {level}",
+      "description": "Pergeseran {d} mm, laju {r} mm/day terhadap {profile}. Draf dibuka oleh monitoring: tinjau dan tetapkan penanggung jawab."
+    },
+    "report": {
+      "title": "Laporan alarm monitoring",
+      "project": "Proyek",
+      "crs": "Sistem koordinat",
+      "profile": "Profil ambang batas",
+      "generated": "Dibuat",
+      "point": "Titik",
+      "baseline": "Acuan (m)",
+      "latest": "Terbaru (m)",
+      "displacement": "Pergeseran (mm)",
+      "rate": "Laju (mm/day)",
+      "level": "Tingkat",
+      "acknowledged": "Diakui",
+      "counts": "Batas alarm: {alarm} · Tindakan: {action} · Peringatan: {alert} · Normal: {ok}",
+      "findings": "Temuan",
+      "no_profile": "Tidak ada profil, atur satu",
+      "ack_yes": "Ya",
+      "ack_no": "Tidak"
+    }
+  },
+  "stockpiles": {
+    "density_assumed": {
+      "fail": "Kerapatan diasumsikan, bukan diukur: ton hanya seandal perkiraan itu.",
+      "suggestion": "Timbang sampel atau ambil kerapatan dari surat jalan pemasok."
+    },
+    "variance_high": {
+      "fail": "Survei berbeda {v} % dari stok buku, melampaui toleransi {t} %.",
+      "suggestion": "Periksa kerapatan dan permukaan dasar, lalu usulkan penyesuaian dan konfirmasikan jika selisihnya nyata."
+    }
+  },
+  "mine_survey": {
+    "compliance_outside": {
+      "fail": "Kepatuhan periode {c} % berada di luar rentang {lo}-{hi} %.",
+      "suggestion": "Periksa rencana dan survei, lalu jelaskan selisihnya di catatan periode sebelum klaim."
+    },
+    "truck_differs": {
+      "fail": "Tonase hitungan truk berbeda {v} % dari tonase survei, melebihi pemeriksaan {t} %.",
+      "suggestion": "Periksa muatan per rit dan densitas, lalu bandingkan kembali kedua permukaan."
+    }
+  },
+  "hongkong": {
+    "sopo_applicability": {
+      "fail": "Kontrak ini tunduk pada Cap. 652 (Security of Payment): tanggapan dalam 30 hari, pembayaran dalam 60 hari sejak klaim"
+    },
+    "sopo_private_scope_check": {
+      "fail": "Kontrak swasta hanya tunduk pada Cap. 652 untuk bangunan baru atau pekerjaan yang perlu persetujuan Building Authority: konfirmasi cakupannya"
+    },
+    "sopo_response_late": {
+      "fail": "Tidak ada tanggapan pembayaran sebelum {date}: jumlah klaim disengketakan dan dapat dibawa ke ajudikasi"
+    },
+    "sopo_payment_term_exceeds_60": {
+      "fail": "Jangka pembayaran {n} hari melebihi 60 hari yang diizinkan Cap. 652"
+    },
+    "sopo_response_term_exceeds_30": {
+      "fail": "Jangka tanggapan {n} hari melebihi 30 hari yang diizinkan Cap. 652"
+    },
+    "sopo_adjudication_window": {
+      "fail": "Sengketa pembayaran timbul: sampaikan pemberitahuan ajudikasi sebelum {date}"
+    },
+    "contract_pay_when_paid": {
+      "fail": "Klausul pay-when-paid: Cap. 652 membuat pembayaran bersyarat tidak dapat dilaksanakan"
+    },
+    "levy_missing": {
+      "fail": "Pekerjaan melebihi HK$3,000,000 tetapi RAB tidak memuat pungutan CIC (0,5%) atau pungutan CWR (0,03%)"
+    },
+    "levy_below_threshold": {
+      "fail": "Pekerjaan paling banyak HK$3,000,000: tidak ada pungutan CIC atau CWR"
+    },
+    "tax_nonzero": {
+      "fail": "Baris PPN atau GST dikenakan, padahal Hong Kong tidak memiliki pajak itu: jadikan nol"
+    },
+    "retention_over_limit": {
+      "fail": "Retensi {x} melebihi batas kontrak {limit}"
+    },
+    "pc_sum_no_attendance": {
+      "fail": "Jumlah prime cost tidak memiliki item laba dan pelayanan"
+    },
+    "index_attribution": {
+      "fail": "Indeks harga ArchSD tidak mencantumkan sumber: sebutkan Architectural Services Department"
     }
   }
 }

@@ -1644,7 +1644,8 @@
         "no_rejections": "Tidak ada barang yang ditolak.",
         "sig_delivered_by": "Dikirim oleh",
         "counterparty_tax_id": "NPWP",
-        "counterparty_address": "Alamat"
+        "counterparty_address": "Alamat",
+        "delivery_address": "Alamat pengiriman"
       },
       "labels": {
         "po_status": {
@@ -1717,7 +1718,8 @@
         "gross_settled": "Jumlah bruto yang diselesaikan",
         "no_withholding": "Tidak ada yang ditahan dari pembayaran ini.",
         "counterparty_tax_id": "NPWP",
-        "counterparty_address": "Alamat"
+        "counterparty_address": "Alamat",
+        "supply_date": "Tanggal penyerahan"
       },
       "labels": {
         "invoice_status": {
@@ -1786,6 +1788,81 @@
         "col_min": "Terendah",
         "col_max": "Tertinggi",
         "col_count": "Pembacaan"
+      }
+    },
+    "gantt_pdf": {
+      "strings": {
+        "title": "Jadwal (diagram Gantt)",
+        "project": "Proyek",
+        "schedule": "Jadwal",
+        "baseline": "Baseline",
+        "no_baseline": "tidak ada",
+        "exported": "Diekspor",
+        "data_date": "Tanggal data",
+        "col_wbs": "WBS",
+        "col_activity": "Aktivitas",
+        "col_start": "Mulai",
+        "col_finish": "Selesai",
+        "col_duration": "Hari",
+        "legend_current": "Rencana saat ini",
+        "legend_progress": "Progres",
+        "legend_critical": "Jalur kritis",
+        "legend_baseline": "Rencana baseline",
+        "legend_actual": "Aktual",
+        "legend_milestone": "Milestone",
+        "legend_summary": "Ringkasan",
+        "week_short": "M{n}",
+        "quarter_short": "K{n}",
+        "sheet_of": "Lembar {page} dari {total}",
+        "no_activities": "Jadwal ini belum memiliki aktivitas."
+      }
+    },
+    "contracts": {
+      "strings": {
+        "doc_title": "Kontrak",
+        "col_code": "Kode",
+        "col_title": "Judul",
+        "col_type": "Jenis kontrak",
+        "col_role": "Posisi kontrak",
+        "col_counterparty": "Pihak lawan",
+        "col_original_value": "Nilai awal",
+        "col_total_value": "Nilai kontrak",
+        "col_retention": "Retensi",
+        "col_start": "Tanggal mulai",
+        "col_end": "Tanggal selesai",
+        "col_signed": "Tanggal penandatanganan",
+        "line_code": "Kode",
+        "line_description": "Uraian",
+        "line_unit": "Satuan",
+        "line_quantity": "Volume",
+        "line_unit_rate": "Harga satuan",
+        "lines": "Rincian nilai pekerjaan",
+        "signer_company": "Untuk perusahaan"
+      },
+      "labels": {
+        "status": {
+          "draft": "Draf",
+          "active": "Aktif",
+          "suspended": "Ditangguhkan",
+          "completed": "Selesai",
+          "terminated": "Diputus"
+        },
+        "type": {
+          "lump_sum": "Harga pasti",
+          "gmp": "GMP",
+          "cost_plus": "Biaya plus",
+          "tm": "Waktu dan material",
+          "unit_price": "Harga satuan",
+          "design_build": "Rancang dan bangun",
+          "combination": "Kombinasi",
+          "remeasurement": "Pengukuran ulang",
+          "framework": "Kontrak payung",
+          "call_off": "Pesanan panggilan"
+        },
+        "party": {
+          "client": "Kontrak dengan pemberi tugas",
+          "subcontractor": "Subkontrak"
+        }
       }
     }
   },
@@ -2076,7 +2153,11 @@
       "notifications.portal.message_received.title": "Pesan baru di portal",
       "notifications.portal.message_received.body": "{buyer_name} mengirim pesan.",
       "dispatch.notify.plan_title": "Your daily plan is ready",
-      "dispatch.notify.plan_body": "Plan for {day}: {lines} lines."
+      "dispatch.notify.plan_body": "Plan for {day}: {lines} lines.",
+      "notifications.monitoring.alert.title": "Peringatan pemantauan",
+      "notifications.monitoring.action.title": "Tingkat tindakan pemantauan",
+      "notifications.monitoring.alarm.title": "Alarm pemantauan",
+      "notifications.monitoring.crossed.body": "Titik {point}: {displacement} mm, {rate} mm/day."
     },
     "schedule_headers": {
       "headers": {
@@ -2701,5 +2782,30 @@
         "gap": "Selisih"
       }
     }
-  }
+  },
+  "monitoring.crossed.fail": "Titik {id}: pergeseran {d} mm atau laju {r} mm/hari melampaui {level}",
+  "monitoring.crossed.suggestion": "Periksa titik dan strukturnya, lalu konfirmasi peringatan dengan catatan.",
+  "monitoring.level.ok": "OK",
+  "monitoring.level.alert": "Peringatan",
+  "monitoring.level.action": "Tindakan",
+  "monitoring.level.alarm": "Alarm",
+  "monitoring.risk.title": "Titik pemantauan {id} pada {level}",
+  "monitoring.risk.description": "Pergeseran {d} mm, laju {r} mm/hari terhadap {profile}. Draf dibuka oleh pemantauan: tinjau dan tetapkan penanggung jawab.",
+  "monitoring.report.title": "Laporan alarm pemantauan",
+  "monitoring.report.project": "Proyek",
+  "monitoring.report.crs": "Sistem koordinat",
+  "monitoring.report.profile": "Profil ambang batas",
+  "monitoring.report.generated": "Dibuat",
+  "monitoring.report.point": "Titik",
+  "monitoring.report.baseline": "Baseline (m)",
+  "monitoring.report.latest": "Terbaru (m)",
+  "monitoring.report.displacement": "Pergeseran (mm)",
+  "monitoring.report.rate": "Laju (mm/hari)",
+  "monitoring.report.level": "Tingkat",
+  "monitoring.report.acknowledged": "Dikonfirmasi",
+  "monitoring.report.counts": "Alarm: {alarm} · Tindakan: {action} · Peringatan: {alert} · OK: {ok}",
+  "monitoring.report.findings": "Temuan",
+  "monitoring.report.no_profile": "Belum ada profil, atur satu",
+  "monitoring.report.ack_yes": "Ya",
+  "monitoring.report.ack_no": "Tidak"
 }

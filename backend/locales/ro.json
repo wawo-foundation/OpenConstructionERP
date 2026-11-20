@@ -1644,7 +1644,8 @@
         "no_rejections": "Nu s-a respins nimic.",
         "sig_delivered_by": "Livrat de",
         "counterparty_tax_id": "CUI/CIF",
-        "counterparty_address": "Adresă"
+        "counterparty_address": "Adresă",
+        "delivery_address": "Adresa de livrare"
       },
       "labels": {
         "po_status": {
@@ -1717,7 +1718,8 @@
         "gross_settled": "Valoare brută decontată",
         "no_withholding": "Nu s-a reținut nimic din această plată.",
         "counterparty_tax_id": "CUI/CIF",
-        "counterparty_address": "Adresă"
+        "counterparty_address": "Adresă",
+        "supply_date": "Data livrării"
       },
       "labels": {
         "invoice_status": {
@@ -1786,6 +1788,81 @@
         "col_min": "Min.",
         "col_max": "Max.",
         "col_count": "Citiri"
+      }
+    },
+    "gantt_pdf": {
+      "strings": {
+        "title": "Grafic de execuție (diagramă Gantt)",
+        "project": "Proiect",
+        "schedule": "Grafic",
+        "baseline": "Plan de referință",
+        "no_baseline": "niciunul",
+        "exported": "Exportat",
+        "data_date": "Data stării",
+        "col_wbs": "WBS",
+        "col_activity": "Activitate",
+        "col_start": "Început",
+        "col_finish": "Sfârșit",
+        "col_duration": "Zile",
+        "legend_current": "Plan curent",
+        "legend_progress": "Progres",
+        "legend_critical": "Drum critic",
+        "legend_baseline": "Plan de referință",
+        "legend_actual": "Real",
+        "legend_milestone": "Jalon",
+        "legend_summary": "Rezumat",
+        "week_short": "S{n}",
+        "quarter_short": "T{n}",
+        "sheet_of": "Foaia {page} din {total}",
+        "no_activities": "Acest grafic nu are încă activități."
+      }
+    },
+    "contracts": {
+      "strings": {
+        "doc_title": "Contract",
+        "col_code": "Cod",
+        "col_title": "Titlu",
+        "col_type": "Tip contract",
+        "col_role": "Partea contractului",
+        "col_counterparty": "Contraparte",
+        "col_original_value": "Valoare inițială",
+        "col_total_value": "Valoarea contractului",
+        "col_retention": "Reținere",
+        "col_start": "Data începerii",
+        "col_end": "Data finalizării",
+        "col_signed": "Semnat la data de",
+        "line_code": "Cod",
+        "line_description": "Descriere",
+        "line_unit": "UM",
+        "line_quantity": "Cantitate",
+        "line_unit_rate": "Preț unitar",
+        "lines": "Situația valorilor",
+        "signer_company": "Pentru societate"
+      },
+      "labels": {
+        "status": {
+          "draft": "Ciornă",
+          "active": "Activ",
+          "suspended": "Suspendat",
+          "completed": "Finalizat",
+          "terminated": "Reziliat"
+        },
+        "type": {
+          "lump_sum": "Sumă forfetară",
+          "gmp": "GMP",
+          "cost_plus": "Cost plus",
+          "tm": "Timp și materiale",
+          "unit_price": "Preț unitar",
+          "design_build": "Proiectare și execuție",
+          "combination": "Combinat",
+          "remeasurement": "Remăsurare",
+          "framework": "Acord-cadru",
+          "call_off": "Comandă subsecventă"
+        },
+        "party": {
+          "client": "Contract cu beneficiarul",
+          "subcontractor": "Subcontract"
+        }
       }
     }
   },
@@ -2076,7 +2153,11 @@
       "notifications.portal.message_received.title": "Mesaj nou în portal",
       "notifications.portal.message_received.body": "Mesaj trimis de {buyer_name}.",
       "dispatch.notify.plan_title": "Your daily plan is ready",
-      "dispatch.notify.plan_body": "Plan for {day}: {lines} lines."
+      "dispatch.notify.plan_body": "Plan for {day}: {lines} lines.",
+      "notifications.monitoring.alert.title": "Alertă de monitorizare",
+      "notifications.monitoring.action.title": "Nivel de acțiune al monitorizării",
+      "notifications.monitoring.alarm.title": "Alarmă de monitorizare",
+      "notifications.monitoring.crossed.body": "Punctul {point}: {displacement} mm, {rate} mm/day."
     },
     "schedule_headers": {
       "headers": {
@@ -2698,5 +2779,30 @@
         "gap": "Diferență"
       }
     }
-  }
+  },
+  "monitoring.crossed.fail": "Punctul {id}: deplasarea {d} mm sau viteza {r} mm/zi a depășit nivelul {level}",
+  "monitoring.crossed.suggestion": "Verificați punctul și construcția, apoi confirmați alerta cu o notă.",
+  "monitoring.level.ok": "OK",
+  "monitoring.level.alert": "Atenționare",
+  "monitoring.level.action": "Acțiune",
+  "monitoring.level.alarm": "Alarmă",
+  "monitoring.risk.title": "Punctul de monitorizare {id} la nivelul {level}",
+  "monitoring.risk.description": "Deplasare {d} mm, viteză {r} mm/zi față de {profile}. Ciornă deschisă de monitorizare: verificați-o și desemnați un responsabil.",
+  "monitoring.report.title": "Raport de alarmă monitorizare",
+  "monitoring.report.project": "Proiect",
+  "monitoring.report.crs": "Sistem de coordonate",
+  "monitoring.report.profile": "Profil de limite",
+  "monitoring.report.generated": "Generat",
+  "monitoring.report.point": "Punct",
+  "monitoring.report.baseline": "Valoare de referință (m)",
+  "monitoring.report.latest": "Ultima valoare (m)",
+  "monitoring.report.displacement": "Deplasare (mm)",
+  "monitoring.report.rate": "Viteză (mm/zi)",
+  "monitoring.report.level": "Nivel",
+  "monitoring.report.acknowledged": "Confirmat",
+  "monitoring.report.counts": "Alarmă: {alarm} · Acțiune: {action} · Atenționare: {alert} · OK: {ok}",
+  "monitoring.report.findings": "Constatări",
+  "monitoring.report.no_profile": "Niciun profil, setați unul",
+  "monitoring.report.ack_yes": "Da",
+  "monitoring.report.ack_no": "Nu"
 }

@@ -6,7 +6,7 @@
  * Features:
  * - User list with role badges and status
  * - Invite new users
- * - Change roles (admin/manager/editor/viewer)
+ * - Change roles (admin/manager/editor/surveyor/viewer)
  * - Activate/deactivate users
  * - Per-user module access matrix (visible + access level per module)
  * - Custom role names
@@ -30,12 +30,14 @@ import {
   Crown,
   Eye,
   Edit3,
+  ClipboardCheck,
   ChevronDown,
   Settings2,
   Lock,
   Unlock,
   Save,
   Trash2,
+  Link2,
 } from 'lucide-react';
 import { Card, Badge, Button, WideModal, Breadcrumb, ConfirmDialog, DismissibleInfo, IntroRichText, ModuleGuideButton } from '@/shared/ui';
 import { PageHeader } from '@/shared/ui/PageHeader';
@@ -49,6 +51,7 @@ import { apiGet } from '@/shared/lib/api';
 import {
   fetchAllUsers,
   updateUser,
+  getVerificationLink,
   deleteUser,
   inviteUser,
   getUserModuleAccess,
@@ -106,6 +109,12 @@ const ROLE_CONFIG: Record<UserRole, RoleConfigEntry> = {
     color: 'text-blue-600 dark:text-blue-400',
     variant: 'blue',
   },
+  surveyor: {
+    icon: ClipboardCheck,
+    labelKey: 'surveyor',
+    color: 'text-teal-600 dark:text-teal-400',
+    variant: 'success',
+  },
   viewer: {
     icon: Eye,
     labelKey: 'viewer',
@@ -114,7 +123,7 @@ const ROLE_CONFIG: Record<UserRole, RoleConfigEntry> = {
   },
 };
 
-const ROLES: UserRole[] = ['admin', 'manager', 'editor', 'viewer'];
+const ROLES: UserRole[] = ['admin', 'manager', 'editor', 'surveyor', 'viewer'];
 
 // Privilege ranking (higher = more access). Used to detect a role DOWNGRADE,
 // which is treated as a destructive action and gated behind a confirmation.
@@ -122,6 +131,7 @@ const ROLE_RANK: Record<UserRole, number> = {
   admin: 3,
   manager: 2,
   editor: 1,
+  surveyor: 1,
   viewer: 0,
 };
 
@@ -773,6 +783,36 @@ export function UserManagementPage() {
     },
   });
 
+  // The way in for a self-registered user whose confirmation email never arrived.
+  const copyLinkMut = useMutation({
+    mutationFn: (id: string) => getVerificationLink(id),
+    onSuccess: async ({ url }) => {
+      try {
+        await navigator.clipboard.writeText(url);
+        addToast({
+          type: 'success',
+          title: t('users.confirmation_link_copied', { defaultValue: 'Confirmation link copied' }),
+          message: t('users.confirmation_link_copied_hint', {
+            defaultValue: 'Send it to the user. Opening it activates the account.',
+          }),
+        });
+      } catch {
+        addToast({
+          type: 'info',
+          title: t('users.confirmation_link', { defaultValue: 'Confirmation link' }),
+          message: url,
+        });
+      }
+    },
+    onError: (e: Error) => {
+      addToast({
+        type: 'error',
+        title: t('common.error', { defaultValue: 'Error' }),
+        message: e.message,
+      });
+    },
+  });
+
   const inviteMut = useMutation({
     mutationFn: inviteUser,
     onSuccess: () => {
@@ -1116,6 +1156,19 @@ export function UserManagementPage() {
                           <Settings2 size={14} />
                           {t('users.access', { defaultValue: 'Access' })}
                         </button>
+                        {!user.is_active && !user.last_login_at && (
+                          <button
+                            onClick={() => copyLinkMut.mutate(user.id)}
+                            disabled={copyLinkMut.isPending}
+                            className="flex items-center gap-1 px-2 py-1 rounded text-xs font-medium text-oe-blue hover:bg-oe-blue/10 transition-colors"
+                            title={t('users.copy_confirmation_link_hint', {
+                              defaultValue: 'For when the sign-up confirmation email did not arrive',
+                            })}
+                          >
+                            <Link2 size={14} />
+                            {t('users.copy_confirmation_link', { defaultValue: 'Copy link' })}
+                          </button>
+                        )}
                         <button
                           onClick={() => handleToggleActive(user)}
                           disabled={isSelf}
@@ -1190,7 +1243,12 @@ export function UserManagementPage() {
                   ? t('users.role_manager_desc', { defaultValue: 'Project management' })
                   : r === 'editor'
                     ? t('users.role_editor_desc', { defaultValue: 'Create & edit' })
-                    : t('users.role_viewer_desc', { defaultValue: 'Read-only' })}
+                    : r === 'surveyor'
+                      ? t('users.role_surveyor_desc', {
+                          defaultValue:
+                            'Can import, edit and confirm survey data; editor rights elsewhere',
+                        })
+                      : t('users.role_viewer_desc', { defaultValue: 'Read-only' })}
             </span>
           );
         })}

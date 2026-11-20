@@ -12,7 +12,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from app.core.decimal_types import Decimal5_2, Decimal18_2, Decimal18_4, FiniteDecimal
+from app.core.decimal_types import Decimal5_2, Decimal8_4, Decimal18_2, Decimal18_4, FiniteDecimal
 
 # Upper bound for money fields - mirrors changeorders/full_evm/risk/punchlist.
 # A finite-but-absurd magnitude (e.g. 1e400) otherwise sums into gross and
@@ -692,6 +692,9 @@ class PaymentApplicationLineCreate(BaseModel):
     certified_qty: Decimal18_4 = Field(default=Decimal("0"))
     # Optional override of the work package's GC schedule-of-values line.
     contract_line_id: UUID | None = None
+    # This period as a percentage of the line's scheduled value. When given
+    # it replaces ``claimed_amount`` (amount = scheduled value x percent).
+    this_period_percent: Decimal8_4 | None = Field(default=None, ge=0, le=1000)
 
 
 class PaymentApplicationLineUpdate(BaseModel):
@@ -703,6 +706,18 @@ class PaymentApplicationLineUpdate(BaseModel):
     """
 
     contract_line_id: UUID | None = None
+
+
+class PaymentApplicationLineQuantities(BaseModel):
+    """The three quantities of one valuation line: claimed, assessed, certified.
+
+    The subcontractor claims, the quantity surveyor assesses (measures) and the
+    certifier certifies. Each is optional; a field left out keeps its value.
+    """
+
+    claimed_qty: Decimal18_4 | None = Field(default=None, ge=0)
+    assessed_qty: Decimal18_4 | None = Field(default=None, ge=0)
+    certified_qty: Decimal18_4 | None = Field(default=None, ge=0)
 
 
 class ApprovedLineAmount(BaseModel):
@@ -740,6 +755,8 @@ class PaymentApplicationLineResponse(BaseModel):
     assessed_qty: Decimal = Decimal("0")
     certified_qty: Decimal = Decimal("0")
     contract_line_id: UUID | None = None
+    # ``valuation.*`` findings for this line (assessed above claimed, and so on).
+    findings: list[dict[str, Any]] = Field(default_factory=list)
 
 
 class PaymentApplicationLineListResponse(BaseModel):
@@ -773,6 +790,9 @@ class PaymentApplicationCreate(BaseModel):
     gross_amount: Decimal18_2 = Field(default=Decimal("0"), ge=0, le=_MONEY_MAX)
     currency: str = Field(default="", max_length=3)
     lines: list[PaymentApplicationLineCreate] = Field(default_factory=list)
+    # Why a line is billed above its scheduled value; recorded on the pay
+    # application and what lets the over-100-percent warning pass.
+    overage_reason: str | None = Field(default=None, max_length=1000)
 
     @field_validator("currency")
     @classmethod
@@ -1600,3 +1620,144 @@ class ProjectInsuranceDashboard(BaseModel):
     certificate_buckets: dict[str, int]
     subcontractors: list[ProjectInsuranceSubRow] = Field(default_factory=list)
     gated_payments: list[ProjectInsurancePaymentRow] = Field(default_factory=list)
+
+
+# ── Progress billing statement and agreement documents ───────────────────
+
+
+class StatementLine(BaseModel):
+    """One line of the schedule of values on a pay application."""
+
+    work_package_id: UUID
+    name: str
+    scheduled_value: FiniteDecimal
+    previous: FiniteDecimal
+    this_period: FiniteDecimal
+    this_period_percent: FiniteDecimal | None = None
+    total_completed: FiniteDecimal
+    percent_complete: FiniteDecimal | None = None
+    retention: FiniteDecimal
+    balance_to_finish: FiniteDecimal
+
+
+class StatementSummary(BaseModel):
+    """The totals block printed above the lines."""
+
+    original_contract_sum: Decimal
+    change_orders: Decimal
+    contract_sum_to_date: Decimal
+    scheduled_total: Decimal
+    previous_completed: Decimal
+    this_period: Decimal
+    completed_to_date: Decimal
+    percent_complete: Decimal | None = None
+    retention_percent: Decimal
+    retention_held: Decimal
+    previous_certified: Decimal
+    current_due: Decimal
+    balance_to_finish: Decimal
+    previous_gross_billed: Decimal
+    this_gross: Decimal
+
+
+class StatementFinding(BaseModel):
+    """One validation result on a statement."""
+
+    rule_id: str
+    severity: str
+    passed: bool
+    message: str
+    element_ref: str | None = None
+    suggestion: str | None = None
+
+
+class PayAppStatementResponse(BaseModel):
+    """The progress statement of one pay application plus what the rules say."""
+
+    payment_application_id: UUID | None = None
+    agreement_id: UUID
+    application_number: str = ""
+    status: str = "draft"
+    period_start: date | None = None
+    period_end: date | None = None
+    currency: str = ""
+    override_reason: str | None = None
+    lines: list[StatementLine] = Field(default_factory=list)
+    summary: StatementSummary
+    findings: list[StatementFinding] = Field(default_factory=list)
+
+
+class StatementPreviewLine(BaseModel):
+    """One line of a statement prepared before the pay application exists."""
+
+    work_package_id: UUID
+    claimed_amount: Decimal18_2 = Field(default=Decimal("0"), ge=0, le=_MONEY_MAX)
+    this_period_percent: Decimal8_4 | None = Field(default=None, ge=0, le=1000)
+
+
+class StatementPreviewRequest(BaseModel):
+    """Body of the statement preview: the lines being typed, nothing saved."""
+
+    lines: list[StatementPreviewLine] = Field(default_factory=list)
+    overage_reason: str | None = Field(default=None, max_length=1000)
+
+
+class AgreementDocumentResponse(BaseModel):
+    """A file attached to a subcontract agreement."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    agreement_id: UUID
+    doc_role: str
+    title: str = ""
+    filename: str = ""
+    mime_type: str | None = None
+    file_size: int | None = None
+    signed_date: date | None = None
+    valid_until: date | None = None
+    notes: str | None = None
+    uploaded_by: str | None = None
+    created_at: datetime
+
+
+class AgreementDocumentListResponse(BaseModel):
+    """One page of the files attached to an agreement."""
+
+    items: list[AgreementDocumentResponse]
+    total: int
+    offset: int = 0
+    limit: int = 200
+
+
+class RequiredDocument(BaseModel):
+    """One entry of the required-documents list."""
+
+    model_config = ConfigDict(str_strip_whitespace=True)
+
+    role: str = Field(min_length=1, max_length=40, pattern=r"^[a-z0-9][a-z0-9_]*$")
+    signed: bool = False
+
+
+class DocumentPolicy(BaseModel):
+    """The installation policy for required subcontract documents."""
+
+    required: list[RequiredDocument] = Field(default_factory=list)
+    enforcement: str = Field(default="warn", pattern=r"^(warn|block)$")
+
+
+class DocumentPolicyResponse(DocumentPolicy):
+    """The policy in force, with the roles the platform names and any national presets."""
+
+    is_default: bool = True
+    roles: list[str] = Field(default_factory=list)
+    presets: list[dict[str, Any]] = Field(default_factory=list)
+
+
+class RequiredDocumentStatus(BaseModel):
+    """Where one agreement stands against the required list."""
+
+    agreement_id: UUID
+    enforcement: str
+    required: list[RequiredDocument] = Field(default_factory=list)
+    gaps: list[dict[str, str]] = Field(default_factory=list)

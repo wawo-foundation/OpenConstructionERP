@@ -299,6 +299,10 @@
     "unit_exportable": {
       "fail": "Post {ordinal}: enheten '{unit}' får ikke plass i GAEB-feltet QU på 4 tegn og kuttes ved eksport",
       "suggestion": "Bruk en GAEB-enhetskode på høyst 4 tegn (m, m2, m3, St, h, psch, kg, t)"
+    },
+    "short_text_length": {
+      "fail": "Post {ordinal}: korttekst har {length} tegn; GAEB-eksport kutter den til 70",
+      "suggestion": "Kort ned kortteksten til 70 tegn og behold detaljene i langteksten"
     }
   },
   "nrm": {
@@ -412,7 +416,10 @@
       "suggestion": "Tilordne en nisifret GB/T 50500-kode (f.eks. 010101001)"
     },
     "valid_code": {
-      "fail": "Ugyldig GB/T 50500-kode '{code}' – forventer 9 eller 12 sifre"
+      "fail": "Ugyldig GB/T 50500-kode '{code}' – forventer 9 eller 12 sifre eller en tilleggskode som 01B001"
+    },
+    "code_unique": {
+      "fail": "Postkoden '{code}' er brukt mer enn én gang i samme delprosjekt"
     }
   },
   "cpwd": {
@@ -931,6 +938,36 @@
     "change_time_within_owner": {
       "fail": "Underentreprenørenes tidspåvirkning for {code} er til sammen {sub_days} dager, mer enn de {owner_days} dagene byggherren har gitt",
       "suggestion": "Kontroller underentreprenørenes tidskrav, eller be byggherren om en tilsvarende forlengelse"
+    },
+    "pay_app_over_complete": {
+      "fail": "Linje {line} når {percent} % av planlagt verdi etter denne perioden ({completed} av {scheduled})",
+      "suggestion": "Reduser beløpet for denne perioden, eller noter årsaken til fakturering over planlagt verdi"
+    },
+    "pay_app_line_negative": {
+      "fail": "Linje {line} ville til nå utgjort {completed}, altså under null"
+    },
+    "pay_app_within_agreement": {
+      "fail": "Betalingsanmodningene utgjør til sammen {billed}, over avtaleverdien pluss godkjente endringer på {limit}"
+    },
+    "pay_app_correct": {
+      "suggestion": "Rett beløpene i denne betalingsanmodningen, eller øk avtaleverdien med en godkjent endring"
+    },
+    "required_documents": {
+      "fail": "Påkrevd dokument: {document} ({state})",
+      "suggestion": "Legg ved dokumentet, signert og gyldig, til underentreprisekontrakten",
+      "states": {
+        "missing": "mangler",
+        "unsigned": "ikke signert",
+        "expired": "utløpt"
+      }
+    },
+    "document_roles": {
+      "terms_and_conditions": "Vilkår og betingelser",
+      "safety_agreement": "Sikkerhetsavtale",
+      "safety_plan": "Sikkerhetsplan",
+      "insurance": "Forsikring",
+      "method_statement": "Metodebeskrivelse",
+      "other": "Annet dokument"
     }
   },
   "submittal": {
@@ -2014,6 +2051,510 @@
     "crew_without_record": {
       "fail": "Et lag på {headcount} var på plassen, men ingen arbeid, kontroll eller forsinkelse er registrert.",
       "suggestion": "Legg til hva laget gjorde, eller forsinkelsen som stoppet arbeidet."
+    }
+  },
+  "framework_agreement": {
+    "item_not_in_agreement": {
+      "fail": "Linje {code} er ikke et aktivt punkt i avtalen {agreement}; registrer det som tilleggsarbeid.",
+      "suggestion": "Fjern linjen fra bestillingen og registrer arbeidet som tilleggsarbeid på bestillingen."
+    },
+    "rate_deviates": {
+      "fail": "Linje {code} har pris {rate} som avviker fra avtalepris {expected}.",
+      "suggestion": "Priser på en avropsordre hentes fra rammeavtalen; priskalkuler linjen på nytt fra prislisten."
+    },
+    "order_outside_validity": {
+      "fail": "Bestillingsdato {date} er utenfor avtaleperioden {from} til {to}.",
+      "suggestion": "Sett bestillingsdatoen innenfor perioden, eller forleng rammeavtalen først."
+    },
+    "rate_period_gap": {
+      "fail": "Ingen prisperiode dekker {date}.",
+      "suggestion": "Legg til en prisperiode som dekker denne datoen under fanen Priser og indeksregulering."
+    },
+    "escalation_unresolved": {
+      "fail": "Indeks {series} har ingen verdi for {period}; prisen kan ikke justeres.",
+      "suggestion": "Legg inn indeksverdien for måneden under Prisindeks, og beregn bestillingen på nytt."
+    },
+    "cap_exceeded": {
+      "fail": "Denne bestillingen tar avtalen til {total} av et tak på {cap}; gjenstående {headroom}.",
+      "suggestion": "Reduser bestillingen til det som er igjen, eller utsted den med en begrunnet overskridelse."
+    },
+    "cap_threshold": {
+      "fail": "Bruken av avtalen har nådd {pct} % av taket.",
+      "suggestion": "Si fra til oppdragsgiver tidlig, slik at en oppfølgende avtale kan forberedes."
+    },
+    "item_max_qty": {
+      "fail": "Post {code}: {qty} bestilt så langt, over oppgitt maksimum {max}.",
+      "suggestion": "Avtal den ekstra mengden med oppdragsgiver før neste bestilling."
+    },
+    "min_at_risk": {
+      "fail": "{days} dager igjen, og {pct} % av garantert minimum er bestilt.",
+      "suggestion": "Ta opp mangelen med oppdragsgiver mens det fortsatt er tid til å bestille."
+    },
+    "currency_mismatch": {
+      "fail": "Valutaen på bestillingen {cur} avviker fra avtalens valuta {agr}.",
+      "suggestion": "Bestillinger prises i avtalens valuta."
+    },
+    "adjustment_unknown": {
+      "fail": "Betingelse {tag} har ingen justering i denne avtalen.",
+      "suggestion": "Legg til justeringen under fanen Betingelser, eller fjern betingelsen fra bestillingen."
+    },
+    "direct_claim": {
+      "fail": "Krav fremsettes på avropsordrer, ikke på rammeavtalen.",
+      "suggestion": "Åpne bestillingen arbeidet ble utført under, og fremsett kravet der."
+    },
+    "duplicate_item": {
+      "fail": "Postkode {code} forekommer to ganger i prisperiode {period}.",
+      "suggestion": "Behold én rad per postkode før prislisten lagres."
+    },
+    "measured_over_ordered": {
+      "fail": "Målt {m} overstiger bestilt {o} på linje {code}; vurder tilleggsarbeid.",
+      "suggestion": "Registrer den ekstra mengden som en endring på bestillingen."
+    },
+    "term_over_legal_max": {
+      "fail": "Varighet på {years} år overskrider grensen på {max} år i {source} (pakke).",
+      "suggestion": "Sjekk varigheten med oppdragsgiver; grensen er oppgitt i pakken, men håndheves ikke."
+    }
+  },
+  "estimate_archive": {
+    "arc_hash_mismatch": {
+      "fail": "Fingeravtrykket stemmer ikke: posten gir {actual}, forseglingen sier {sealed}. Behandle posten som endret."
+    },
+    "arc_total_mismatch": {
+      "fail": "Den forseglede summen {seal} avviker fra kontrakten {award} med {diff}."
+    },
+    "arc_no_breakdown": {
+      "fail": "{n} poster mangler ressursoppdeling; prisene deres kan ikke spores senere."
+    },
+    "arc_no_markups": {
+      "fail": "Kalkylen har ingen påslag å forsegle."
+    },
+    "arc_sealed_after_signing": {
+      "fail": "Forseglet {days} dager etter at kontrakten ble signert."
+    },
+    "arc_no_receipt": {
+      "fail": "Motparten har ennå ikke bekreftet fingeravtrykket."
+    },
+    "arc_open_not_closed": {
+      "fail": "Åpning {id} har stått åpen i {days} dager uten referat."
+    },
+    "arc_open_no_reason": {
+      "fail": "En åpning krever en grunn og en referanse."
+    },
+    "arc_open_one_party": {
+      "fail": "Bare én part er oppført; noter hvorfor den andre mangler."
+    },
+    "var_basis_no_seal": {
+      "fail": "Post {code} er priset på opprinnelig grunnlag, men ingen forseglet kalkyle finnes."
+    },
+    "var_basis_deviation": {
+      "fail": "Post {code}: {field} endret fra {old} til {new} uten merknad."
+    },
+    "var_new_resource_no_evidence": {
+      "fail": "Ny ressurs {res} mangler prisdato og tilbudsreferanse."
+    },
+    "var_markup_not_sealed": {
+      "fail": "Post {code} bruker påslag {m}, som ikke er i forseglingen."
+    },
+    "var_abnormal_carried_rate": {
+      "fail": "Overført kostnad {c} avviker {pct} % fra referansen."
+    },
+    "arc_mutation_refused": {
+      "fail": "En forseglet kalkyle kan ikke endres eller slettes. Forsegl en ny versjon som erstatter den."
+    },
+    "contents_locked": "Innholdet forblir forseglet til en formell åpning starter.",
+    "market_off": "Forseglede kalkyler er ikke en del av prosjektets markedsprofil.",
+    "contract_required": "Det trengs en kundekontrakt før et overslag kan forsegles som kontraktsgrunnlag."
+  },
+  "boq_revision": {
+    "superseded_still_editable": {
+      "fail": "Revisjon {label} kan fortsatt redigeres selv om {later} er opprettet siden; endringer her overføres ikke",
+      "suggestion": "Lås {label} for å fryse den, eller arbeid videre i den nyeste revisjonen"
+    }
+  },
+  "schedule_baseline": {
+    "single_approved": {
+      "fail": "Denne planen har mer enn én godkjent basisplan ({baselines}).",
+      "suggestion": "Godkjenn basisplanen som skal gjelde; å godkjenne én trekker tilbake godkjenningen av de andre."
+    }
+  },
+  "project_catalogue": {
+    "unit_present": {
+      "fail": "Prisen {code} har ingen enhet.",
+      "suggestion": "Oppgi enheten prisen gjelder for, for eksempel m2, m3 eller t."
+    },
+    "duplicate_code": {
+      "fail": "Koden {code} brukes av mer enn én pris i dette prosjektet.",
+      "suggestion": "Behold én pris per kode, eller gi varianten en egen kode."
+    },
+    "currency_differs": {
+      "fail": "Prisen {code} er i {currency}, men prosjektet er kalkulert i {project_currency}.",
+      "suggestion": "Regn om prisen til prosjektets valuta, eller bekreft at den utenlandske valutaen er tilsiktet."
+    },
+    "override_far": {
+      "fail": "Den lokale prisen for {code} avviker {percent} % fra kildeprisen {source_rate}.",
+      "suggestion": "Sjekk om et desimaltegn er flyttet, eller noter hvorfor prosjektet trenger en annen pris."
+    },
+    "source_changed": {
+      "fail": "Kildeprisen for {code} er endret fra {old} til {new} siden prosjektet kopierte den.",
+      "suggestion": "Ta i bruk den nye kildeprisen, eller behold bevisst den lokale prisen."
+    }
+  },
+  "schedule_mspdi_import": {
+    "task_dates": {
+      "missing_dates": "Aktivitet {ref} \"{name}\" har ingen start- eller sluttdato.",
+      "finish_before_start": "Aktivitet {ref} \"{name}\" slutter ({finish}) før den starter ({start}).",
+      "suggestion": "Rett datoene i kildeplanen og eksporter den på nytt. Datoer gjettes aldri ved import."
+    },
+    "unique_ids": {
+      "duplicate_uid": "Aktivitets-ID {ref} forekommer mer enn én gang; bare den første aktiviteten beholdes.",
+      "suggestion": "Gi hver aktivitet en unik ID i kildeplanen."
+    },
+    "links_resolve": {
+      "dangling_link": "Aktivitet {ref} \"{name}\": forgjenger {predecessor} finnes ikke i filen, koblingen hoppes over.",
+      "duplicate_link": "Aktivitet {ref} \"{name}\": en andre kobling fra forgjenger {predecessor} hoppes over, én kobling per par beholdes.",
+      "self_link": "Aktivitet {ref} \"{name}\" er koblet til seg selv, koblingen hoppes over.",
+      "unknown_link_type": "Aktivitet {ref} \"{name}\": koblingstype {type} er ukjent og leses som slutt-til-start.",
+      "suggestion": "Kontroller de logiske koblingene i kildeplanen."
+    },
+    "values_in_range": {
+      "percent_out_of_range": "Aktivitet {ref} \"{name}\": {value} % fullført er utenfor 0-100 og begrenses.",
+      "outline_gap": "Aktivitet {ref} \"{name}\" hopper over et disposisjonsnivå ({level}); den plasseres under nærmeste sammendragsaktivitet over.",
+      "suggestion": "Kontroller % fullført og innrykk i kildeplanen."
+    },
+    "calendar_work_days": {
+      "calendar_no_work_days": "Kalender {calendar} har ingen arbeidsdag.",
+      "suggestion": "Merk arbeidsdagene i denne kalenderen i kildeplanen."
+    }
+  },
+  "schedule_pdf_import": {
+    "no_text_layer": {
+      "fail": "PDF-en har ikke noe tekstlag, så tabellen kan ikke leses.",
+      "suggestion": "Eksporter fremdriftsplanen som MS Project XML, XER eller Excel, og importer den filen."
+    },
+    "dates_parsed": {
+      "fail": "Rad {row}: en start eller slutt er ikke en dato.",
+      "suggestion": "Kontroller datokolonnene og rekkefølgen dag/måned, eller rett datoen i kilden."
+    },
+    "finish_before_start": {
+      "fail": "Rad {row}: slutt er før start.",
+      "suggestion": "Rett datoene i kildeplanen."
+    },
+    "duration_mismatch": {
+      "fail": "Rad {row}: den trykte varigheten avviker fra arbeidsdagene mellom start og slutt.",
+      "suggestion": "Datoene beholdes; kontroller varighetskolonnen og prosjektkalenderen."
+    },
+    "unique_ids": {
+      "fail": "Rad {row}: aktivitets-ID-en brukes av en annen rad.",
+      "suggestion": "Gi hver aktivitet en unik ID i kildeplanen."
+    },
+    "links_resolve": {
+      "fail": "Rad {row}: en forgjenger er ikke en aktivitet i tabellen.",
+      "suggestion": "Kontroller forgjengerkolonnen; uløste koblinger hoppes over."
+    }
+  },
+  "commercial_control": {
+    "ok": "Kontrollert, ingen merknader",
+    "cvr": {
+      "target_rate_basis": {
+        "fail": "{missing} av {total} prisede poster har ingen målpris og budsjetteres til salgspris (for eksempel {sample})",
+        "suggestion": "Legg inn målkostprisen på disse postene slik at budsjettet er kostnaden byggeplassen holdes til"
+      },
+      "unmapped_cost": {
+        "fail": "{kind} {label} har ingen WBS eller kostnadskode: forpliktet {committed}, faktisk {actual}",
+        "suggestion": "Før ordrelinjen, underentreprisen eller fakturaen på et WBS-element slik at CVR kan plassere den"
+      }
+    },
+    "procurement": {
+      "line_over_committed": {
+        "fail": "Post {ordinal} er overforpliktet: {committed_qty} av {budget_qty} bestilt, {committed_value} mot et budsjett på {budget_value}",
+        "suggestion": "Sjekk for dobbeltbestilling, eller registrer en endring eller budsjettoverføring før dere forplikter mer"
+      }
+    },
+    "approval_routes": {
+      "bands_contiguous": {
+        "gap": {
+          "fail": "Beløp fra {low} opp til {high} når ingen godkjenner (trinn {step})",
+          "suggestion": "Utvid et nabointervall eller legg til et trinn slik at hvert beløp har en godkjenner"
+        },
+        "overlap": {
+          "fail": "Trinn {step} overlapper et lavere intervall fra {low} opp til {high}; begge godkjennerne signerer de beløpene",
+          "suggestion": "La hvert intervall starte der det forrige slutter, med mindre begge skal signere"
+        },
+        "empty": {
+          "fail": "Trinn {step} har et intervall fra {low} til {high} som ikke inneholder noe beløp",
+          "suggestion": "Sett minimum under maksimum, eller la maksimum stå tomt for intet tak"
+        }
+      }
+    },
+    "valuation": {
+      "assessed_within_submitted": {
+        "fail": "Linje {line}: vurdert mengde {assessed} er over innsendt {submitted}",
+        "suggestion": "Vurder høyst det som er sendt inn, og registrer ekstraarbeid som en endring"
+      },
+      "certified_within_assessed": {
+        "fail": "Linje {line}: sertifisert mengde {certified} er over vurdert {assessed}",
+        "suggestion": "Sertifiser høyst det som er vurdert, eller vurder linjen på nytt først"
+      }
+    }
+  },
+  "norm_base": {
+    "code_present": {
+      "fail": "Linje {ordinal} oppgir ingen normkode fra {base}. Et normbasert kostnadsoverslag oppgir en norm på hver linje.",
+      "suggestion": "Fyll inn normkoden under linjens klassifikasjon {classification}."
+    },
+    "code_shape": {
+      "fail": "«{code}» på linje {ordinal} er ikke en kode fra {base}. Forventet en kode som {example}."
+    },
+    "legacy_prefix": {
+      "fail": "«{code}» på linje {ordinal} bruker det utgåtte prefikset {old}. Gjeldende kode er {new}."
+    },
+    "resource_breakdown": {
+      "fail": "Normlinjen {code} har ingen arbeidstimer eller ingen gjennomsnittlig lønnsklasse.",
+      "suggestion": "Legg til arbeidsressursen med timer per enhet og normens gjennomsnittlige lønnsklasse."
+    },
+    "grade_range": {
+      "fail": "Lønnsklasse {grade} på linje {ordinal} ligger utenfor {min} til {max} eller ikke i trinn på {step}."
+    }
+  },
+  "public_funding": {
+    "markup_cap": {
+      "fail": "{funding}: {markup} er {percent} %, taket er {cap} % av de direkte kostnadene ({source}).",
+      "suggestion": "Senk påslaget til taket, eller sett finansieringen til privat hvis ingen offentlige midler betaler arbeidet."
+    },
+    "investor_exact": {
+      "fail": "Byggherrens overslag med {funding}: {markup} bør være nøyaktig {cap} % ({source})."
+    },
+    "material_price_evidence": {
+      "fail": "{funding}: materialet {material} på linje {ordinal} har {count} av {required} pristilbud og ingen prisanalyse.",
+      "suggestion": "Registrer leverandørtilbudene for materialet, eller legg ved prisanalyserapporten."
+    }
+  },
+  "vat_rate": {
+    "standard_rate": {
+      "fail": "{markup} er {percent} %; den alminnelige mva-satsen i {country} er {rate} %.",
+      "suggestion": "Sett avgiftslinjen til den alminnelige satsen, eller noter i kalkylen hvorfor en annen sats eller et fritak gjelder."
+    }
+  },
+  "survey": {
+    "no_crs": {
+      "fail": "Punktsettet {name} har ikke koordinatsystem: oppgi EPSG eller lokalt nett før volumer eller eiendommer.",
+      "suggestion": "Angi prosjektets koordinatsystem, og oppgi deretter hvilket system filen er målt i."
+    },
+    "crs_unconfirmed": {
+      "fail": "Koordinatsystem funnet automatisk (sikkerhet {confidence}); bekreft før bruk.",
+      "suggestion": "Åpne Angi prosjektets koordinatsystem, og bekreft systemet som ble funnet eller velg et annet."
+    },
+    "duplicate_point": {
+      "fail": "Duplisert punktnummer {point_id} med ulike koordinater.",
+      "suggestion": "Behold én måling: slett punktsettet med den feile og importer det på nytt."
+    },
+    "traverse_misclosure": {
+      "fail": "Polygondraget {name} lukker på 1:{r}, under profilens minimum 1:{min}.",
+      "suggestion": "Kontroller sidene for grove feil, mål den svakeste siden på nytt eller bekreft profilverdien."
+    },
+    "level_misclosure": {
+      "fail": "Nivellementets sluttfeil {f} mm overstiger k·√km med k = {k} mm.",
+      "suggestion": "Gjenta nivellementet eller kontroller høydene på fastmerkene som ble brukt."
+    }
+  },
+  "volumes": {
+    "no_overlap": {
+      "fail": "De to flatene overlapper bare på {p} % av arealet: volumet er meningsløst.",
+      "suggestion": "Kontroller at begge flatene er i samme koordinatsystem og dekker samme terreng."
+    },
+    "low_coverage": {
+      "fail": "Bare {c} % av arealet har data i begge flatene (minimum {min} %).",
+      "suggestion": "Legg til målepunkter der en flate mangler, eller innsnevre avgrensningen til det dekkede arealet."
+    },
+    "coarse_scan": {
+      "fail": "En grov skanning (LOA10) gir dette volumet uten oppgitt grunn.",
+      "suggestion": "Bruk en skanning med oppmålingsnøyaktighet, eller skriv hvorfor denne skanningen holder."
+    },
+    "bank_volume": {
+      "fail": "Mengden er faste masser (i grunnen); svellfaktoren er ikke brukt.",
+      "suggestion": "Send heller løse masser fra utgraving hvis posten måles som løst materiale."
+    }
+  },
+  "setting_out": {
+    "stake_off": {
+      "fail": "Utsettingspunkt {id} avviker {d} mm, toleranse {t} mm",
+      "suggestion": "Sett ut punktet på nytt og registrer det, eller lag et NCR-utkast."
+    },
+    "record_untraceable": {
+      "fail": "Utsettingsregistrering {id} mangler instrument eller fastmerker.",
+      "suggestion": "Oppgi instrumentet og fastmerkene stasjonen ble etablert på."
+    },
+    "sheet": {
+      "title": "Utsettingsskjema",
+      "project": "Prosjekt",
+      "crs": "Koordinatsystem",
+      "request": "Forespørsel",
+      "tolerance": "Toleranse",
+      "element": "Bygningsdel",
+      "generated": "Laget",
+      "point": "Punkt",
+      "design_e": "Prosjektert E",
+      "design_n": "Prosjektert N",
+      "design_z": "Prosjektert Z",
+      "measured_e": "Målt E",
+      "measured_n": "Målt N",
+      "verdict": "Resultat",
+      "by": "Målt av",
+      "verdict_pass": "Godkjent",
+      "verdict_fail": "Avvist",
+      "verdict_open": "Åpen",
+      "verdict_no_tolerance": "Ingen profil",
+      "counts": "Godkjent: {passed} · Avvist: {failed} · Åpen: {open}",
+      "findings": "Funn",
+      "no_profile": "Ingen profil, angi en",
+      "d": "d (mm)",
+      "dz": "dZ (mm)"
+    }
+  },
+  "land_parcels": {
+    "area_mismatch": {
+      "fail": "Eiendom {id}: beregnet areal {a} m2 avviker fra registrert areal {l} m2 med mer enn toleransen ({t}).",
+      "suggestion": "Kontroller grensepunktene mot registerutskriften, eller noter hvorfor arealene avviker."
+    },
+    "ring_invalid": {
+      "fail": "Eiendom {id}: grensen er ikke lukket eller krysser seg selv.",
+      "suggestion": "Rett grensepunktene slik at de går én gang rundt eiendommen uten å krysse."
+    },
+    "zone_not_acquired": {
+      "fail": "Arbeidsområdet overlapper eiendom {id} som ennå ikke er ervervet ({area} m2).",
+      "suggestion": "Erverv eiendommen eller avtal adgang før arbeidet starter, eller flytt arbeidsområdet."
+    },
+    "overlap": {
+      "fail": "Eiendommene {a} og {b} overlapper med {area} m2.",
+      "suggestion": "Rett den felles grensen slik at begge eiendommene bruker de samme punktene."
+    },
+    "gap": {
+      "fail": "Glipe på {gap} m mellom eiendommene {a} og {b}.",
+      "suggestion": "La begge eiendommene bruke de samme grensepunktene, eller bekreft at beltet hører til en annen eiendom."
+    },
+    "id_format": {
+      "fail": "Nummeret {id} følger ikke formatet {label} (for eksempel {example}).",
+      "suggestion": "Skriv av nummeret nøyaktig slik registeret skriver det."
+    },
+    "pdf": {
+      "title": "Eiendomsliste",
+      "project": "Prosjekt",
+      "crs": "Koordinatsystem",
+      "method": "Metode",
+      "method_value": "Areal fra grensekoordinater (Gauss' formel), avrundet til {decimals} desimaler, m2",
+      "printed": "Skrevet ut av",
+      "legal": "Registrert areal (m2)",
+      "computed": "Beregnet (m2)",
+      "diff": "Differanse (m2)",
+      "status": "Eiendomsstatus",
+      "rights": "Rettigheter",
+      "cost": "Kostnad",
+      "findings": "Funn",
+      "total": "Totalt, {count} eiendommer",
+      "acquired_of": "Ervervet {acquired} av {total}",
+      "findings_title": "Funn",
+      "no_findings": "Ingen funn.",
+      "disclaimer": "Eiere og rettigheter vises slik de er registrert i dette prosjektet. Listen er verken en juridisk vurdering eller en registerutskrift.",
+      "status_needed": "Trengs",
+      "status_negotiating": "Forhandling",
+      "status_acquired": "Ervervet",
+      "status_expropriation": "Ekspropriasjon"
+    }
+  },
+  "monitoring": {
+    "crossed": {
+      "fail": "Punkt {id}: forskyvning {d} mm eller hastighet {r} mm/day passerte {level}",
+      "suggestion": "Kontroller punktet og konstruksjonen, og bekreft deretter varselet med en merknad."
+    },
+    "level": {
+      "ok": "Normal",
+      "alert": "Varsel",
+      "action": "Tiltak",
+      "alarm": "Alarmnivå"
+    },
+    "risk": {
+      "title": "Målepunkt {id} ved {level}",
+      "description": "Forskyvning {d} mm, hastighet {r} mm/day mot {profile}. Utkastet ble åpnet av overvåkingen: gå gjennom det og utpek en ansvarlig."
+    },
+    "report": {
+      "title": "Alarmrapport for overvåking",
+      "project": "Prosjekt",
+      "crs": "Koordinatsystem",
+      "profile": "Terskelprofil",
+      "generated": "Generert",
+      "point": "Punkt",
+      "baseline": "Referanseverdi (m)",
+      "latest": "Siste (m)",
+      "displacement": "Forskyvning (mm)",
+      "rate": "Hastighet (mm/day)",
+      "level": "Nivå",
+      "acknowledged": "Bekreftet",
+      "counts": "Alarmnivå: {alarm} · Tiltak: {action} · Varsel: {alert} · Normal: {ok}",
+      "findings": "Funn",
+      "no_profile": "Ingen profil, velg en",
+      "ack_yes": "Ja",
+      "ack_no": "Nei"
+    }
+  },
+  "stockpiles": {
+    "density_assumed": {
+      "fail": "Tettheten er antatt, ikke målt: tonnene er bare så pålitelige som antakelsen.",
+      "suggestion": "Veie en prøve eller hent tettheten fra leverandørens følgesedler."
+    },
+    "variance_high": {
+      "fail": "Oppmålingen avviker {v} % fra bokført beholdning, over toleransen på {t} %.",
+      "suggestion": "Kontroller tettheten og basisflaten, foreslå deretter en justering og bekreft den hvis forskjellen er reell."
+    }
+  },
+  "mine_survey": {
+    "compliance_outside": {
+      "fail": "Periodens oppfyllelse {c} % ligger utenfor båndet {lo}-{hi} %.",
+      "suggestion": "Kontroller planen og oppmålingen, og forklar avviket i periodenotatet før kravet."
+    },
+    "truck_differs": {
+      "fail": "Tonn etter lastebiltelling avviker {v} % fra oppmålte tonn, over kontrollen på {t} %.",
+      "suggestion": "Kontroller nyttelasten per tur og tettheten, og sammenlign deretter de to flatene på nytt."
+    }
+  },
+  "hongkong": {
+    "sopo_applicability": {
+      "fail": "Cap. 652 (Security of Payment) gjelder kontrakten: svar innen 30 dager, betaling innen 60 dager fra kravet"
+    },
+    "sopo_private_scope_check": {
+      "fail": "En privat kontrakt omfattes av Cap. 652 bare ved nybygg eller arbeider som krever Building Authority-godkjenning: bekreft omfanget"
+    },
+    "sopo_response_late": {
+      "fail": "Intet betalingssvar ble forkynt før {date}: det krevde beløpet er omtvistet og kan gå til adjudikasjon"
+    },
+    "sopo_payment_term_exceeds_60": {
+      "fail": "Betalingsfristen på {n} dager overstiger de 60 dagene Cap. 652 tillater"
+    },
+    "sopo_response_term_exceeds_30": {
+      "fail": "Svarfristen på {n} dager overstiger de 30 dagene Cap. 652 tillater"
+    },
+    "sopo_adjudication_window": {
+      "fail": "En betalingstvist har oppstått: forkynn adjudikasjonsvarselet før {date}"
+    },
+    "contract_pay_when_paid": {
+      "fail": "Pay-when-paid-klausul: Cap. 652 gjør betinget betaling uten virkning"
+    },
+    "levy_missing": {
+      "fail": "Arbeidene overstiger HK$3,000,000, men kalkylen mangler CIC-avgiften (0,5 %) eller CWR-avgiften (0,03 %)"
+    },
+    "levy_below_threshold": {
+      "fail": "Arbeidene er høyst HK$3,000,000: ingen CIC- eller CWR-avgift"
+    },
+    "tax_nonzero": {
+      "fail": "En mva- eller GST-linje belastes, men Hongkong har ingen slik skatt: sett til null"
+    },
+    "retention_over_limit": {
+      "fail": "Tilbakeholdt beløp {x} overstiger kontraktens grense {limit}"
+    },
+    "pc_sum_no_attendance": {
+      "fail": "En prime cost-sum mangler poster for fortjeneste og bistand"
+    },
+    "index_attribution": {
+      "fail": "ArchSD-prisindeksen mangler kildeangivelse: oppgi Architectural Services Department"
     }
   }
 }

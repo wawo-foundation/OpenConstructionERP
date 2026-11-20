@@ -19,6 +19,7 @@ describe('menu groups', () => {
       'grp_estimating',
       'grp_drawings',
       'grp_reality',
+      'grp_survey',
       'grp_coordination',
       'grp_scheduling',
       'grp_cost_control',
@@ -83,12 +84,12 @@ describe('menu groups', () => {
         '/videos', '/courses', '/cases', '/packs',
         '/', '/projects', '/files', '/inbox', '/timeline',
         '/takeoff?tab=measurements', '/dwg-takeoff', '/bim', '/bim/rules', '/quantities',
-        '/costs', '/catalog', '/cost-explorer', '/assemblies', '/cost-match', '/fx',
+        '/costs', '/catalog', '/project-catalogue', '/cost-explorer', '/assemblies', '/cost-match', '/fx',
         '/boq', '/templates', '/regional-exchange', '/match-elements', '/project-intelligence', '/rom-estimate',
         '/methodologies',
         '/sheets',
         '/geo', '/pointcloud',
-        '/contracts', '/payment-clock', '/tax-withholding', '/tax-rates', '/einvoice-clearance',
+        '/contracts', '/framework-agreements', '/payment-clock', '/tax-withholding', '/china-tax', '/tax-rates', '/einvoice-clearance',
       ].sort(),
     );
   });

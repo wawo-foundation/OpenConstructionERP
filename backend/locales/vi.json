@@ -1644,7 +1644,8 @@
         "no_rejections": "Không có hàng bị từ chối.",
         "sig_delivered_by": "Người giao hàng",
         "counterparty_tax_id": "Mã số thuế",
-        "counterparty_address": "Địa chỉ"
+        "counterparty_address": "Địa chỉ",
+        "delivery_address": "Địa chỉ giao hàng"
       },
       "labels": {
         "po_status": {
@@ -1717,7 +1718,8 @@
         "gross_settled": "Tổng giá trị đã quyết toán",
         "no_withholding": "Không giữ lại khoản nào từ lần thanh toán này.",
         "counterparty_tax_id": "Mã số thuế",
-        "counterparty_address": "Địa chỉ"
+        "counterparty_address": "Địa chỉ",
+        "supply_date": "Ngày cung ứng"
       },
       "labels": {
         "invoice_status": {
@@ -1786,6 +1788,81 @@
         "col_min": "Thấp nhất",
         "col_max": "Cao nhất",
         "col_count": "Số đo"
+      }
+    },
+    "gantt_pdf": {
+      "strings": {
+        "title": "Tiến độ (biểu đồ Gantt)",
+        "project": "Dự án",
+        "schedule": "Tiến độ",
+        "baseline": "Đường cơ sở",
+        "no_baseline": "không có",
+        "exported": "Xuất ngày",
+        "data_date": "Ngày dữ liệu",
+        "col_wbs": "WBS",
+        "col_activity": "Công việc",
+        "col_start": "Bắt đầu",
+        "col_finish": "Kết thúc",
+        "col_duration": "Ngày",
+        "legend_current": "Kế hoạch hiện tại",
+        "legend_progress": "Tiến độ thực hiện",
+        "legend_critical": "Đường găng",
+        "legend_baseline": "Kế hoạch cơ sở",
+        "legend_actual": "Thực tế",
+        "legend_milestone": "Mốc",
+        "legend_summary": "Tổng hợp",
+        "week_short": "T{n}",
+        "quarter_short": "Q{n}",
+        "sheet_of": "Tờ {page}/{total}",
+        "no_activities": "Tiến độ này chưa có công việc nào."
+      }
+    },
+    "contracts": {
+      "strings": {
+        "doc_title": "Hợp đồng",
+        "col_code": "Mã",
+        "col_title": "Tiêu đề",
+        "col_type": "Loại hợp đồng",
+        "col_role": "Bên hợp đồng",
+        "col_counterparty": "Đối tác",
+        "col_original_value": "Giá trị ban đầu",
+        "col_total_value": "Giá trị hợp đồng",
+        "col_retention": "Tiền giữ lại",
+        "col_start": "Ngày bắt đầu",
+        "col_end": "Ngày kết thúc",
+        "col_signed": "Ngày ký",
+        "line_code": "Mã",
+        "line_description": "Mô tả",
+        "line_unit": "Đơn vị",
+        "line_quantity": "Khối lượng",
+        "line_unit_rate": "Đơn giá",
+        "lines": "Bảng giá trị công việc",
+        "signer_company": "Đại diện công ty"
+      },
+      "labels": {
+        "status": {
+          "draft": "Bản nháp",
+          "active": "Đang hiệu lực",
+          "suspended": "Tạm dừng",
+          "completed": "Hoàn thành",
+          "terminated": "Chấm dứt"
+        },
+        "type": {
+          "lump_sum": "Trọn gói",
+          "gmp": "GMP",
+          "cost_plus": "Chi phí cộng phí",
+          "tm": "Theo thời gian và vật liệu",
+          "unit_price": "Đơn giá",
+          "design_build": "Thiết kế và thi công",
+          "combination": "Kết hợp",
+          "remeasurement": "Đo lại khối lượng",
+          "framework": "Hợp đồng khung",
+          "call_off": "Đơn đặt hàng theo hợp đồng khung"
+        },
+        "party": {
+          "client": "Hợp đồng với chủ đầu tư",
+          "subcontractor": "Hợp đồng thầu phụ"
+        }
       }
     }
   },
@@ -2076,7 +2153,11 @@
       "notifications.portal.message_received.title": "Tin nhắn mới trên cổng thông tin",
       "notifications.portal.message_received.body": "{buyer_name} đã gửi một tin nhắn.",
       "dispatch.notify.plan_title": "Your daily plan is ready",
-      "dispatch.notify.plan_body": "Plan for {day}: {lines} lines."
+      "dispatch.notify.plan_body": "Plan for {day}: {lines} lines.",
+      "notifications.monitoring.alert.title": "Cảnh báo quan trắc",
+      "notifications.monitoring.action.title": "Mức hành động quan trắc",
+      "notifications.monitoring.alarm.title": "Báo động quan trắc",
+      "notifications.monitoring.crossed.body": "Điểm {point}: {displacement} mm, {rate} mm/day."
     },
     "schedule_headers": {
       "headers": {
@@ -2695,5 +2776,30 @@
         "gap": "Chênh lệch"
       }
     }
-  }
+  },
+  "monitoring.crossed.fail": "Điểm {id}: dịch chuyển {d} mm hoặc tốc độ {r} mm/ngày đã vượt mức {level}",
+  "monitoring.crossed.suggestion": "Kiểm tra điểm và công trình, sau đó xác nhận cảnh báo kèm ghi chú.",
+  "monitoring.level.ok": "OK",
+  "monitoring.level.alert": "Cảnh báo",
+  "monitoring.level.action": "Hành động",
+  "monitoring.level.alarm": "Báo động",
+  "monitoring.risk.title": "Điểm giám sát {id} ở mức {level}",
+  "monitoring.risk.description": "Dịch chuyển {d} mm, tốc độ {r} mm/ngày so với {profile}. Bản nháp do giám sát mở: hãy xem xét và chỉ định người phụ trách.",
+  "monitoring.report.title": "Báo cáo cảnh báo giám sát",
+  "monitoring.report.project": "Dự án",
+  "monitoring.report.crs": "Hệ tọa độ",
+  "monitoring.report.profile": "Hồ sơ ngưỡng",
+  "monitoring.report.generated": "Đã tạo",
+  "monitoring.report.point": "Điểm",
+  "monitoring.report.baseline": "Giá trị gốc (m)",
+  "monitoring.report.latest": "Giá trị gần nhất (m)",
+  "monitoring.report.displacement": "Dịch chuyển (mm)",
+  "monitoring.report.rate": "Tốc độ (mm/ngày)",
+  "monitoring.report.level": "Mức",
+  "monitoring.report.acknowledged": "Đã xác nhận",
+  "monitoring.report.counts": "Báo động: {alarm} · Hành động: {action} · Cảnh báo: {alert} · OK: {ok}",
+  "monitoring.report.findings": "Kết luận",
+  "monitoring.report.no_profile": "Chưa có hồ sơ, hãy đặt một hồ sơ",
+  "monitoring.report.ack_yes": "Có",
+  "monitoring.report.ack_no": "Không"
 }

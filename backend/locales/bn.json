@@ -1156,7 +1156,11 @@
       "notifications.portal.message_received.title": "পোর্টালে নতুন বার্তা",
       "notifications.portal.message_received.body": "{buyer_name} একটি বার্তা পাঠিয়েছেন।",
       "dispatch.notify.plan_title": "Your daily plan is ready",
-      "dispatch.notify.plan_body": "Plan for {day}: {lines} lines."
+      "dispatch.notify.plan_body": "Plan for {day}: {lines} lines.",
+      "notifications.monitoring.alert.title": "মনিটরিং সতর্কতা",
+      "notifications.monitoring.action.title": "মনিটরিং অ্যাকশন স্তর",
+      "notifications.monitoring.alarm.title": "মনিটরিং অ্যালার্ম",
+      "notifications.monitoring.crossed.body": "পয়েন্ট {point}: {displacement} mm, {rate} mm/day।"
     },
     "schedule_headers": {
       "headers": {
@@ -1592,7 +1596,8 @@
         "no_rejections": "কিছুই প্রত্যাখ্যাত হয়নি।",
         "sig_delivered_by": "সরবরাহকারী",
         "counterparty_tax_id": "করদাতা শনাক্তকরণ নম্বর",
-        "counterparty_address": "ঠিকানা"
+        "counterparty_address": "ঠিকানা",
+        "delivery_address": "ডেলিভারির ঠিকানা"
       },
       "labels": {
         "po_status": {
@@ -1665,7 +1670,8 @@
         "gross_settled": "নিষ্পন্ন স্থূল পরিমাণ",
         "no_withholding": "এই পরিশোধ থেকে কিছু কাটা হয়নি।",
         "counterparty_tax_id": "করদাতা শনাক্তকরণ নম্বর",
-        "counterparty_address": "ঠিকানা"
+        "counterparty_address": "ঠিকানা",
+        "supply_date": "সরবরাহের তারিখ"
       },
       "labels": {
         "invoice_status": {
@@ -1689,6 +1695,81 @@
     },
     "furniture": {
       "footer_page": "পৃষ্ঠা {page} / {total}"
+    },
+    "gantt_pdf": {
+      "strings": {
+        "title": "সময়সূচি (গ্যান্ট চার্ট)",
+        "project": "প্রকল্প",
+        "schedule": "সময়সূচি",
+        "baseline": "বেসলাইন",
+        "no_baseline": "নেই",
+        "exported": "এক্সপোর্টের তারিখ",
+        "data_date": "ডেটা তারিখ",
+        "col_wbs": "WBS",
+        "col_activity": "কার্যক্রম",
+        "col_start": "শুরু",
+        "col_finish": "শেষ",
+        "col_duration": "দিন",
+        "legend_current": "বর্তমান পরিকল্পনা",
+        "legend_progress": "অগ্রগতি",
+        "legend_critical": "ক্রিটিক্যাল পাথ",
+        "legend_baseline": "বেসলাইন পরিকল্পনা",
+        "legend_actual": "প্রকৃত",
+        "legend_milestone": "মাইলস্টোন",
+        "legend_summary": "সারাংশ",
+        "week_short": "স{n}",
+        "quarter_short": "ত্রৈ{n}",
+        "sheet_of": "শীট {page} / {total}",
+        "no_activities": "এই সময়সূচিতে এখনও কোনো কার্যক্রম নেই।"
+      }
+    },
+    "contracts": {
+      "strings": {
+        "doc_title": "চুক্তি",
+        "col_code": "কোড",
+        "col_title": "শিরোনাম",
+        "col_type": "চুক্তির ধরন",
+        "col_role": "চুক্তির পক্ষ",
+        "col_counterparty": "প্রতিপক্ষ",
+        "col_original_value": "মূল মূল্য",
+        "col_total_value": "চুক্তির মূল্য",
+        "col_retention": "রিটেনশন",
+        "col_start": "শুরুর তারিখ",
+        "col_end": "শেষের তারিখ",
+        "col_signed": "স্বাক্ষরের তারিখ",
+        "line_code": "কোড",
+        "line_description": "বিবরণ",
+        "line_unit": "একক",
+        "line_quantity": "পরিমাণ",
+        "line_unit_rate": "একক দর",
+        "lines": "কাজের মূল্যের তালিকা",
+        "signer_company": "কোম্পানির পক্ষে"
+      },
+      "labels": {
+        "status": {
+          "draft": "খসড়া",
+          "active": "সক্রিয়",
+          "suspended": "স্থগিত",
+          "completed": "সম্পন্ন",
+          "terminated": "বাতিল"
+        },
+        "type": {
+          "lump_sum": "একমুঠো অঙ্ক",
+          "gmp": "GMP",
+          "cost_plus": "খরচ-প্লাস",
+          "tm": "সময় ও উপকরণ",
+          "unit_price": "একক দর",
+          "design_build": "ডিজাইন ও নির্মাণ",
+          "combination": "সমন্বিত",
+          "remeasurement": "পুনঃপরিমাপ",
+          "framework": "ফ্রেমওয়ার্ক চুক্তি",
+          "call_off": "কল-অফ আদেশ"
+        },
+        "party": {
+          "client": "ক্লায়েন্ট চুক্তি",
+          "subcontractor": "সাবকন্ট্রাক্ট"
+        }
+      }
     }
   },
   "property_dev": {
@@ -2122,5 +2203,30 @@
       "file_missing": "ছবি '{name}'-এর ফাইল স্টোরেজে নেই",
       "file_missing_fix": "ছবিটি আবার আপলোড করুন বা ব্যাকআপ থেকে ফিরিয়ে আনুন"
     }
-  }
+  },
+  "monitoring.crossed.fail": "পয়েন্ট {id}: সরণ {d} মিমি বা হার {r} মিমি/দিন {level} স্তর অতিক্রম করেছে",
+  "monitoring.crossed.suggestion": "বিন্দু ও কাঠামো যাচাই করুন, তারপর একটি নোট দিয়ে সতর্কতা নিশ্চিত করুন।",
+  "monitoring.level.ok": "OK",
+  "monitoring.level.alert": "সতর্কতা",
+  "monitoring.level.action": "ব্যবস্থা",
+  "monitoring.level.alarm": "অ্যালার্ম",
+  "monitoring.risk.title": "মনিটরিং বিন্দু {id}, স্তর {level}",
+  "monitoring.risk.description": "সরণ {d} মিমি, হার {r} মিমি/দিন, {profile} অনুযায়ী। মনিটরিং থেকে খসড়া খোলা হয়েছে: পর্যালোচনা করে একজন দায়িত্বপ্রাপ্ত ব্যক্তি নির্ধারণ করুন।",
+  "monitoring.report.title": "মনিটরিং অ্যালার্ম প্রতিবেদন",
+  "monitoring.report.project": "প্রকল্প",
+  "monitoring.report.crs": "স্থানাঙ্ক ব্যবস্থা",
+  "monitoring.report.profile": "সীমা প্রোফাইল",
+  "monitoring.report.generated": "তৈরির সময়",
+  "monitoring.report.point": "বিন্দু",
+  "monitoring.report.baseline": "ভিত্তি মান (মি)",
+  "monitoring.report.latest": "সর্বশেষ মান (মি)",
+  "monitoring.report.displacement": "সরণ (মিমি)",
+  "monitoring.report.rate": "হার (মিমি/দিন)",
+  "monitoring.report.level": "স্তর",
+  "monitoring.report.acknowledged": "নিশ্চিত করা হয়েছে",
+  "monitoring.report.counts": "অ্যালার্ম: {alarm} · ব্যবস্থা: {action} · সতর্কতা: {alert} · OK: {ok}",
+  "monitoring.report.findings": "পর্যবেক্ষণ",
+  "monitoring.report.no_profile": "কোনো প্রোফাইল নেই, একটি ঠিক করুন",
+  "monitoring.report.ack_yes": "হ্যাঁ",
+  "monitoring.report.ack_no": "না"
 }

@@ -299,6 +299,10 @@
     "unit_exportable": {
       "fail": "条目 {ordinal}：单位“{unit}”超出 GAEB QU 字段的 4 个字符，导出时会被截断",
       "suggestion": "请使用不超过 4 个字符的 GAEB 单位代码（m、m2、m3、St、h、psch、kg、t）"
+    },
+    "short_text_length": {
+      "fail": "条目 {ordinal}：短文本有 {length} 个字符；GAEB 导出会截断为 70 个",
+      "suggestion": "将短文本缩短到 70 个字符以内，详细内容保留在长文本中"
     }
   },
   "nrm": {
@@ -412,7 +416,10 @@
       "suggestion": "请指定九位数的 GB/T 50500 编码（例如 010101001）。"
     },
     "valid_code": {
-      "fail": "GB/T 50500 编码“{code}”无效，应为 9 位或 12 位数字。"
+      "fail": "GB/T 50500 编码“{code}”无效，应为 9 位或 12 位数字，或 01B001 这类补充编码。"
+    },
+    "code_unique": {
+      "fail": "清单编码“{code}”在同一单项工程内重复使用。"
     }
   },
   "cpwd": {
@@ -931,6 +938,36 @@
     "change_time_within_owner": {
       "fail": "{code} 的分包工期影响合计 {sub_days} 天，超过业主批准的 {owner_days} 天",
       "suggestion": "请核对分包商的工期索赔，或向业主申请相应的延期"
+    },
+    "pay_app_over_complete": {
+      "fail": "明细 {line} 在本期后达到计划价值的 {percent}%（{scheduled} 中的 {completed}）",
+      "suggestion": "请降低本期金额，或记录超出计划价值计价的原因"
+    },
+    "pay_app_line_negative": {
+      "fail": "明细 {line} 的累计将为 {completed}，低于零"
+    },
+    "pay_app_within_agreement": {
+      "fail": "付款申请合计 {billed}，超过合同价值加已批准变更之和（{limit}）"
+    },
+    "pay_app_correct": {
+      "suggestion": "请更正本付款申请的金额，或通过已批准的变更提高合同价值"
+    },
+    "required_documents": {
+      "fail": "必需文件：{document}（{state}）",
+      "suggestion": "请将已签署且有效的文件附到分包合同上",
+      "states": {
+        "missing": "缺失",
+        "unsigned": "未签署",
+        "expired": "已过期"
+      }
+    },
+    "document_roles": {
+      "terms_and_conditions": "合同条款",
+      "safety_agreement": "安全协议",
+      "safety_plan": "安全计划",
+      "insurance": "保险",
+      "method_statement": "施工方案",
+      "other": "其他文件"
     }
   },
   "submittal": {
@@ -2014,6 +2051,510 @@
     "crew_without_record": {
       "fail": "现场有 {headcount} 人的班组，但未记录施工、检查或延误。",
       "suggestion": "请补充班组所做工作，或导致停工的延误。"
+    }
+  },
+  "framework_agreement": {
+    "item_not_in_agreement": {
+      "fail": "行 {code} 不是协议 {agreement} 的有效项目；请作为增项录入。",
+      "suggestion": "从订单中删除该行，并将工作作为增项记录在订单上。"
+    },
+    "rate_deviates": {
+      "fail": "行 {code} 的单价 {rate} 与协议单价 {expected} 不一致。",
+      "suggestion": "订单单价来自框架协议；请按价目表重新计价该行。"
+    },
+    "order_outside_validity": {
+      "fail": "订单日期 {date} 不在协议期限 {from} 至 {to} 之内。",
+      "suggestion": "将订单日期改为期限之内，或先延长协议。"
+    },
+    "rate_period_gap": {
+      "fail": "没有单价期间覆盖 {date}。",
+      "suggestion": "请在“单价与调价”页签中添加覆盖该日期的单价期间。"
+    },
+    "escalation_unresolved": {
+      "fail": "指数 {series} 在 {period} 没有数值，无法调整单价。",
+      "suggestion": "请在价格指数中录入该月的指数值，然后重新计价订单。"
+    },
+    "cap_exceeded": {
+      "fail": "本订单使协议累计达到 {total}，而上限为 {cap}；剩余额度 {headroom}。",
+      "suggestion": "将订单减少到剩余额度以内，或附说明理由的超限批准后再下达。"
+    },
+    "cap_threshold": {
+      "fail": "协议已使用 {pct}% 的上限。",
+      "suggestion": "请尽早告知业主，以便准备后续协议。"
+    },
+    "item_max_qty": {
+      "fail": "项目 {code}：目前已订购 {qty}，超过规定的最大数量 {max}。",
+      "suggestion": "下一份订单之前，请与业主商定增加的数量。"
+    },
+    "min_at_risk": {
+      "fail": "剩余 {days} 天，保证最低量的 {pct}% 已订购。",
+      "suggestion": "趁仍可下单的时间，与业主沟通尚缺的数量。"
+    },
+    "currency_mismatch": {
+      "fail": "订单币种 {cur} 与协议币种 {agr} 不一致。",
+      "suggestion": "订单按协议币种计价。"
+    },
+    "adjustment_unknown": {
+      "fail": "条件 {tag} 在本协议中没有对应的调整。",
+      "suggestion": "请在“条件”页签中添加调整，或从订单中删除该条件。"
+    },
+    "direct_claim": {
+      "fail": "索赔应在调用订单上提出，而不是在框架协议上。",
+      "suggestion": "请打开完成该工作所依据的订单，并在那里提出索赔。"
+    },
+    "duplicate_item": {
+      "fail": "项目编码 {code} 在单价期间 {period} 中出现两次。",
+      "suggestion": "保存价目表前，请确保每个项目编码只保留一行。"
+    },
+    "measured_over_ordered": {
+      "fail": "行 {code} 的实测量 {m} 超过订购量 {o}；请考虑增项。",
+      "suggestion": "请将增加的数量作为订单变更登记。"
+    },
+    "term_over_legal_max": {
+      "fail": "工期 {years} 年超过了 {source}（数据包）规定的 {max} 年上限。",
+      "suggestion": "请与业主核实工期；上限由数据包给出，系统不强制执行。"
+    }
+  },
+  "estimate_archive": {
+    "arc_hash_mismatch": {
+      "fail": "指纹不一致：记录为 {actual}，封存值为 {sealed}。请视为记录已被改动。"
+    },
+    "arc_total_mismatch": {
+      "fail": "封存总额 {seal} 与中标金额 {award} 相差 {diff}。"
+    },
+    "arc_no_breakdown": {
+      "fail": "{n} 个清单项没有资源分解，日后无法追溯其单价。"
+    },
+    "arc_no_markups": {
+      "fail": "预算中没有可封存的取费项。"
+    },
+    "arc_sealed_after_signing": {
+      "fail": "在合同签署 {days} 天后封存。"
+    },
+    "arc_no_receipt": {
+      "fail": "对方尚未确认指纹。"
+    },
+    "arc_open_not_closed": {
+      "fail": "开启 {id} 已持续 {days} 天且无会议纪要。"
+    },
+    "arc_open_no_reason": {
+      "fail": "开启需要理由和依据。"
+    },
+    "arc_open_one_party": {
+      "fail": "只列出了一方；请记录另一方缺席的原因。"
+    },
+    "var_basis_no_seal": {
+      "fail": "清单项 {code} 按原始基准计价，但没有封存的预算。"
+    },
+    "var_basis_deviation": {
+      "fail": "清单项 {code}：{field} 从 {old} 改为 {new}，没有说明。"
+    },
+    "var_new_resource_no_evidence": {
+      "fail": "新资源 {res} 没有价格日期或报价依据。"
+    },
+    "var_markup_not_sealed": {
+      "fail": "清单项 {code} 使用了封存中没有的取费 {m}。"
+    },
+    "var_abnormal_carried_rate": {
+      "fail": "沿用成本 {c} 偏离基准 {pct} %。"
+    },
+    "arc_mutation_refused": {
+      "fail": "已封存的预算不能修改或删除。请封存一个替代它的新版本。"
+    },
+    "contents_locked": "在正式开启之前，内容保持封存。",
+    "market_off": "封存预算不属于本项目的市场配置。",
+    "contract_required": "将估算封存为合同依据之前，需要先有客户合同。"
+  },
+  "boq_revision": {
+    "superseded_still_editable": {
+      "fail": "修订 {label} 仍可编辑，但之后已创建 {later}；在此所做的更改不会带入后续修订",
+      "suggestion": "锁定 {label}，或在最新修订中继续工作"
+    }
+  },
+  "schedule_baseline": {
+    "single_approved": {
+      "fail": "此进度计划有多个已批准的基线（{baselines}）。",
+      "suggestion": "批准应当生效的基线；批准其中一个会撤销其他基线的批准。"
+    }
+  },
+  "project_catalogue": {
+    "unit_present": {
+      "fail": "单价 {code} 没有计量单位。",
+      "suggestion": "请输入单价对应的单位,例如 m2、m3 或 h。"
+    },
+    "duplicate_code": {
+      "fail": "编码 {code} 在本项目中被多个单价使用。",
+      "suggestion": "每个编码只保留一个单价,或为变体指定单独的编码。"
+    },
+    "currency_differs": {
+      "fail": "单价 {code} 以 {currency} 计价,但项目以 {project_currency} 计价。",
+      "suggestion": "请将单价换算为项目币种,或确认使用外币是有意为之。"
+    },
+    "override_far": {
+      "fail": "{code} 的本地单价与来源单价 {source_rate} 相差 {percent} %。",
+      "suggestion": "检查小数点是否错位,或注明本项目需要不同价格的原因。"
+    },
+    "source_changed": {
+      "fail": "{code} 的来源单价自复制到项目后已从 {old} 变为 {new}。",
+      "suggestion": "采用新的来源单价,或有意保留本地单价。"
+    }
+  },
+  "schedule_mspdi_import": {
+    "task_dates": {
+      "missing_dates": "任务 {ref}“{name}”没有开始或完成日期。",
+      "finish_before_start": "任务 {ref}“{name}”在开始 ({start}) 之前就完成 ({finish})。",
+      "suggestion": "请在源进度计划中更正日期后重新导出。导入时从不猜测日期。"
+    },
+    "unique_ids": {
+      "duplicate_uid": "任务 ID {ref} 出现多次；仅保留第一个任务。",
+      "suggestion": "请在源进度计划中为每个任务设置唯一 ID。"
+    },
+    "links_resolve": {
+      "dangling_link": "任务 {ref}“{name}”：前置任务 {predecessor} 不在文件中，已跳过该链接。",
+      "duplicate_link": "任务 {ref} \"{name}\"：来自前置任务 {predecessor} 的第二个链接已跳过，每对任务只保留一个链接。",
+      "self_link": "任务 {ref}“{name}”链接到自身，已跳过该链接。",
+      "unknown_link_type": "任务 {ref}“{name}”：链接类型 {type} 未知，按完成-开始读取。",
+      "suggestion": "请检查源进度计划中的逻辑链接。"
+    },
+    "values_in_range": {
+      "percent_out_of_range": "任务 {ref}“{name}”：完成百分比 {value}% 超出 0-100，已被限制。",
+      "outline_gap": "任务 {ref}“{name}”跳过了一个大纲级别 ({level})；已放在其上方最近的摘要任务下。",
+      "suggestion": "请检查源进度计划中的完成百分比和缩进。"
+    },
+    "calendar_work_days": {
+      "calendar_no_work_days": "日历 {calendar} 没有工作日。",
+      "suggestion": "请在源进度计划中标出此日历的工作日。"
+    }
+  },
+  "schedule_pdf_import": {
+    "no_text_layer": {
+      "fail": "该 PDF 没有文本层，无法读取其表格。",
+      "suggestion": "请将进度计划导出为 MS Project XML、XER 或 Excel，然后导入该文件。"
+    },
+    "dates_parsed": {
+      "fail": "第 {row} 行：开始或完成不是日期。",
+      "suggestion": "请检查日期列和日/月顺序，或在源文件中更正日期。"
+    },
+    "finish_before_start": {
+      "fail": "第 {row} 行：完成日期早于开始日期。",
+      "suggestion": "请在源进度计划中更正日期。"
+    },
+    "duration_mismatch": {
+      "fail": "第 {row} 行：打印的工期与开始和完成之间的工作日不一致。",
+      "suggestion": "日期保持不变；请检查工期列和项目日历。"
+    },
+    "unique_ids": {
+      "fail": "第 {row} 行：作业编号已被其他行使用。",
+      "suggestion": "请在源进度计划中为每项作业指定唯一编号。"
+    },
+    "links_resolve": {
+      "fail": "第 {row} 行：某个紧前作业不是表中的作业。",
+      "suggestion": "请检查紧前作业列；无法匹配的关系将被跳过。"
+    }
+  },
+  "commercial_control": {
+    "ok": "已检查，未发现问题",
+    "cvr": {
+      "target_rate_basis": {
+        "fail": "{total} 个已计价清单项中有 {missing} 个没有目标单价，按销售单价计入预算（例如 {sample}）",
+        "suggestion": "请为这些清单项填写目标成本单价，使预算成为现场必须控制的成本"
+      },
+      "unmapped_cost": {
+        "fail": "{kind} {label} 没有 WBS 或成本编码：已承诺 {committed}，实际 {actual}",
+        "suggestion": "请将订单行、分包或发票归入一个 WBS 元素，以便成本价值核对表能够归集"
+      }
+    },
+    "procurement": {
+      "line_over_committed": {
+        "fail": "清单项 {ordinal} 超额承诺：已订 {committed_qty}，预算量 {budget_qty}；金额 {committed_value}，预算 {budget_value}",
+        "suggestion": "继续承诺前请检查是否重复订货，或登记变更或预算调拨"
+      }
+    },
+    "approval_routes": {
+      "bands_contiguous": {
+        "gap": {
+          "fail": "{low} 至 {high}（不含）之间的金额没有任何审批人（步骤 {step}）",
+          "suggestion": "请扩大相邻区间或增加步骤，使每个金额都有审批人"
+        },
+        "overlap": {
+          "fail": "步骤 {step} 与较低区间 {low} 至 {high}（不含）重叠，这些金额需两位审批人都签字",
+          "suggestion": "除非两位都应签字，否则请让每个区间从上一个区间结束处开始"
+        },
+        "empty": {
+          "fail": "步骤 {step} 的区间 {low} 至 {high} 不包含任何金额",
+          "suggestion": "请将最小值设为小于最大值，或将最大值留空表示无上限"
+        }
+      }
+    },
+    "valuation": {
+      "assessed_within_submitted": {
+        "fail": "第 {line} 行：审核数量 {assessed} 大于申报数量 {submitted}",
+        "suggestion": "审核数量不应超过申报数量，额外工作请登记为变更"
+      },
+      "certified_within_assessed": {
+        "fail": "第 {line} 行：核定数量 {certified} 大于审核数量 {assessed}",
+        "suggestion": "核定数量不应超过审核数量，或先重新审核该行"
+      }
+    }
+  },
+  "norm_base": {
+    "code_present": {
+      "fail": "第 {ordinal} 行未引用 {base} 定额编号。按定额编制的预算每一行都应引用定额。",
+      "suggestion": "请在该行的 {classification} 分类中填写定额编号。"
+    },
+    "code_shape": {
+      "fail": "第 {ordinal} 行的“{code}”不是 {base} 编号。应为类似 {example} 的编号。"
+    },
+    "legacy_prefix": {
+      "fail": "第 {ordinal} 行的“{code}”使用了已废止的前缀 {old}。现行编号为 {new}。"
+    },
+    "resource_breakdown": {
+      "fail": "定额行 {code} 缺少人工工时或平均等级。",
+      "suggestion": "请添加人工资源，并填写每单位工时和定额的平均等级。"
+    },
+    "grade_range": {
+      "fail": "第 {ordinal} 行的等级 {grade} 超出 {min} 至 {max} 范围，或不是 {step} 的整数倍。"
+    }
+  },
+  "public_funding": {
+    "markup_cap": {
+      "fail": "{funding}：{markup} 为 {percent} %，上限为直接费的 {cap} %（{source}）。",
+      "suggestion": "请将费率降至上限；如工程不由公共资金支付，请将资金类型设为私人。"
+    },
+    "investor_exact": {
+      "fail": "{funding} 的业主预算：{markup} 应恰好为 {cap} %（{source}）。"
+    },
+    "material_price_evidence": {
+      "fail": "{funding}：第 {ordinal} 行的材料 {material} 有 {count}/{required} 份报价，且没有价格分析。",
+      "suggestion": "请记录该材料的供应商报价，或附上价格分析报告。"
+    }
+  },
+  "vat_rate": {
+    "standard_rate": {
+      "fail": "{markup} 为 {percent} %；{country} 的标准增值税税率为 {rate} %。",
+      "suggestion": "请将税额行设为标准税率，或在预算中注明适用其他税率或免税的原因。"
+    }
+  },
+  "survey": {
+    "no_crs": {
+      "fail": "点集 {name} 没有坐标参考系：在计算土方量或宗地之前，请指定 EPSG 或局部坐标系。",
+      "suggestion": "请设置项目坐标系，然后指明此文件是在哪个坐标系中测量的。"
+    },
+    "crs_unconfirmed": {
+      "fail": "已自动检测到坐标系（置信度 {confidence}），使用前请确认。",
+      "suggestion": "打开“设置项目坐标系”，确认检测到的坐标系或选择其他坐标系。"
+    },
+    "duplicate_point": {
+      "fail": "点号 {point_id} 重复且坐标不同。",
+      "suggestion": "只保留一个测量值：删除含有错误值的点集，然后重新导入。"
+    },
+    "traverse_misclosure": {
+      "fail": "导线 {name} 闭合比为 1:{r}，低于配置最低值 1:{min}。",
+      "suggestion": "检查各边是否有粗差，重测最弱的边，或确认配置值。"
+    },
+    "level_misclosure": {
+      "fail": "水准路线闭合差 {f} mm 超过 k·√km（k = {k} mm）。",
+      "suggestion": "重新进行水准测量，或检查所用水准点的高程。"
+    }
+  },
+  "volumes": {
+    "no_overlap": {
+      "fail": "两个曲面仅在 {p} % 的面积上重叠：体积没有意义。",
+      "suggestion": "检查两个曲面是否在同一坐标系中并覆盖同一地块。"
+    },
+    "low_coverage": {
+      "fail": "仅 {c} % 的面积在两个曲面中都有数据（最低 {min} %）。",
+      "suggestion": "在缺少曲面的地方补充测点，或把边界缩小到已覆盖区域。"
+    },
+    "coarse_scan": {
+      "fail": "此体积来自粗精度扫描（LOA10），且未说明原因。",
+      "suggestion": "使用测量级扫描，或写明为何此扫描足够。"
+    },
+    "bank_volume": {
+      "fail": "数量为自然方（原状土）；未应用松散系数。",
+      "suggestion": "如果清单项按松方计量，请改为发送松方挖方。"
+    }
+  },
+  "setting_out": {
+    "stake_off": {
+      "fail": "放样点 {id} 偏差 {d} mm，允许偏差 {t} mm",
+      "suggestion": "重新放样该点并记录，或创建 NCR 草稿。"
+    },
+    "record_untraceable": {
+      "fail": "放样记录 {id} 缺少仪器或控制点。",
+      "suggestion": "填写所用仪器以及设站所依据的控制点。"
+    },
+    "sheet": {
+      "title": "放样记录表",
+      "project": "项目",
+      "crs": "坐标系",
+      "request": "放样任务",
+      "tolerance": "允许偏差",
+      "element": "构件",
+      "generated": "生成时间",
+      "point": "点",
+      "design_e": "设计 E",
+      "design_n": "设计 N",
+      "design_z": "设计 Z",
+      "measured_e": "实测 E",
+      "measured_n": "实测 N",
+      "verdict": "结论",
+      "by": "测量人",
+      "verdict_pass": "合格",
+      "verdict_fail": "不合格",
+      "verdict_open": "未测",
+      "verdict_no_tolerance": "无偏差配置",
+      "counts": "合格：{passed} · 不合格：{failed} · 未测：{open}",
+      "findings": "问题",
+      "no_profile": "无偏差配置，请设置",
+      "d": "d (mm)",
+      "dz": "dZ (mm)"
+    }
+  },
+  "land_parcels": {
+    "area_mismatch": {
+      "fail": "宗地 {id}：计算面积 {a} m2 与登记面积 {l} m2 之差超出容差 ({t})。",
+      "suggestion": "请将界址点与登记簿摘录核对，或注明两者不同的原因。"
+    },
+    "ring_invalid": {
+      "fail": "宗地 {id}：界线未闭合或自相交。",
+      "suggestion": "修正界址点，使其不交叉地绕宗地一周。"
+    },
+    "zone_not_acquired": {
+      "fail": "施工区与尚未取得的宗地 {id} 重叠 ({area} m2)。",
+      "suggestion": "在施工前取得宗地或商定进入，或移动施工区。"
+    },
+    "overlap": {
+      "fail": "宗地 {a} 与 {b} 重叠 {area} m2。",
+      "suggestion": "修正共用界线，使两个宗地使用相同的点。"
+    },
+    "gap": {
+      "fail": "宗地 {a} 与 {b} 之间有 {gap} m 的缝隙。",
+      "suggestion": "让两个宗地使用相同的界址点，或确认该带属于另一宗地。"
+    },
+    "id_format": {
+      "fail": "宗地号 {id} 不符合 {label} 格式 (例如 {example})。",
+      "suggestion": "请严格按登记簿的写法复制宗地号。"
+    },
+    "pdf": {
+      "title": "宗地清单",
+      "project": "项目",
+      "crs": "坐标系",
+      "method": "方法",
+      "method_value": "按界址坐标计算面积 (坐标法)，保留 {decimals} 位小数，m2",
+      "printed": "打印人",
+      "legal": "登记面积 (m2)",
+      "computed": "计算面积 (m2)",
+      "diff": "差值 (m2)",
+      "status": "状态",
+      "rights": "权利",
+      "cost": "费用",
+      "findings": "问题",
+      "total": "合计，{count} 宗",
+      "acquired_of": "已取得 {acquired} / {total}",
+      "findings_title": "问题",
+      "no_findings": "没有问题。",
+      "disclaimer": "所有人和权利按本项目中的记录显示。本清单不是法律意见，也不是登记簿摘录。",
+      "status_needed": "需要",
+      "status_negotiating": "协商中",
+      "status_acquired": "已取得",
+      "status_expropriation": "征收"
+    }
+  },
+  "monitoring": {
+    "crossed": {
+      "fail": "测点 {id} 位移 {d} mm 或速率 {r} mm/day 超过 {level}",
+      "suggestion": "请检查测点和结构，然后附注确认该预警。"
+    },
+    "level": {
+      "ok": "正常",
+      "alert": "预警值",
+      "action": "控制值",
+      "alarm": "报警值"
+    },
+    "risk": {
+      "title": "监测点 {id} 达到 {level}",
+      "description": "位移 {d} mm，速率 {r} mm/day，对照 {profile}。监测系统已生成草稿：请复核并指定负责人。"
+    },
+    "report": {
+      "title": "监测报警报告",
+      "project": "项目",
+      "crs": "坐标系",
+      "profile": "阈值方案",
+      "generated": "生成时间",
+      "point": "测点",
+      "baseline": "初始值 (m)",
+      "latest": "最新值 (m)",
+      "displacement": "位移 (mm)",
+      "rate": "速率 (mm/day)",
+      "level": "等级",
+      "acknowledged": "已确认",
+      "counts": "报警值: {alarm} · 控制值: {action} · 预警值: {alert} · 正常: {ok}",
+      "findings": "发现",
+      "no_profile": "无阈值方案，请设置",
+      "ack_yes": "是",
+      "ack_no": "否"
+    }
+  },
+  "stockpiles": {
+    "density_assumed": {
+      "fail": "密度是假定的，不是实测：吨数的可靠性只有这个估计那么高。",
+      "suggestion": "称一个样品，或从供应商的送货单取密度。"
+    },
+    "variance_high": {
+      "fail": "测量结果与账面库存相差 {v} %，超过容差 {t} %。",
+      "suggestion": "检查密度和基准曲面，然后提出调整；如果差异属实，请确认。"
+    }
+  },
+  "mine_survey": {
+    "compliance_outside": {
+      "fail": "本期完成率 {c} % 超出 {lo}-{hi} % 范围。",
+      "suggestion": "请核对计划和测量结果，并在申报前于期间备注中说明差异。"
+    },
+    "truck_differs": {
+      "fail": "按车次统计的吨数与测量吨数相差 {v} %，超过 {t} % 的核对限值。",
+      "suggestion": "请核对每车载重和密度，然后重新比较两个曲面。"
+    }
+  },
+  "hongkong": {
+    "sopo_applicability": {
+      "fail": "本合同受 Cap. 652（付款保障）规管：须于付款申索后 30 天内回应，60 天内付款"
+    },
+    "sopo_private_scope_check": {
+      "fail": "私人合同仅在新建建筑或需屋宇署批准的工程时受 Cap. 652 规管：请确认范围"
+    },
+    "sopo_response_late": {
+      "fail": "{date} 前未送达付款回应：申索金额已成争议，可提交审裁"
+    },
+    "sopo_payment_term_exceeds_60": {
+      "fail": "{n} 天的付款期超过 Cap. 652 允许的 60 天"
+    },
+    "sopo_response_term_exceeds_30": {
+      "fail": "{n} 天的付款回应期超过 Cap. 652 允许的 30 天"
+    },
+    "sopo_adjudication_window": {
+      "fail": "已产生付款争议：须于 {date} 前送达审裁通知"
+    },
+    "contract_pay_when_paid": {
+      "fail": "有条件付款条款：Cap. 652 规定此类条款不可执行"
+    },
+    "levy_missing": {
+      "fail": "工程超过 HK$3,000,000，但工程量清单缺少 CIC 征款（0.5%）或 CWR 征款（0.03%）"
+    },
+    "levy_below_threshold": {
+      "fail": "工程不超过 HK$3,000,000：无须缴付 CIC 或 CWR 征款"
+    },
+    "tax_nonzero": {
+      "fail": "计算了增值税或 GST 行，但香港没有此类税项：请设为零"
+    },
+    "retention_over_limit": {
+      "fail": "保留金 {x} 超过合同上限 {limit}"
+    },
+    "pc_sum_no_attendance": {
+      "fail": "主要成本金额缺少利润及照料项目"
+    },
+    "index_attribution": {
+      "fail": "ArchSD 投标价格指数未注明来源：请注明建筑署"
     }
   }
 }

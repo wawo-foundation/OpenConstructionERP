@@ -1,6 +1,6 @@
 // DDC-CWICR-OE: DataDrivenConstruction · OpenConstructionERP​‌‍⁠​‌‍⁠​‌‍⁠​‌‍⁠
 // Copyright (c) 2026 Artem Boiko / DataDrivenConstruction
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Plus, RotateCcw, GitBranch, Diamond, Minus, Users, Trash2, ChevronRight, ChevronDown, ArrowUp, ArrowDown } from 'lucide-react';
@@ -736,11 +736,10 @@ export function ActivityGrid({
                     </td>
                     <td className="min-w-[180px]">
                       <GridAssigneeCell
+                        projectId={projectId}
                         activity={a}
                         disabled={cellsDisabled}
-                        onCommit={(assigneeId) =>
-                          updateMutation.mutate({ id: a.id, body: { assignee_id: assigneeId } })
-                        }
+                        onCommit={(body) => updateMutation.mutate({ id: a.id, body })}
                       />
                     </td>
                     <td>
@@ -840,52 +839,65 @@ export function ActivityGrid({
 }
 
 /**
- * The assignee cell: a contact picked from the caller's contacts, searchable
- * past the first page.
+ * The assignee cell: a contact picked from the company's contacts (project team first), searchable
+ * past the first page, or a name typed for someone who is not a contact.
  *
  * The name shown for a stored assignee comes from the server
  * (``assignee_name``), not from the viewer's own contact list, which holds
  * only that viewer's contacts and only the first page of them: a colleague's
- * pick used to fall out of that list and read as unassigned. Typing only
- * filters; nothing is saved until a contact is picked or the cell is cleared.
+ * pick used to fall out of that list and read as unassigned. A pick saves at
+ * once; typed text saves when the cell is left or on Enter with no match, and
+ * Escape drops it.
  */
 function GridAssigneeCell({
   activity,
+  projectId,
   disabled,
   onCommit,
 }: {
   activity: Activity;
+  projectId: string;
   disabled: boolean;
-  onCommit: (assigneeId: string | null) => void;
+  onCommit: (body: { assignee_id?: string | null; assignee_text?: string | null }) => void;
 }) {
   const { t } = useTranslation();
   const stored = activity.assignee_id ?? '';
+  const storedText = stored ? '' : activity.assignee_text ?? activity.assignee_name ?? '';
   const storedName =
     activity.assignee_name ||
-    (stored ? t('schedule.assignee_unknown_contact', { defaultValue: 'Contact not in your list' }) : '');
+    (stored ? t('schedule.assignee_unknown_contact', { defaultValue: 'Contact not in your list' }) : storedText);
   const [draft, setDraft] = useState<AssigneeValue | null>(null);
+  // Blur can follow Enter: one typed name is sent once.
+  const sentText = useRef<string | null>(null);
   // The saved value has come back (or changed elsewhere): show it.
-  useEffect(() => setDraft(null), [stored, storedName]);
+  useEffect(() => {
+    setDraft(null);
+    sentText.current = null;
+  }, [stored, storedName]);
   const value = draft ?? { name: storedName, userId: '', contactId: stored };
 
   return (
     <AssigneePicker
       value={value}
       includeUsers={false}
+      projectId={projectId}
       testIdPrefix={`grid-assignee-${activity.id}`}
       ariaLabel={t('schedule.assignee', { defaultValue: 'Assignee' })}
       placeholder={t('schedule.no_assignee', { defaultValue: 'Unassigned' })}
-      noMatchesText={t('schedule.assignee_no_matches', { defaultValue: 'No matching contacts.' })}
       inputClassName={CELL_INPUT_CLS}
       disabled={disabled}
-      // Typed text that matched no contact is not an assignee: show the stored one again.
-      onDismiss={() => setDraft((d) => (d && !d.contactId && d.name ? null : d))}
+      onCancel={() => setDraft(null)}
+      onCommitText={(name) => {
+        if (!name || (!stored && name === storedText) || sentText.current === name) return;
+        sentText.current = name;
+        onCommit({ assignee_text: name });
+      }}
       onChange={(next) => {
         setDraft(next);
         if (next.contactId) {
-          if (next.contactId !== stored) onCommit(next.contactId);
-        } else if (!next.name && stored) {
-          onCommit(null);
+          if (next.contactId !== stored) onCommit({ assignee_id: next.contactId });
+        } else if (!next.name && (stored || storedText)) {
+          onCommit({ assignee_id: null, assignee_text: null });
         }
       }}
     />

@@ -1644,7 +1644,8 @@
         "no_rejections": "Midagi ei lükatud tagasi.",
         "sig_delivered_by": "Tarnija esindaja",
         "counterparty_tax_id": "KMKR",
-        "counterparty_address": "Aadress"
+        "counterparty_address": "Aadress",
+        "delivery_address": "Tarneaadress"
       },
       "labels": {
         "po_status": {
@@ -1717,7 +1718,8 @@
         "gross_settled": "Tasutud brutosumma",
         "no_withholding": "Sellest maksest ei ole midagi kinni peetud.",
         "counterparty_tax_id": "KMKR",
-        "counterparty_address": "Aadress"
+        "counterparty_address": "Aadress",
+        "supply_date": "Tarnekuupäev"
       },
       "labels": {
         "invoice_status": {
@@ -1786,6 +1788,81 @@
         "col_min": "Väikseim",
         "col_max": "Suurim",
         "col_count": "Näidud"
+      }
+    },
+    "gantt_pdf": {
+      "strings": {
+        "title": "Ajakava (Gantti diagramm)",
+        "project": "Projekt",
+        "schedule": "Ajakava",
+        "baseline": "Baasplaan",
+        "no_baseline": "puudub",
+        "exported": "Eksporditud",
+        "data_date": "Seisuga",
+        "col_wbs": "WBS",
+        "col_activity": "Tegevus",
+        "col_start": "Algus",
+        "col_finish": "Lõpp",
+        "col_duration": "Päevi",
+        "legend_current": "Kehtiv plaan",
+        "legend_progress": "Edenemine",
+        "legend_critical": "Kriitiline tee",
+        "legend_baseline": "Baasplaan",
+        "legend_actual": "Tegelik",
+        "legend_milestone": "Verstapost",
+        "legend_summary": "Kokkuvõte",
+        "week_short": "N{n}",
+        "quarter_short": "K{n}",
+        "sheet_of": "Leht {page}/{total}",
+        "no_activities": "Selles ajakavas pole veel tegevusi."
+      }
+    },
+    "contracts": {
+      "strings": {
+        "doc_title": "Leping",
+        "col_code": "Kood",
+        "col_title": "Nimetus",
+        "col_type": "Lepingu liik",
+        "col_role": "Lepingu pool",
+        "col_counterparty": "Vastaspool",
+        "col_original_value": "Algne maksumus",
+        "col_total_value": "Lepingu maksumus",
+        "col_retention": "Garantiipidatis",
+        "col_start": "Alguskuupäev",
+        "col_end": "Lõppkuupäev",
+        "col_signed": "Allkirjastamise kuupäev",
+        "line_code": "Kood",
+        "line_description": "Kirjeldus",
+        "line_unit": "Ühik",
+        "line_quantity": "Kogus",
+        "line_unit_rate": "Ühikuhind",
+        "lines": "Tööde maksumuse jaotus",
+        "signer_company": "Ettevõtte nimel"
+      },
+      "labels": {
+        "status": {
+          "draft": "Mustand",
+          "active": "Kehtiv",
+          "suspended": "Peatatud",
+          "completed": "Täidetud",
+          "terminated": "Üles öeldud"
+        },
+        "type": {
+          "lump_sum": "Kindlasummaline",
+          "gmp": "GMP",
+          "cost_plus": "Kulu pluss",
+          "tm": "Aja- ja materjalikulupõhine",
+          "unit_price": "Ühikuhinnaline",
+          "design_build": "Projekteeri ja ehita",
+          "combination": "Kombineeritud",
+          "remeasurement": "Järelmõõdistamine",
+          "framework": "Raamleping",
+          "call_off": "Hange raamlepingu alusel"
+        },
+        "party": {
+          "client": "Tellijaleping",
+          "subcontractor": "Alltöövõtuleping"
+        }
       }
     }
   },
@@ -2076,7 +2153,11 @@
       "notifications.portal.message_received.title": "Uus portaalisõnum",
       "notifications.portal.message_received.body": "{buyer_name} saatis sõnumi.",
       "dispatch.notify.plan_title": "Your daily plan is ready",
-      "dispatch.notify.plan_body": "Plan for {day}: {lines} lines."
+      "dispatch.notify.plan_body": "Plan for {day}: {lines} lines.",
+      "notifications.monitoring.alert.title": "Jälgimise hoiatus",
+      "notifications.monitoring.action.title": "Jälgimise sekkumistase",
+      "notifications.monitoring.alarm.title": "Jälgimise alarm",
+      "notifications.monitoring.crossed.body": "Punkt {point}: {displacement} mm, {rate} mm/day."
     },
     "schedule_headers": {
       "headers": {
@@ -2699,5 +2780,30 @@
         "gap": "Puudujääk"
       }
     }
-  }
+  },
+  "monitoring.crossed.fail": "Punkt {id}: nihe {d} mm või kiirus {r} mm/päev ületas taseme {level}",
+  "monitoring.crossed.suggestion": "Kontrollige punkti ja ehitist ning kinnitage seejärel häire märkmega.",
+  "monitoring.level.ok": "OK",
+  "monitoring.level.alert": "Hoiatus",
+  "monitoring.level.action": "Meede",
+  "monitoring.level.alarm": "Häire",
+  "monitoring.risk.title": "Jälgimispunkt {id}, tase {level}",
+  "monitoring.risk.description": "Nihe {d} mm, kiirus {r} mm/päev võrreldes profiiliga {profile}. Mustandi avas jälgimine: vaadake see üle ja määrake vastutaja.",
+  "monitoring.report.title": "Jälgimise häiretaruanne",
+  "monitoring.report.project": "Projekt",
+  "monitoring.report.crs": "Koordinaatsüsteem",
+  "monitoring.report.profile": "Piirväärtuste profiil",
+  "monitoring.report.generated": "Genereeritud",
+  "monitoring.report.point": "Punkt",
+  "monitoring.report.baseline": "Lähteväärtus (m)",
+  "monitoring.report.latest": "Viimane väärtus (m)",
+  "monitoring.report.displacement": "Nihe (mm)",
+  "monitoring.report.rate": "Kiirus (mm/päev)",
+  "monitoring.report.level": "Tase",
+  "monitoring.report.acknowledged": "Kinnitatud",
+  "monitoring.report.counts": "Häire: {alarm} · Meede: {action} · Hoiatus: {alert} · OK: {ok}",
+  "monitoring.report.findings": "Järeldused",
+  "monitoring.report.no_profile": "Profiil puudub, määrake see",
+  "monitoring.report.ack_yes": "Jah",
+  "monitoring.report.ack_no": "Ei"
 }

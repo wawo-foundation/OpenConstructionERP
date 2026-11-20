@@ -1628,7 +1628,8 @@
         "no_rejections": "无拒收。",
         "sig_delivered_by": "送货人",
         "counterparty_tax_id": "税号",
-        "counterparty_address": "地址"
+        "counterparty_address": "地址",
+        "delivery_address": "交货地址"
       },
       "labels": {
         "po_status": {
@@ -1701,7 +1702,8 @@
         "gross_settled": "结算总额",
         "no_withholding": "本次付款未扣留任何款项。",
         "counterparty_tax_id": "税号",
-        "counterparty_address": "地址"
+        "counterparty_address": "地址",
+        "supply_date": "供货日期"
       },
       "labels": {
         "invoice_status": {
@@ -1770,6 +1772,81 @@
         "col_min": "最低",
         "col_max": "最高",
         "col_count": "读数"
+      }
+    },
+    "gantt_pdf": {
+      "strings": {
+        "title": "进度计划（甘特图）",
+        "project": "项目",
+        "schedule": "进度计划",
+        "baseline": "基线",
+        "no_baseline": "无",
+        "exported": "导出日期",
+        "data_date": "数据日期",
+        "col_wbs": "WBS",
+        "col_activity": "作业",
+        "col_start": "开始",
+        "col_finish": "完成",
+        "col_duration": "天数",
+        "legend_current": "当前计划",
+        "legend_progress": "进度",
+        "legend_critical": "关键路径",
+        "legend_baseline": "基线计划",
+        "legend_actual": "实际",
+        "legend_milestone": "里程碑",
+        "legend_summary": "摘要",
+        "week_short": "第{n}周",
+        "quarter_short": "第{n}季度",
+        "sheet_of": "第{page}页，共{total}页",
+        "no_activities": "此进度计划还没有作业。"
+      }
+    },
+    "contracts": {
+      "strings": {
+        "doc_title": "合同",
+        "col_code": "编码",
+        "col_title": "名称",
+        "col_type": "合同类型",
+        "col_role": "合同方向",
+        "col_counterparty": "对方单位",
+        "col_original_value": "原合同金额",
+        "col_total_value": "合同金额",
+        "col_retention": "质保金",
+        "col_start": "开始日期",
+        "col_end": "结束日期",
+        "col_signed": "签订日期",
+        "line_code": "编码",
+        "line_description": "项目描述",
+        "line_unit": "单位",
+        "line_quantity": "数量",
+        "line_unit_rate": "单价",
+        "lines": "价值明细表",
+        "signer_company": "公司签署"
+      },
+      "labels": {
+        "status": {
+          "draft": "草稿",
+          "active": "生效中",
+          "suspended": "已暂停",
+          "completed": "已完成",
+          "terminated": "已终止"
+        },
+        "type": {
+          "lump_sum": "总价合同",
+          "gmp": "GMP",
+          "cost_plus": "成本加酬金",
+          "tm": "时间与材料",
+          "unit_price": "单价合同",
+          "design_build": "设计施工",
+          "combination": "组合合同",
+          "remeasurement": "重新计量",
+          "framework": "框架协议",
+          "call_off": "框架协议订单"
+        },
+        "party": {
+          "client": "业主合同",
+          "subcontractor": "分包合同"
+        }
       }
     }
   },
@@ -2060,7 +2137,11 @@
       "notifications.portal.message_received.title": "门户有新消息",
       "notifications.portal.message_received.body": "{buyer_name} 发来一条消息。",
       "dispatch.notify.plan_title": "Your daily plan is ready",
-      "dispatch.notify.plan_body": "Plan for {day}: {lines} lines."
+      "dispatch.notify.plan_body": "Plan for {day}: {lines} lines.",
+      "notifications.monitoring.alert.title": "监测预警",
+      "notifications.monitoring.action.title": "监测行动级别",
+      "notifications.monitoring.alarm.title": "监测报警",
+      "notifications.monitoring.crossed.body": "测点 {point}：{displacement} mm，{rate} mm/day。"
     },
     "schedule_headers": {
       "headers": {
@@ -2676,5 +2757,30 @@
         "gap": "缺口"
       }
     }
-  }
+  },
+  "monitoring.crossed.fail": "测点 {id}：位移 {d} mm 或速率 {r} mm/天 超过 {level} 限值",
+  "monitoring.crossed.suggestion": "检查测点与结构，然后附注确认该预警。",
+  "monitoring.level.ok": "OK",
+  "monitoring.level.alert": "预警",
+  "monitoring.level.action": "处置",
+  "monitoring.level.alarm": "报警",
+  "monitoring.risk.title": "{level} 级监测点 {id}",
+  "monitoring.risk.description": "位移 {d} mm，速率 {r} mm/天，相对于 {profile}。监测模块已生成草稿：请复核并指定负责人。",
+  "monitoring.report.title": "监测报警报告",
+  "monitoring.report.project": "项目",
+  "monitoring.report.crs": "坐标系",
+  "monitoring.report.profile": "阈值剖面",
+  "monitoring.report.generated": "生成时间",
+  "monitoring.report.point": "测点",
+  "monitoring.report.baseline": "基准值 (m)",
+  "monitoring.report.latest": "最新值 (m)",
+  "monitoring.report.displacement": "位移 (mm)",
+  "monitoring.report.rate": "速率 (mm/天)",
+  "monitoring.report.level": "等级",
+  "monitoring.report.acknowledged": "已确认",
+  "monitoring.report.counts": "报警：{alarm} · 处置：{action} · 预警：{alert} · OK：{ok}",
+  "monitoring.report.findings": "结论",
+  "monitoring.report.no_profile": "没有剖面，请设置一个",
+  "monitoring.report.ack_yes": "是",
+  "monitoring.report.ack_no": "否"
 }

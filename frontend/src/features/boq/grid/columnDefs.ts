@@ -1,5 +1,6 @@
 // DDC-CWICR-OE: DataDrivenConstruction · OpenConstructionERP​‌‍⁠​‌‍⁠​‌‍⁠​‌‍⁠
 // Copyright (c) 2026 Artem Boiko / DataDrivenConstruction
+import { averageLabourGrade } from '@/features/norm-pricing/grade';
 import type {
   ColDef,
   ITooltipParams,
@@ -171,6 +172,12 @@ export interface BOQColumnContext {
    * instead of whichever key happens to be first by insertion order.
    */
   classificationStandard?: string;
+  /**
+   * Set only when the project's country pack declares a norm base: adds the
+   * norm code and average labour grade columns. Absent for every other market,
+   * so their bills never see the columns.
+   */
+  normBase?: { classificationKey: string; gradeField: string } | null;
 }
 
 /**
@@ -179,14 +186,15 @@ export interface BOQColumnContext {
  *
  * The cell renders the OZ in ``font-mono text-xs`` (12px, ~7.5px advance per
  * character, upper bound across the mono stacks we ship) plus fixed chrome:
- * 8px cell padding each side and the 10px validation dot with its 4px gap.
+ * the quartz theme's 16px cell padding each side and the 10px validation dot
+ * with its 4px gap.
  * Clamped to [88, 180] so short ordinals keep the historic compact column
  * and a pathological ordinal cannot eat the viewport - the column stays
  * user-resizable either way.
  */
 export function ordinalColumnWidth(maxOrdinalChars: number): number {
   const CHAR_PX = 7.5;
-  const CHROME_PX = 30; // 2 x 8px padding + 10px status dot + 4px gap
+  const CHROME_PX = 50; // 2 x 16px padding + 10px status dot + 4px gap + 4px slack
   const fitted = Math.ceil(maxOrdinalChars * CHAR_PX) + CHROME_PX;
   return Math.max(88, Math.min(180, fitted));
 }
@@ -397,7 +405,7 @@ export function resourceSplitMoneyTotals(
 /** True for a real cost line (not a section header, footer, or resource sub-row). */
 function isCostLine(d: Record<string, unknown> | undefined): boolean {
   return (
-    !!d && !d._isSection && !d._isFooter && !d._isResource && !d._isAddResource && !d._isVariantHeader && !d._isLangtext
+    !!d && !d._isSection && !d._isFooter && !d._isResource && !d._isAddResource && !d._isVariantHeader
   );
 }
 
@@ -525,6 +533,47 @@ export function tierRateValueParser(params: Pick<ValueParserParams, 'newValue' |
   const val = parseDecimalInput(text);
   if (val === null || !isFinite(val)) return params.oldValue;
   return normalizeDecimalSeparators(text);
+}
+
+/** Norm code and average labour grade, read-only, present only when a pack declares a norm base. */
+function normBaseColumns(context: BOQColumnContext): ColDef[] {
+  const base = context.normBase;
+  if (!base) return [];
+  const { t } = context;
+  const plain = (d: Record<string, unknown> | undefined) =>
+    !!d && !d._isSection && !d._isFooter && !d._isResource && !d._isAddResource && !d._isVariantHeader && !d._isLangtext;
+  return [
+    {
+      headerName: t('boq.norm_code', { defaultValue: 'Norm code' }),
+      headerTooltip: t('boq.norm_code_tip', {
+        defaultValue: 'The norm this line is priced against, from the norm base of the country pack.',
+      }),
+      colId: 'norm_code',
+      width: 110,
+      editable: false,
+      valueGetter: (params) => {
+        const d = params.data as Record<string, unknown> | undefined;
+        if (!plain(d)) return '';
+        const cls = d?.classification as Record<string, unknown> | undefined;
+        return String(cls?.[base.classificationKey] ?? '');
+      },
+      cellClass: 'text-xs font-mono',
+    },
+    {
+      headerName: t('boq.labour_grade', { defaultValue: 'Grade' }),
+      headerTooltip: t('boq.labour_grade_tip', {
+        defaultValue: 'Average labour grade of the line, weighted by the hours of its labour resources.',
+      }),
+      colId: 'labour_grade',
+      width: 72,
+      editable: false,
+      valueGetter: (params) => {
+        const d = params.data as Record<string, unknown> | undefined;
+        return plain(d) ? (averageLabourGrade(d?.metadata, base.gradeField) ?? '') : '';
+      },
+      cellClass: 'text-xs tabular-nums text-right',
+    },
+  ];
 }
 
 export function getColumnDefs(context: BOQColumnContext): ColDef[] {
@@ -678,18 +727,14 @@ export function getColumnDefs(context: BOQColumnContext): ColDef[] {
       minWidth: 180,
       flex: 3,
       editable: true,
-      // Multi-line Langtext editor: a popup textarea so a position description
-      // can hold a full LV-style specification with newlines, not just one
-      // line. The value is the same `description` field (stored as TEXT,
-      // newlines preserved); the grid's density toggle controls how much of it
-      // shows at rest.
-      cellEditor: 'agLargeTextCellEditor',
-      cellEditorPopup: true,
-      cellEditorParams: {
-        maxLength: 5000,
-        rows: 14,
-        cols: 64,
-      },
+      // A click edits the Kurztext in place, on one line. The Langtext has its
+      // own editor (pencil, double-click on it, Alt+L). A description that
+      // already holds line breaks keeps the popup textarea, because a one-line
+      // input would drop them.
+      cellEditorSelector: (params) =>
+        String(params.data?.description ?? '').includes('\n')
+          ? { component: 'agLargeTextCellEditor', popup: true, params: { maxLength: 5000, rows: 14, cols: 64 } }
+          : { component: 'agTextCellEditor', params: { maxLength: 5000 } },
       cellRenderer: 'descriptionCellRenderer',
       // !pl-1 overrides AG Grid's default ~17px cell-horizontal-padding
       // so the position description sits flush-left within the column
@@ -708,7 +753,7 @@ export function getColumnDefs(context: BOQColumnContext): ColDef[] {
         const d = params.data as Record<string, unknown> | undefined;
         if (
           !d || d._isSection || d._isFooter || d._isResource ||
-          d._isAddResource || d._isVariantHeader || d._isLangtext
+          d._isAddResource || d._isVariantHeader
         ) {
           return null;
         }
@@ -734,6 +779,7 @@ export function getColumnDefs(context: BOQColumnContext): ColDef[] {
       },
       cellClass: 'text-xs font-mono text-content-secondary',
     },
+    ...normBaseColumns(context),
     {
       headerName: t('boq.unit', { defaultValue: 'Unit' }),
       field: 'unit',

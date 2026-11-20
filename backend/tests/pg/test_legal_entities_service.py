@@ -57,6 +57,9 @@ async def test_an_invalid_currency_is_refused_on_update(pg_session) -> None:
 
 async def test_branches_belong_to_their_entity_and_go_with_it(pg_session) -> None:
     service = LegalEntityService(pg_session)
+    # The default entity absorbs every project that names none, and the shared PG lane
+    # leaves such projects behind; keep LE-BR off the default so it owns nothing.
+    await service.create_entity(_entity("LE-BR-HOME", is_default=True))
     entity = await service.create_entity(_entity("LE-BR"))
     home, home_warnings = await service.create_branch(entity.id, {"code": "MUC", "name": "Munich"})
     abroad, abroad_warnings = await service.create_branch(
@@ -101,14 +104,14 @@ async def test_a_project_names_its_entity_or_falls_back_to_the_default(pg_sessio
     assert await service.project_entity(project.id) == (default, "default")
 
     sub = await service.create_entity(_entity("LE-SUB", country_code="PL", functional_currency="PLN"))
-    assert await service.assign_project(project.id, sub.id) == (sub, "assigned")
+    assert await service.assign_project(project.id, sub.id) == (sub, "assigned", [])
     assert project.legal_entity_id == sub.id
 
     with pytest.raises(HTTPException) as exc:
         await service.delete_entity(sub.id)
     assert exc.value.status_code == 409
 
-    assert await service.assign_project(project.id, None) == (default, "default")
+    assert await service.assign_project(project.id, None) == (default, "default", [])
     await service.delete_entity(sub.id)
 
 

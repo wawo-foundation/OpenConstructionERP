@@ -1644,7 +1644,8 @@
         "no_rejections": "Ništa nije odbijeno.",
         "sig_delivered_by": "Isporučio",
         "counterparty_tax_id": "OIB",
-        "counterparty_address": "Adresa"
+        "counterparty_address": "Adresa",
+        "delivery_address": "Adresa isporuke"
       },
       "labels": {
         "po_status": {
@@ -1717,7 +1718,8 @@
         "gross_settled": "Bruto podmireni iznos",
         "no_withholding": "Od ove uplate ništa nije zadržano.",
         "counterparty_tax_id": "OIB",
-        "counterparty_address": "Adresa"
+        "counterparty_address": "Adresa",
+        "supply_date": "Datum isporuke"
       },
       "labels": {
         "invoice_status": {
@@ -1786,6 +1788,81 @@
         "col_min": "Najniža",
         "col_max": "Najviša",
         "col_count": "Očitanja"
+      }
+    },
+    "gantt_pdf": {
+      "strings": {
+        "title": "Vremenski plan (Ganttov dijagram)",
+        "project": "Projekt",
+        "schedule": "Vremenski plan",
+        "baseline": "Osnovni plan",
+        "no_baseline": "nema",
+        "exported": "Izvezeno",
+        "data_date": "Datum stanja",
+        "col_wbs": "WBS",
+        "col_activity": "Aktivnost",
+        "col_start": "Početak",
+        "col_finish": "Završetak",
+        "col_duration": "Dana",
+        "legend_current": "Trenutni plan",
+        "legend_progress": "Napredak",
+        "legend_critical": "Kritični put",
+        "legend_baseline": "Osnovni plan",
+        "legend_actual": "Stvarno",
+        "legend_milestone": "Ključni događaj",
+        "legend_summary": "Sažetak",
+        "week_short": "T{n}",
+        "quarter_short": "K{n}",
+        "sheet_of": "List {page} od {total}",
+        "no_activities": "Ovaj plan još nema aktivnosti."
+      }
+    },
+    "contracts": {
+      "strings": {
+        "doc_title": "Ugovor",
+        "col_code": "Šifra",
+        "col_title": "Naziv",
+        "col_type": "Vrsta ugovora",
+        "col_role": "Strana ugovora",
+        "col_counterparty": "Druga ugovorna strana",
+        "col_original_value": "Izvorna vrijednost",
+        "col_total_value": "Vrijednost ugovora",
+        "col_retention": "Zadržano jamstvo",
+        "col_start": "Datum početka",
+        "col_end": "Datum završetka",
+        "col_signed": "Datum potpisa",
+        "line_code": "Šifra",
+        "line_description": "Opis",
+        "line_unit": "Jedinica",
+        "line_quantity": "Količina",
+        "line_unit_rate": "Jedinična cijena",
+        "lines": "Raspored vrijednosti",
+        "signer_company": "Za tvrtku"
+      },
+      "labels": {
+        "status": {
+          "draft": "Nacrt",
+          "active": "Aktivan",
+          "suspended": "Obustavljen",
+          "completed": "Završen",
+          "terminated": "Raskinut"
+        },
+        "type": {
+          "lump_sum": "Paušalni iznos",
+          "gmp": "GMP",
+          "cost_plus": "Troškovi plus",
+          "tm": "Vrijeme i materijal",
+          "unit_price": "Jedinične cijene",
+          "design_build": "Projektiraj i izgradi",
+          "combination": "Kombinirani",
+          "remeasurement": "Obračun po izmjeri",
+          "framework": "Okvirni ugovor",
+          "call_off": "Narudžba iz okvirnog ugovora"
+        },
+        "party": {
+          "client": "Ugovor s naručiteljem",
+          "subcontractor": "Podugovor"
+        }
       }
     }
   },
@@ -2076,7 +2153,11 @@
       "notifications.portal.message_received.title": "Nova poruka u portalu",
       "notifications.portal.message_received.body": "{buyer_name} je poslao poruku.",
       "dispatch.notify.plan_title": "Your daily plan is ready",
-      "dispatch.notify.plan_body": "Plan for {day}: {lines} lines."
+      "dispatch.notify.plan_body": "Plan for {day}: {lines} lines.",
+      "notifications.monitoring.alert.title": "Upozorenje praćenja",
+      "notifications.monitoring.action.title": "Razina djelovanja praćenja",
+      "notifications.monitoring.alarm.title": "Alarm praćenja",
+      "notifications.monitoring.crossed.body": "Točka {point}: {displacement} mm, {rate} mm/day."
     },
     "schedule_headers": {
       "headers": {
@@ -2698,5 +2779,30 @@
         "gap": "Manjak"
       }
     }
-  }
+  },
+  "monitoring.crossed.fail": "Točka {id}: pomak {d} mm ili brzina {r} mm/dan prekoračila je razinu {level}",
+  "monitoring.crossed.suggestion": "Provjerite točku i građevinu, zatim potvrdite upozorenje bilješkom.",
+  "monitoring.level.ok": "OK",
+  "monitoring.level.alert": "Upozorenje",
+  "monitoring.level.action": "Intervencija",
+  "monitoring.level.alarm": "Alarm",
+  "monitoring.risk.title": "Točka praćenja {id} na razini {level}",
+  "monitoring.risk.description": "Pomak {d} mm, brzina {r} mm/dan u odnosu na {profile}. Nacrt je otvorio sustav praćenja: pregledajte ga i odredite odgovornu osobu.",
+  "monitoring.report.title": "Izvješće o alarmima praćenja",
+  "monitoring.report.project": "Projekt",
+  "monitoring.report.crs": "Koordinatni sustav",
+  "monitoring.report.profile": "Profil granica",
+  "monitoring.report.generated": "Generirano",
+  "monitoring.report.point": "Točka",
+  "monitoring.report.baseline": "Početna vrijednost (m)",
+  "monitoring.report.latest": "Zadnja vrijednost (m)",
+  "monitoring.report.displacement": "Pomak (mm)",
+  "monitoring.report.rate": "Brzina (mm/dan)",
+  "monitoring.report.level": "Razina",
+  "monitoring.report.acknowledged": "Potvrđeno",
+  "monitoring.report.counts": "Alarm: {alarm} · Intervencija: {action} · Upozorenje: {alert} · OK: {ok}",
+  "monitoring.report.findings": "Nalazi",
+  "monitoring.report.no_profile": "Nema profila, postavite ga",
+  "monitoring.report.ack_yes": "Da",
+  "monitoring.report.ack_no": "Ne"
 }

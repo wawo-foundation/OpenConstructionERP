@@ -1644,7 +1644,8 @@
         "no_rejections": "Nic nie zostało odrzucone.",
         "sig_delivered_by": "Dostarczył",
         "counterparty_tax_id": "NIP",
-        "counterparty_address": "Adres"
+        "counterparty_address": "Adres",
+        "delivery_address": "Adres dostawy"
       },
       "labels": {
         "po_status": {
@@ -1717,7 +1718,8 @@
         "gross_settled": "Rozliczona kwota brutto",
         "no_withholding": "Z tej płatności nic nie zostało zatrzymane.",
         "counterparty_tax_id": "NIP",
-        "counterparty_address": "Adres"
+        "counterparty_address": "Adres",
+        "supply_date": "Data dostawy"
       },
       "labels": {
         "invoice_status": {
@@ -1786,6 +1788,81 @@
         "col_min": "Min.",
         "col_max": "Maks.",
         "col_count": "Odczyty"
+      }
+    },
+    "gantt_pdf": {
+      "strings": {
+        "title": "Harmonogram (wykres Gantta)",
+        "project": "Projekt",
+        "schedule": "Harmonogram",
+        "baseline": "Plan bazowy",
+        "no_baseline": "brak",
+        "exported": "Wyeksportowano",
+        "data_date": "Data stanu",
+        "col_wbs": "WBS",
+        "col_activity": "Zadanie",
+        "col_start": "Początek",
+        "col_finish": "Koniec",
+        "col_duration": "Dni",
+        "legend_current": "Plan bieżący",
+        "legend_progress": "Postęp",
+        "legend_critical": "Ścieżka krytyczna",
+        "legend_baseline": "Plan bazowy",
+        "legend_actual": "Rzeczywiste",
+        "legend_milestone": "Kamień milowy",
+        "legend_summary": "Zadanie sumaryczne",
+        "week_short": "T{n}",
+        "quarter_short": "K{n}",
+        "sheet_of": "Arkusz {page} z {total}",
+        "no_activities": "Ten harmonogram nie ma jeszcze zadań."
+      }
+    },
+    "contracts": {
+      "strings": {
+        "doc_title": "Umowa",
+        "col_code": "Kod",
+        "col_title": "Tytuł",
+        "col_type": "Rodzaj umowy",
+        "col_role": "Strona umowy",
+        "col_counterparty": "Kontrahent",
+        "col_original_value": "Wartość pierwotna",
+        "col_total_value": "Wartość umowy",
+        "col_retention": "Kaucja gwarancyjna",
+        "col_start": "Data rozpoczęcia",
+        "col_end": "Data zakończenia",
+        "col_signed": "Data podpisania",
+        "line_code": "Kod",
+        "line_description": "Opis",
+        "line_unit": "Jednostka",
+        "line_quantity": "Ilość",
+        "line_unit_rate": "Cena jednostkowa",
+        "lines": "Zestawienie wartości robót",
+        "signer_company": "Za spółkę"
+      },
+      "labels": {
+        "status": {
+          "draft": "Projekt",
+          "active": "Obowiązująca",
+          "suspended": "Zawieszona",
+          "completed": "Zakończona",
+          "terminated": "Rozwiązana"
+        },
+        "type": {
+          "lump_sum": "Ryczałt",
+          "gmp": "GMP",
+          "cost_plus": "Koszt plus",
+          "tm": "Czas i materiały",
+          "unit_price": "Ceny jednostkowe",
+          "design_build": "Projektuj i buduj",
+          "combination": "Mieszana",
+          "remeasurement": "Obmiar powykonawczy",
+          "framework": "Umowa ramowa",
+          "call_off": "Zamówienie wykonawcze"
+        },
+        "party": {
+          "client": "Umowa z zamawiającym",
+          "subcontractor": "Umowa podwykonawcza"
+        }
       }
     }
   },
@@ -2076,7 +2153,11 @@
       "notifications.portal.message_received.title": "Nowa wiadomość w portalu",
       "notifications.portal.message_received.body": "Nadawca wiadomości: {buyer_name}.",
       "dispatch.notify.plan_title": "Your daily plan is ready",
-      "dispatch.notify.plan_body": "Plan for {day}: {lines} lines."
+      "dispatch.notify.plan_body": "Plan for {day}: {lines} lines.",
+      "notifications.monitoring.alert.title": "Ostrzeżenie monitoringu",
+      "notifications.monitoring.action.title": "Poziom działania monitoringu",
+      "notifications.monitoring.alarm.title": "Alarm monitoringu",
+      "notifications.monitoring.crossed.body": "Punkt {point}: {displacement} mm, {rate} mm/day."
     },
     "schedule_headers": {
       "headers": {
@@ -2675,5 +2756,30 @@
         "gap": "Luka"
       }
     }
-  }
+  },
+  "monitoring.crossed.fail": "Punkt {id}: przemieszczenie {d} mm lub prędkość {r} mm/dzień przekroczyło poziom {level}",
+  "monitoring.crossed.suggestion": "Sprawdź punkt i konstrukcję, a następnie potwierdź alert notatką.",
+  "monitoring.level.ok": "OK",
+  "monitoring.level.alert": "Ostrzeżenie",
+  "monitoring.level.action": "Interwencja",
+  "monitoring.level.alarm": "Alarm",
+  "monitoring.risk.title": "Punkt monitoringu {id} na poziomie {level}",
+  "monitoring.risk.description": "Przemieszczenie {d} mm, prędkość {r} mm/dzień względem {profile}. Szkic otworzył monitoring: sprawdź go i wskaż osobę odpowiedzialną.",
+  "monitoring.report.title": "Raport alarmowy monitoringu",
+  "monitoring.report.project": "Projekt",
+  "monitoring.report.crs": "Układ współrzędnych",
+  "monitoring.report.profile": "Profil progów",
+  "monitoring.report.generated": "Wygenerowano",
+  "monitoring.report.point": "Punkt",
+  "monitoring.report.baseline": "Wartość bazowa (m)",
+  "monitoring.report.latest": "Ostatnia wartość (m)",
+  "monitoring.report.displacement": "Przemieszczenie (mm)",
+  "monitoring.report.rate": "Prędkość (mm/dzień)",
+  "monitoring.report.level": "Poziom",
+  "monitoring.report.acknowledged": "Potwierdzono",
+  "monitoring.report.counts": "Alarm: {alarm} · Interwencja: {action} · Ostrzeżenie: {alert} · OK: {ok}",
+  "monitoring.report.findings": "Ustalenia",
+  "monitoring.report.no_profile": "Brak profilu, ustaw go",
+  "monitoring.report.ack_yes": "Tak",
+  "monitoring.report.ack_no": "Nie"
 }

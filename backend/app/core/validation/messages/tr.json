@@ -299,6 +299,10 @@
     "unit_exportable": {
       "fail": "{ordinal} kalemi: '{unit}' birimi 4 karakterlik GAEB QU alanına sığmaz ve dışa aktarımda kesilir",
       "suggestion": "En fazla 4 karakterlik bir GAEB birim kodu kullanın (m, m2, m3, St, h, psch, kg, t)"
+    },
+    "short_text_length": {
+      "fail": "Poz {ordinal}: kısa metin {length} karakter; GAEB dışa aktarımı onu 70 karaktere kısaltır",
+      "suggestion": "Kısa metni 70 karaktere indirin, ayrıntıları uzun metinde bırakın"
     }
   },
   "nrm": {
@@ -412,7 +416,10 @@
       "suggestion": "Dokuz haneli GB/T 50500 kodu atayın (ör. 010101001)"
     },
     "valid_code": {
-      "fail": "Geçersiz GB/T 50500 kodu '{code}'; 9 veya 12 hane bekleniyor"
+      "fail": "Geçersiz GB/T 50500 kodu '{code}'; 9 veya 12 hane ya da 01B001 gibi bir ek kod bekleniyor"
+    },
+    "code_unique": {
+      "fail": "'{code}' kalem kodu aynı alt projede birden fazla kez kullanılmış"
     }
   },
   "cpwd": {
@@ -931,6 +938,36 @@
     "change_time_within_owner": {
       "fail": "{code} için alt yüklenicilerin süre etkileri toplam {sub_days} gündür; işverenin verdiği {owner_days} günden fazladır",
       "suggestion": "Alt yüklenicilerin süre taleplerini kontrol edin veya işverenden eşdeğer bir uzatma isteyin"
+    },
+    "pay_app_over_complete": {
+      "fail": "{line} kalemi bu dönemden sonra planlanan değerinin %{percent} düzeyine ulaşıyor ({completed} / {scheduled})",
+      "suggestion": "Bu dönemin tutarını düşürün veya planlanan değerin üzerinde fatura edilme nedenini kaydedin"
+    },
+    "pay_app_line_negative": {
+      "fail": "{line} kalemi bugüne kadar {completed} tutarında olurdu, yani sıfırın altında"
+    },
+    "pay_app_within_agreement": {
+      "fail": "Hakedişlerin toplamı {billed}, sözleşme bedeli ile onaylı değişikliklerin toplamını ({limit}) aşıyor"
+    },
+    "pay_app_correct": {
+      "suggestion": "Bu hakedişin tutarlarını düzeltin veya sözleşme bedelini onaylı bir değişiklikle artırın"
+    },
+    "required_documents": {
+      "fail": "Gerekli belge: {document} ({state})",
+      "suggestion": "Belgeyi, imzalı ve geçerli olarak, alt yüklenici sözleşmesine ekleyin",
+      "states": {
+        "missing": "eksik",
+        "unsigned": "imzalanmamış",
+        "expired": "süresi dolmuş"
+      }
+    },
+    "document_roles": {
+      "terms_and_conditions": "Şartlar ve koşullar",
+      "safety_agreement": "İş güvenliği sözleşmesi",
+      "safety_plan": "İş güvenliği planı",
+      "insurance": "Sigorta",
+      "method_statement": "Yöntem bildirimi",
+      "other": "Diğer belge"
     }
   },
   "submittal": {
@@ -2014,6 +2051,510 @@
     "crew_without_record": {
       "fail": "Sahada {headcount} kişilik bir ekip vardı ancak iş, kontrol veya gecikme kaydı yok.",
       "suggestion": "Ekibin ne yaptığını veya işi durduran gecikmeyi ekleyin."
+    }
+  },
+  "framework_agreement": {
+    "item_not_in_agreement": {
+      "fail": "{code} kalemi {agreement} anlaşmasında aktif bir kalem değil; ek iş olarak girin.",
+      "suggestion": "Kalemi siparişten çıkarın ve işi siparişe ek iş olarak kaydedin."
+    },
+    "rate_deviates": {
+      "fail": "{code} kaleminin birim fiyatı {rate}, anlaşma fiyatı {expected} ile farklı.",
+      "suggestion": "Siparişteki fiyatlar çerçeve anlaşmadan gelir; kalemi fiyat listesinden yeniden fiyatlandırın."
+    },
+    "order_outside_validity": {
+      "fail": "Sipariş tarihi {date}, {from} – {to} anlaşma süresinin dışında.",
+      "suggestion": "Siparişi süre içine tarihleyin veya önce anlaşmayı uzatın."
+    },
+    "rate_period_gap": {
+      "fail": "Hiçbir fiyat dönemi {date} tarihini kapsamıyor.",
+      "suggestion": "Fiyatlar ve endeksleme sekmesine bu tarihi kapsayan bir fiyat dönemi ekleyin."
+    },
+    "escalation_unresolved": {
+      "fail": "{series} endeksinin {period} dönemi için değeri yok; birim fiyat düzeltilemiyor.",
+      "suggestion": "Fiyat endeksine o ayın endeks değerini girin, ardından siparişi yeniden fiyatlandırın."
+    },
+    "cap_exceeded": {
+      "fail": "Bu sipariş anlaşmayı {cap} tavanın {total} tutarına çıkarıyor; kalan limit {headroom}.",
+      "suggestion": "Siparişi kalan limite indirin veya gerekçeli bir istisnayla düzenleyin."
+    },
+    "cap_threshold": {
+      "fail": "Anlaşma kullanımı tavanın %{pct} seviyesine ulaştı.",
+      "suggestion": "Devam anlaşmasının hazırlanabilmesi için müşteriyi erken bilgilendirin."
+    },
+    "item_max_qty": {
+      "fail": "{code} kalemi: şimdiye kadar {qty} sipariş verildi; belirtilen en fazla {max} miktarını aşıyor.",
+      "suggestion": "Bir sonraki siparişten önce ek miktarı müşteriyle kararlaştırın."
+    },
+    "min_at_risk": {
+      "fail": "{days} gün kaldı ve garantili asgari miktarın %{pct} kadarı sipariş edildi.",
+      "suggestion": "Sipariş verme süresi dolmadan eksikliği müşteriyle görüşün."
+    },
+    "currency_mismatch": {
+      "fail": "Sipariş para birimi {cur}, anlaşma para birimi {agr} ile farklı.",
+      "suggestion": "Siparişler anlaşmanın para biriminde fiyatlandırılır."
+    },
+    "adjustment_unknown": {
+      "fail": "{tag} koşulu bu anlaşmada bir düzeltmeye sahip değil.",
+      "suggestion": "Düzeltmeyi Koşullar sekmesine ekleyin veya koşulu siparişten çıkarın."
+    },
+    "direct_claim": {
+      "fail": "Hak talepleri çerçeve anlaşmaya değil, çağrılı siparişlere yapılır.",
+      "suggestion": "İşin yapıldığı siparişi açın ve talebi orada yapın."
+    },
+    "duplicate_item": {
+      "fail": "{code} kalem kodu {period} fiyat döneminde iki kez geçiyor.",
+      "suggestion": "Fiyat listesini kaydetmeden önce her kalem kodu için tek satır bırakın."
+    },
+    "measured_over_ordered": {
+      "fail": "{code} satırında ölçülen {m}, sipariş edilen {o} miktarını aşıyor; ek iş düşünün.",
+      "suggestion": "Fazla miktarı siparişte değişiklik olarak kaydedin."
+    },
+    "term_over_legal_max": {
+      "fail": "{years} yıllık süre, {source} (paket) kapsamındaki {max} yıllık sınırı aşıyor.",
+      "suggestion": "Süreyi müşteriyle kontrol edin; sınırı paket belirtir ancak zorunlu değildir."
+    }
+  },
+  "estimate_archive": {
+    "arc_hash_mismatch": {
+      "fail": "Parmak izi uyuşmuyor: kayıt {actual} veriyor, mühür {sealed} diyor. Kaydı değiştirilmiş sayın."
+    },
+    "arc_total_mismatch": {
+      "fail": "Mühürlü toplam {seal}, ihale bedeli {award} değerinden {diff} farklı."
+    },
+    "arc_no_breakdown": {
+      "fail": "{n} pozisyonda kaynak dökümü yok; fiyatları sonradan izlenemez."
+    },
+    "arc_no_markups": {
+      "fail": "Keşifte mühürlenecek ek yok."
+    },
+    "arc_sealed_after_signing": {
+      "fail": "Sözleşme imzalandıktan {days} gün sonra mühürlendi."
+    },
+    "arc_no_receipt": {
+      "fail": "Karşı taraf parmak izini henüz onaylamadı."
+    },
+    "arc_open_not_closed": {
+      "fail": "{id} açılışı {days} gündür tutanaksız açık."
+    },
+    "arc_open_no_reason": {
+      "fail": "Bir açılış için gerekçe ve referans gerekir."
+    },
+    "arc_open_one_party": {
+      "fail": "Yalnızca bir taraf listelenmiş; diğerinin neden olmadığını kaydedin."
+    },
+    "var_basis_no_seal": {
+      "fail": "{code} pozisyonu orijinal esasa göre fiyatlandı, ancak mühürlü keşif yok."
+    },
+    "var_basis_deviation": {
+      "fail": "{code} pozisyonu: {field} not olmadan {old} değerinden {new} değerine değişti."
+    },
+    "var_new_resource_no_evidence": {
+      "fail": "Yeni kaynak {res} için fiyat tarihi veya teklif referansı yok."
+    },
+    "var_markup_not_sealed": {
+      "fail": "{code} pozisyonu mühürde olmayan {m} ekini uyguluyor."
+    },
+    "var_abnormal_carried_rate": {
+      "fail": "Aktarılan maliyet {c}, referanstan % {pct} sapıyor."
+    },
+    "arc_mutation_refused": {
+      "fail": "Mühürlü bir keşif değiştirilemez veya silinemez. Yerine geçecek yeni bir sürüm mühürleyin."
+    },
+    "contents_locked": "İçerik resmi bir açılış başlayana kadar mühürlü kalır.",
+    "market_off": "Mühürlü keşifler bu projenin pazar profilinde yer almıyor.",
+    "contract_required": "Tahmini maliyeti sözleşme esası olarak mühürlemeden önce bir müşteri sözleşmesi gerekir."
+  },
+  "boq_revision": {
+    "superseded_still_editable": {
+      "fail": "{label} revizyonu, sonrasında {later} oluşturulmuş olmasına rağmen hâlâ düzenlenebilir; burada yapılan değişiklikler aktarılmaz",
+      "suggestion": "{label} revizyonunu kilitleyin veya en son revizyonda çalışmaya devam edin"
+    }
+  },
+  "schedule_baseline": {
+    "single_approved": {
+      "fail": "Bu iş programının birden fazla onaylı temel planı var ({baselines}).",
+      "suggestion": "Geçerli olması gereken temel planı onaylayın; birini onaylamak diğerlerinin onayını geri alır."
+    }
+  },
+  "project_catalogue": {
+    "unit_present": {
+      "fail": "{code} birim fiyatının birimi yok.",
+      "suggestion": "Fiyatın ait olduğu birimi girin, örneğin m2, m3 veya sa."
+    },
+    "duplicate_code": {
+      "fail": "{code} kodu bu projede birden fazla fiyat tarafından kullanılıyor.",
+      "suggestion": "Kod başına bir fiyat tutun veya varyanta kendi kodunu verin."
+    },
+    "currency_differs": {
+      "fail": "{code} fiyatı {currency} cinsinden, ancak proje {project_currency} ile fiyatlandırılıyor.",
+      "suggestion": "Fiyatı proje para birimine çevirin veya yabancı para biriminin bilinçli olduğunu onaylayın."
+    },
+    "override_far": {
+      "fail": "{code} için yerel fiyat, kaynak fiyat {source_rate} değerinden % {percent} sapıyor.",
+      "suggestion": "Kaymış bir ondalık ayırıcı olup olmadığını kontrol edin veya projenin neden farklı bir fiyata ihtiyaç duyduğunu not edin."
+    },
+    "source_changed": {
+      "fail": "{code} kaynak fiyatı, proje kopyaladığından beri {old} değerinden {new} değerine değişti.",
+      "suggestion": "Yeni kaynak fiyatı alın veya yerel fiyatı bilinçli olarak koruyun."
+    }
+  },
+  "schedule_mspdi_import": {
+    "task_dates": {
+      "missing_dates": "{ref} \"{name}\" görevinin başlangıç veya bitiş tarihi yok.",
+      "finish_before_start": "{ref} \"{name}\" görevi başlamadan ({start}) önce bitiyor ({finish}).",
+      "suggestion": "Kaynak programdaki tarihleri düzeltip yeniden dışa aktarın. İçe aktarmada tarihler asla tahmin edilmez."
+    },
+    "unique_ids": {
+      "duplicate_uid": "{ref} görev kimliği birden fazla kez geçiyor; yalnızca ilk görev tutulur.",
+      "suggestion": "Kaynak programda her göreve benzersiz bir kimlik verin."
+    },
+    "links_resolve": {
+      "dangling_link": "{ref} \"{name}\" görevi: {predecessor} öncülü dosyada yok, bağlantı atlanıyor.",
+      "duplicate_link": "Görev {ref} \"{name}\": {predecessor} öncülünden ikinci bağlantı atlandı, her çift için bir bağlantı tutulur.",
+      "self_link": "{ref} \"{name}\" görevi kendisine bağlı, bağlantı atlanıyor.",
+      "unknown_link_type": "{ref} \"{name}\" görevi: {type} bağlantı türü bilinmiyor ve bitiş-başlangıç olarak okunuyor.",
+      "suggestion": "Kaynak programdaki mantıksal bağlantıları kontrol edin."
+    },
+    "values_in_range": {
+      "percent_out_of_range": "{ref} \"{name}\" görevi: %{value} tamamlanma 0-100 aralığının dışında ve sınırlanıyor.",
+      "outline_gap": "{ref} \"{name}\" görevi bir anahat düzeyini atlıyor ({level}); üstündeki en yakın özet görevin altına yerleştiriliyor.",
+      "suggestion": "Kaynak programdaki tamamlanma yüzdesini ve girintileri kontrol edin."
+    },
+    "calendar_work_days": {
+      "calendar_no_work_days": "{calendar} takviminde çalışma günü yok.",
+      "suggestion": "Kaynak programda bu takvimin çalışma günlerini işaretleyin."
+    }
+  },
+  "schedule_pdf_import": {
+    "no_text_layer": {
+      "fail": "PDF'de metin katmanı yok, tablo okunamıyor.",
+      "suggestion": "Programı MS Project XML, XER veya Excel olarak dışa aktarın ve o dosyayı içe aktarın."
+    },
+    "dates_parsed": {
+      "fail": "Satır {row}: bir başlangıç veya bitiş tarih değil.",
+      "suggestion": "Tarih sütunlarını ve gün/ay sırasını kontrol edin ya da kaynaktaki tarihi düzeltin."
+    },
+    "finish_before_start": {
+      "fail": "Satır {row}: bitiş başlangıçtan önce.",
+      "suggestion": "Kaynak programdaki tarihleri düzeltin."
+    },
+    "duration_mismatch": {
+      "fail": "Satır {row}: basılı süre, başlangıç ile bitiş arasındaki iş günlerinden farklı.",
+      "suggestion": "Tarihler korunur; süre sütununu ve proje takvimini kontrol edin."
+    },
+    "unique_ids": {
+      "fail": "Satır {row}: faaliyet kimliği başka bir satırda kullanılıyor.",
+      "suggestion": "Kaynak programda her faaliyete benzersiz bir kimlik verin."
+    },
+    "links_resolve": {
+      "fail": "Satır {row}: bir öncül tablodaki bir faaliyet değil.",
+      "suggestion": "Öncül sütununu kontrol edin; çözülemeyen bağlantılar atlanır."
+    }
+  },
+  "commercial_control": {
+    "ok": "Kontrol edildi, sorun yok",
+    "cvr": {
+      "target_rate_basis": {
+        "fail": "Fiyatlı {total} pozdan {missing} tanesinin hedef birim fiyatı yok ve satış fiyatıyla bütçelenmiş (örneğin {sample})",
+        "suggestion": "Bütçenin şantiyenin bağlı olduğu maliyet olması için bu pozlara hedef maliyet fiyatını girin"
+      },
+      "unmapped_cost": {
+        "fail": "{kind} {label} için WBS veya maliyet kodu yok: taahhüt {committed}, gerçekleşen {actual}",
+        "suggestion": "CVR'nin yerleştirebilmesi için sipariş satırını, taşeron sözleşmesini veya faturayı bir WBS öğesine atayın"
+      }
+    },
+    "procurement": {
+      "line_over_committed": {
+        "fail": "{ordinal} pozu bütçeyi aşan taahhüt içeriyor: {budget_qty} içinden {committed_qty} sipariş edildi, {budget_value} bütçeye karşı {committed_value}",
+        "suggestion": "Daha fazla taahhütten önce çift siparişi kontrol edin veya bir değişiklik ya da bütçe aktarımı kaydedin"
+      }
+    },
+    "approval_routes": {
+      "bands_contiguous": {
+        "gap": {
+          "fail": "{low} ile {high} arasındaki tutarlar hiçbir onaylayıcıya ulaşmıyor (adım {step})",
+          "suggestion": "Her tutarın bir onaylayıcısı olması için komşu aralığı genişletin veya bir adım ekleyin"
+        },
+        "overlap": {
+          "fail": "{step}. adım {low} ile {high} arasındaki alt aralıkla çakışıyor; bu tutarları iki onaylayıcı da imzalar",
+          "suggestion": "İkisinin de imzalaması gerekmiyorsa her aralık bir öncekinin bittiği yerde başlasın"
+        },
+        "empty": {
+          "fail": "{step}. adımın {low} ile {high} arasındaki aralığı hiçbir tutar içermiyor",
+          "suggestion": "Minimumu maksimumun altına ayarlayın veya üst sınır yoksa maksimumu boş bırakın"
+        }
+      }
+    },
+    "valuation": {
+      "assessed_within_submitted": {
+        "fail": "{line} satırı: değerlendirilen miktar {assessed}, sunulan {submitted} miktarından fazla",
+        "suggestion": "En fazla sunulanı değerlendirin ve ek işi değişiklik olarak kaydedin"
+      },
+      "certified_within_assessed": {
+        "fail": "{line} satırı: onaylanan miktar {certified}, değerlendirilen {assessed} miktarından fazla",
+        "suggestion": "En fazla değerlendirileni onaylayın veya satırı önce yeniden değerlendirin"
+      }
+    }
+  },
+  "norm_base": {
+    "code_present": {
+      "fail": "{ordinal}. satır {base} norm kodu belirtmiyor. Norma dayalı bir keşifte her satır bir norma dayanır.",
+      "suggestion": "Norm kodunu satırın {classification} sınıflandırmasına girin."
+    },
+    "code_shape": {
+      "fail": "{ordinal}. satırdaki \"{code}\" bir {base} kodu değil. {example} gibi bir kod beklenir."
+    },
+    "legacy_prefix": {
+      "fail": "{ordinal}. satırdaki \"{code}\" kaldırılmış {old} önekini kullanıyor. Geçerli kod {new}."
+    },
+    "resource_breakdown": {
+      "fail": "{code} norm satırında işçilik saati veya ortalama işçi derecesi yok.",
+      "suggestion": "İşçilik kaynağını birim başına saatleri ve normun ortalama derecesiyle ekleyin."
+    },
+    "grade_range": {
+      "fail": "{ordinal}. satırdaki {grade} derecesi {min}–{max} aralığının dışında veya {step} adımlı değil."
+    }
+  },
+  "public_funding": {
+    "markup_cap": {
+      "fail": "{funding}: {markup} %{percent}, üst sınır doğrudan maliyetlerin %{cap} kadarı ({source}).",
+      "suggestion": "Kesintiyi üst sınıra indirin veya iş kamu kaynağıyla ödenmiyorsa finansmanı özel olarak ayarlayın."
+    },
+    "investor_exact": {
+      "fail": "İşveren keşfi, {funding}: {markup} tam olarak %{cap} olmalı ({source})."
+    },
+    "material_price_evidence": {
+      "fail": "{funding}: {ordinal}. satırdaki {material} malzemesinin {required} fiyat teklifinden {count} tanesi var ve fiyat analizi yok.",
+      "suggestion": "Malzeme için tedarikçi tekliflerini kaydedin veya fiyat analizi raporunu ekleyin."
+    }
+  },
+  "vat_rate": {
+    "standard_rate": {
+      "fail": "{markup} %{percent}; {country} için standart KDV oranı %{rate}.",
+      "suggestion": "Vergi satırını standart orana ayarlayın veya keşifte neden başka bir oran ya da istisna uygulandığını kaydedin."
+    }
+  },
+  "survey": {
+    "no_crs": {
+      "fail": "{name} nokta kümesinin koordinat sistemi yok: hacim veya parsel öncesinde EPSG ya da yerel ağ belirtin.",
+      "suggestion": "Projenin koordinat sistemini ayarlayın, ardından bu dosyanın hangi sistemde ölçüldüğünü belirtin."
+    },
+    "crs_unconfirmed": {
+      "fail": "Koordinat sistemi otomatik algılandı (güven {confidence}); kullanmadan önce onaylayın.",
+      "suggestion": "Proje koordinat sistemini ayarla penceresini açın ve algılanan sistemi onaylayın ya da başkasını seçin."
+    },
+    "duplicate_point": {
+      "fail": "Farklı koordinatlara sahip yinelenen nokta numarası {point_id}.",
+      "suggestion": "Tek bir ölçüm tutun: yanlış olanı içeren kümeyi silin ve yeniden içe aktarın."
+    },
+    "traverse_misclosure": {
+      "fail": "{name} poligonu 1:{r} ile kapanıyor, profil minimumu 1:{min} altında.",
+      "suggestion": "Kenarlarda kaba hata arayın, en zayıf kenarı yeniden ölçün veya profil değerini onaylayın."
+    },
+    "level_misclosure": {
+      "fail": "Nivelman kapanma hatası {f} mm, k = {k} mm ile k·√km değerini aşıyor.",
+      "suggestion": "Nivelmanı tekrarlayın veya kullanılan röper kotlarını kontrol edin."
+    }
+  },
+  "volumes": {
+    "no_overlap": {
+      "fail": "İki yüzey alanın yalnızca %{p} kadarında örtüşüyor: hacim anlamsız.",
+      "suggestion": "İki yüzeyin aynı koordinat sisteminde olduğunu ve aynı araziyi kapsadığını kontrol edin."
+    },
+    "low_coverage": {
+      "fail": "Alanın yalnızca %{c} kadarında iki yüzeyde de veri var (minimum %{min}).",
+      "suggestion": "Yüzeyin eksik olduğu yerlere nokta ekleyin veya sınırı kapsanan alana daraltın."
+    },
+    "coarse_scan": {
+      "fail": "Bu hacmi gerekçe belirtilmeden kaba bir tarama (LOA10) besliyor.",
+      "suggestion": "Ölçme hassasiyetinde bir tarama kullanın veya bu taramanın neden yeterli olduğunu yazın."
+    },
+    "bank_volume": {
+      "fail": "Miktar yerinde (zemindeki) hacimdir; kabarma katsayısı uygulanmadı.",
+      "suggestion": "Keşif kalemi gevşek malzeme olarak ölçülüyorsa gevşek kazıyı gönderin."
+    }
+  },
+  "setting_out": {
+    "stake_off": {
+      "fail": "Aplikasyon noktası {id} {d} mm sapmış, tolerans {t} mm",
+      "suggestion": "Noktayı yeniden aplike edip kaydedin veya NCR taslağı oluşturun."
+    },
+    "record_untraceable": {
+      "fail": "{id} aplikasyon kaydında alet veya poligon noktası yok.",
+      "suggestion": "Aleti ve istasyonun kurulduğu poligon noktalarını girin."
+    },
+    "sheet": {
+      "title": "Aplikasyon föyü",
+      "project": "Proje",
+      "crs": "Koordinat sistemi",
+      "request": "Talep",
+      "tolerance": "Tolerans",
+      "element": "Eleman",
+      "generated": "Oluşturuldu",
+      "point": "Nokta",
+      "design_e": "Proje E",
+      "design_n": "Proje N",
+      "design_z": "Proje Z",
+      "measured_e": "Ölçülen E",
+      "measured_n": "Ölçülen N",
+      "verdict": "Sonuç",
+      "by": "Ölçen",
+      "verdict_pass": "Uygun",
+      "verdict_fail": "Uygun değil",
+      "verdict_open": "Açık",
+      "verdict_no_tolerance": "Profil yok",
+      "counts": "Uygun: {passed} · Uygun değil: {failed} · Açık: {open}",
+      "findings": "Bulgular",
+      "no_profile": "Profil yok, bir tane belirleyin",
+      "d": "d (mm)",
+      "dz": "dZ (mm)"
+    }
+  },
+  "land_parcels": {
+    "area_mismatch": {
+      "fail": "Parsel {id}: hesaplanan alan {a} m2, tapu alanı {l} m2'den toleranstan fazla farklı ({t}).",
+      "suggestion": "Sınır noktalarını kayıt örneğiyle karşılaştırın veya alanların neden farklı olduğunu not edin."
+    },
+    "ring_invalid": {
+      "fail": "Parsel {id}: sınır kapalı değil veya kendini kesiyor.",
+      "suggestion": "Sınır noktalarını, parselin çevresinde kesişmeden bir kez dolaşacak şekilde düzeltin."
+    },
+    "zone_not_acquired": {
+      "fail": "Çalışma alanı henüz edinilmemiş {id} parseliyle çakışıyor ({area} m2).",
+      "suggestion": "İşler başlamadan parseli edinin veya erişim için anlaşın ya da çalışma alanını taşıyın."
+    },
+    "overlap": {
+      "fail": "{a} ve {b} parselleri {area} m2 çakışıyor.",
+      "suggestion": "Ortak sınırı, iki parsel de aynı noktaları kullanacak şekilde düzeltin."
+    },
+    "gap": {
+      "fail": "{a} ve {b} parselleri arasında {gap} m boşluk.",
+      "suggestion": "İki parselin de aynı sınır noktalarını kullanmasını sağlayın veya şeridin başka bir parsele ait olduğunu doğrulayın."
+    },
+    "id_format": {
+      "fail": "{id} numarası {label} biçimine uymuyor (örneğin {example}).",
+      "suggestion": "Numarayı kayıtta yazıldığı gibi aynen kopyalayın."
+    },
+    "pdf": {
+      "title": "Parsel listesi",
+      "project": "Proje",
+      "crs": "Koordinat sistemi",
+      "method": "Yöntem",
+      "method_value": "Sınır koordinatlarından alan (Gauss formülü), {decimals} ondalığa yuvarlanmış, m2",
+      "printed": "Yazdıran",
+      "legal": "Tapu alanı (m2)",
+      "computed": "Hesaplanan (m2)",
+      "diff": "Fark (m2)",
+      "status": "Durum",
+      "rights": "Haklar",
+      "cost": "Maliyet",
+      "findings": "Bulgular",
+      "total": "Toplam, {count} parsel",
+      "acquired_of": "Edinilen {acquired} / {total}",
+      "findings_title": "Bulgular",
+      "no_findings": "Bulgu yok.",
+      "disclaimer": "Malikler ve haklar bu projede kaydedildiği şekliyle gösterilir. Bu liste hukuki görüş veya tapu kaydı örneği değildir.",
+      "status_needed": "Gerekli",
+      "status_negotiating": "Müzakere",
+      "status_acquired": "Edinildi",
+      "status_expropriation": "Kamulaştırma"
+    }
+  },
+  "monitoring": {
+    "crossed": {
+      "fail": "{id} noktasında {d} mm yer değiştirme veya {r} mm/day hız {level} eşiğini aştı",
+      "suggestion": "Noktayı ve yapıyı kontrol edin, ardından uyarıyı bir notla onaylayın."
+    },
+    "level": {
+      "ok": "Uygun",
+      "alert": "Uyarı",
+      "action": "Eylem",
+      "alarm": "Alarm seviyesi"
+    },
+    "risk": {
+      "title": "{id} izleme noktası, {level} seviyesinde",
+      "description": "Yer değiştirme {d} mm, hız {r} mm/day, {profile} değerine göre. Taslak izleme tarafından açıldı: inceleyin ve bir sorumlu atayın."
+    },
+    "report": {
+      "title": "İzleme alarm raporu",
+      "project": "Proje",
+      "crs": "Koordinat sistemi",
+      "profile": "Eşik profili",
+      "generated": "Oluşturulma",
+      "point": "Nokta",
+      "baseline": "Başlangıç (m)",
+      "latest": "Son (m)",
+      "displacement": "Yer değiştirme (mm)",
+      "rate": "Hız (mm/day)",
+      "level": "Seviye",
+      "acknowledged": "Onaylandı",
+      "counts": "Alarm seviyesi: {alarm} · Eylem: {action} · Uyarı: {alert} · Uygun: {ok}",
+      "findings": "Bulgular",
+      "no_profile": "Profil yok, bir profil belirleyin",
+      "ack_yes": "Evet",
+      "ack_no": "Hayır"
+    }
+  },
+  "stockpiles": {
+    "density_assumed": {
+      "fail": "Yoğunluk varsayılmış, ölçülmemiş: tonlar bu tahmin kadar güvenilirdir.",
+      "suggestion": "Bir numune tartın veya yoğunluğu tedarikçinin irsaliyelerinden alın."
+    },
+    "variance_high": {
+      "fail": "Ölçüm kayıtlı stoktan %{v} sapıyor, %{t} toleransın üzerinde.",
+      "suggestion": "Yoğunluğu ve taban yüzeyini kontrol edin, ardından düzeltme önerin ve fark gerçekse onaylayın."
+    }
+  },
+  "mine_survey": {
+    "compliance_outside": {
+      "fail": "Dönem gerçekleşmesi {c} %, {lo}-{hi} % bandının dışında.",
+      "suggestion": "Planı ve ölçümü kontrol edin, hakedişten önce farkı dönem notunda açıklayın."
+    },
+    "truck_differs": {
+      "fail": "Kamyon sayımına göre tonaj, ölçülen tonajdan {v} % farklı ve {t} % kontrol sınırını aşıyor.",
+      "suggestion": "Sefer başına yükü ve yoğunluğu kontrol edin, ardından iki yüzeyi yeniden karşılaştırın."
+    }
+  },
+  "hongkong": {
+    "sopo_applicability": {
+      "fail": "Sözleşme Cap. 652 (Security of Payment) kapsamında: talepten itibaren 30 gün içinde yanıt, 60 gün içinde ödeme"
+    },
+    "sopo_private_scope_check": {
+      "fail": "Özel sözleşme yalnızca yeni bina veya Building Authority onayı gereken işlerde Cap. 652 kapsamındadır: kapsamı doğrulayın"
+    },
+    "sopo_response_late": {
+      "fail": "{date} tarihine kadar ödeme yanıtı tebliğ edilmedi: talep edilen tutar ihtilaflı, hakem kararına gidebilir"
+    },
+    "sopo_payment_term_exceeds_60": {
+      "fail": "{n} günlük ödeme süresi Cap. 652'nin izin verdiği 60 günü aşıyor"
+    },
+    "sopo_response_term_exceeds_30": {
+      "fail": "{n} günlük yanıt süresi Cap. 652'nin izin verdiği 30 günü aşıyor"
+    },
+    "sopo_adjudication_window": {
+      "fail": "Ödeme uyuşmazlığı doğdu: hakem kararı bildirimini {date} tarihine kadar tebliğ edin"
+    },
+    "contract_pay_when_paid": {
+      "fail": "Pay-when-paid maddesi: Cap. 652 koşullu ödemeyi uygulanamaz kılar"
+    },
+    "levy_missing": {
+      "fail": "İşler HK$3,000,000'u aşıyor ancak keşifte CIC harcı (%0,5) veya CWR harcı (%0,03) yok"
+    },
+    "levy_below_threshold": {
+      "fail": "İşler en fazla HK$3,000,000: CIC veya CWR harcı yok"
+    },
+    "tax_nonzero": {
+      "fail": "KDV veya GST satırı uygulanmış, ancak Hong Kong'da böyle bir vergi yok: sıfır yapın"
+    },
+    "retention_over_limit": {
+      "fail": "Tutulan teminat {x}, sözleşme sınırı {limit} değerini aşıyor"
+    },
+    "pc_sum_no_attendance": {
+      "fail": "Prime cost tutarında kâr ve hizmet kalemleri yok"
+    },
+    "index_attribution": {
+      "fail": "ArchSD fiyat endeksinde kaynak belirtilmemiş: Architectural Services Department'ı belirtin"
     }
   }
 }

@@ -10,8 +10,11 @@
  * notification follow it); a contact is sent by id and the server decides what
  * it links; typed text stays a plain name.
  *
- * The first 200 contacts are listed on open. Typing also asks the contacts
- * search, so a directory larger than that page still finds the one person.
+ * Every active contact of the company is offered, not only the caller's own;
+ * with a ``projectId`` the project's team is listed first in its own group.
+ * The first 200 are listed on open and typing asks the server again, so a
+ * directory larger than that page still finds the one person. Editing a contact
+ * stays with its author; picking is read-only.
  *
  * The users list needs the manager permission (``users.list``). Asking for it
  * from an editor or viewer only earns a 403, so the query is not made for
@@ -20,16 +23,16 @@
  * The list is portalled to the body with fixed positioning: inside a
  * scrolling table (the schedule grid) an absolute list was clipped away.
  */
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import { Fragment, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { BookUser, User, X } from 'lucide-react';
-import { apiGet, type Page } from '@/shared/lib/api';
+import { apiGet } from '@/shared/lib/api';
 import { normalizeRole, ROLE_RANK } from '@/shared/lib/roles';
 import { matchesSearch } from '@/shared/lib/highlightMatch';
 import { useAuthStore } from '@/stores/useAuthStore';
-import { fetchContacts, type Contact } from './api';
+import type { Contact } from './api';
 
 export interface AssigneeValue {
   /** What the field shows: the picked name, or the text typed. */
@@ -49,6 +52,7 @@ interface UserRow {
 
 interface Option {
   kind: 'user' | 'contact';
+  group: 'team' | 'user' | 'company';
   id: string;
   label: string;
   detail: string;
@@ -59,6 +63,11 @@ type ContactRow = Pick<Contact, 'id' | 'first_name' | 'last_name' | 'company_nam
 export function contactDisplayName(c: ContactRow): string {
   const person = [c.first_name, c.last_name].filter(Boolean).join(' ');
   return person || c.company_name || c.primary_email || c.id;
+}
+
+interface PickableResponse {
+  team: ContactRow[];
+  company: ContactRow[];
 }
 
 const MAX_OPTIONS = 50;
@@ -74,6 +83,9 @@ export function AssigneePicker({
   disabled = false,
   noMatchesText,
   onDismiss,
+  onCancel,
+  onCommitText,
+  projectId,
 }: {
   value: AssigneeValue;
   onChange: (next: AssigneeValue) => void;
@@ -88,6 +100,13 @@ export function AssigneePicker({
   noMatchesText?: string;
   /** Called when the list closes without a pick (outside click, Escape). */
   onDismiss?: () => void;
+  /** Called on Escape instead of ``onDismiss``: drop what was typed. */
+  onCancel?: () => void;
+  /** Called with the typed name when the field is left without a pick, or on
+   *  Enter when no option matches, for callers that save a name as typed. */
+  onCommitText?: (name: string) => void;
+  /** List this project's team first, in a "Project team" group. */
+  projectId?: string;
 }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
@@ -104,19 +123,16 @@ export function AssigneePicker({
   const picked = !!(value.userId || value.contactId);
   const query = picked ? '' : value.name.trim();
 
-  // Same cache as every other contacts dropdown.
-  const { data: contactsPage } = useQuery({
-    queryKey: ['contacts', 'list'],
-    queryFn: () => fetchContacts({ limit: 200 }),
-    staleTime: 120_000,
-    enabled: open,
-  });
-  const { data: searchPage } = useQuery({
-    queryKey: ['contacts', 'search', query],
-    queryFn: () => apiGet<Page<ContactRow>>(`/v1/contacts/search/?q=${encodeURIComponent(query)}&limit=20`),
+  const { data: pickable } = useQuery({
+    queryKey: ['contacts', 'pickable', projectId ?? '', query],
+    queryFn: () => {
+      const params = new URLSearchParams({ limit: '200' });
+      if (projectId) params.set('project_id', projectId);
+      if (query) params.set('q', query);
+      return apiGet<PickableResponse>(`/v1/contacts/pickable/?${params.toString()}`);
+    },
     staleTime: 30_000,
-    enabled: open && query.length > 0,
-    retry: false,
+    enabled: open,
   });
   // Same raw-row cache the approval and issue pickers share.
   const { data: users = [] } = useQuery({
@@ -165,25 +181,35 @@ export function AssigneePicker({
   }, [open]);
 
   const options = useMemo<Option[]>(() => {
-    const contactRows = new Map<string, ContactRow>();
-    for (const c of [...(searchPage?.items ?? []), ...(contactsPage?.items ?? [])]) contactRows.set(c.id, c);
+    const toOption = (c: ContactRow, group: 'team' | 'company'): Option => ({
+      kind: 'contact',
+      group,
+      id: c.id,
+      label: contactDisplayName(c),
+      detail: c.company_name && (c.first_name || c.last_name) ? c.company_name : c.primary_email ?? '',
+    });
     const all: Option[] = [
+      ...(pickable?.team ?? []).map((c) => toOption(c, 'team')),
       ...(mayListUsers && Array.isArray(users) ? users : []).map((u) => ({
         kind: 'user' as const,
+        group: 'user' as const,
         id: u.id,
         label: u.full_name || u.email,
         detail: u.email,
       })),
-      ...[...contactRows.values()].map((c) => ({
-        kind: 'contact' as const,
-        id: c.id,
-        label: contactDisplayName(c),
-        detail: c.company_name && (c.first_name || c.last_name) ? c.company_name : c.primary_email ?? '',
-      })),
+      ...(pickable?.company ?? []).map((c) => toOption(c, 'company')),
     ];
     const hits = query ? all.filter((o) => matchesSearch(query, o.label, o.detail)) : all;
     return hits.slice(0, MAX_OPTIONS);
-  }, [users, mayListUsers, contactsPage, searchPage, query]);
+  }, [users, mayListUsers, pickable, query]);
+
+  const hasTeam = options.some((o) => o.group === 'team');
+  const groupTitle = (g: Option['group']): string | null => {
+    if (!hasTeam) return null;
+    if (g === 'team') return t('contacts.picker_project_team', { defaultValue: 'Project team' });
+    if (g === 'company') return t('contacts.picker_company_contacts', { defaultValue: 'Company contacts' });
+    return null;
+  };
 
   const pick = (o: Option) => {
     onChange({
@@ -225,12 +251,17 @@ export function AssigneePicker({
             setOpen(true);
           }}
           onFocus={() => setOpen(true)}
+          // A pick keeps focus (options swallow mousedown), so a blur means the field was left.
+          onBlur={() => {
+            if (onCommitText && !value.userId && !value.contactId) onCommitText(value.name.trim());
+          }}
           aria-label={ariaLabel}
           disabled={disabled}
           onKeyDown={(e) => {
             if (e.key === 'Escape') {
               setOpen(false);
-              onDismiss?.();
+              if (onCancel) onCancel();
+              else onDismiss?.();
             } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
               e.preventDefault();
               setOpen(true);
@@ -240,6 +271,10 @@ export function AssigneePicker({
               // Enter takes the highlighted match, so a typed name is never left unsaved.
               e.preventDefault();
               pick(options[active]);
+            } else if (e.key === 'Enter' && onCommitText && !value.userId && !value.contactId) {
+              e.preventDefault();
+              setOpen(false);
+              onCommitText(value.name.trim());
             }
           }}
           className={`${inputClassName}${linked ? ' ps-9' : ''}${value.name ? ' pe-8' : ''}`}
@@ -274,6 +309,12 @@ export function AssigneePicker({
             </div>
           ) : (
             options.map((o, i) => (
+              <Fragment key={`${o.kind}-${o.id}`}>
+              {options[i - 1]?.group !== o.group && groupTitle(o.group) && (
+                <div className="px-3 pt-2 pb-1 text-2xs font-semibold uppercase text-content-tertiary">
+                  {groupTitle(o.group)}
+                </div>
+              )}
               <button
                 key={`${o.kind}-${o.id}`}
                 type="button"
@@ -302,6 +343,7 @@ export function AssigneePicker({
                     : t('tasks.assignee_kind_contact', { defaultValue: 'Contact' })}
                 </span>
               </button>
+              </Fragment>
             ))
           )}
         </div>,

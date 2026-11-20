@@ -26,7 +26,7 @@ modules/users, modules/integrations, and any future consumer.
 from __future__ import annotations
 
 import logging
-from collections.abc import Awaitable, Callable
+from collections.abc import Awaitable, Callable, Mapping
 from contextlib import AbstractAsyncContextManager
 from functools import lru_cache
 from typing import TYPE_CHECKING
@@ -174,6 +174,9 @@ def report_email_config_at_startup(settings: Settings) -> None:
     log without a single ERROR line, or the ERROR lines that matter stop being
     read.
     """
+    registration = registration_without_mail_notice(settings)
+    if registration is not None:
+        logger.warning("[email] %s", registration)
     problem = diagnose_email_config(settings)
     if problem is None:
         return
@@ -181,6 +184,22 @@ def report_email_config_at_startup(settings: Settings) -> None:
         logger.warning("[email] %s", problem)
     else:
         logger.error("[email] %s", problem)
+
+
+def registration_without_mail_notice(settings: Settings) -> str | None:
+    """Say so when e-mail verification was asked for and nothing can deliver it.
+
+    ``effective_registration_mode`` already lets such sign-ups in as ``open``
+    rather than leaving them dormant behind a mail that never comes; this is
+    the line that tells the operator verification is not happening.
+    """
+    if settings.registration_mode != "email-verify" or email_delivery_enabled(settings):
+        return None
+    return (
+        f"OE_REGISTRATION_MODE=email-verify, but EMAIL_BACKEND={settings.email_backend!r} delivers no mail, so "
+        f"new self-registered accounts are activated without e-mail confirmation. Configure SMTP to verify "
+        f"addresses, or set OE_REGISTRATION_MODE=admin-approve to review sign-ups by hand. See {EMAIL_SETUP_DOC}."
+    )
 
 
 def _resolve_backend(settings: Settings) -> EmailBackend:
@@ -298,6 +317,7 @@ class EmailService:
                 message.subject,
             )
             return DeliveryResult.failure(self._backend.name, "recipient account is deactivated")
+        _attach_company_logo(message)
         result = await self._backend.send(message)
         if not result.ok:
             logger.warning(
@@ -325,8 +345,12 @@ class EmailService:
         reset_url: str,
         recipient_name: str | None = None,
         token_lifetime_minutes: int = 60,
+        wording: Mapping[str, str] | None = None,
     ) -> DeliveryResult:
         """Send a password-reset email. Returns the delivery result.
+
+        ``wording`` is the firm's published ``users.password_reset`` text; ``None``
+        sends the built-in mail.
 
         ``reset_url`` must already embed the signed token as a query
         parameter.  Never log the URL at INFO - the token is sensitive.
@@ -335,6 +359,7 @@ class EmailService:
             recipient_name=recipient_name,
             reset_url=reset_url,
             token_lifetime_minutes=token_lifetime_minutes,
+            wording=wording,
         )
         # Log intent at INFO without the URL; the backend logs the subject.
         logger.info("sending password-reset email to %s via %s", to, self._backend.name)
@@ -391,6 +416,24 @@ class EmailService:
                 attachments=[attachment],
             ),
         )
+
+
+def _attach_company_logo(message: EmailMessage) -> None:
+    """Embed the company logo the shell references, so no client fetches a remote image."""
+    from .base import EmailAttachment
+    from .templates import COMPANY_LOGO_CID, company_logo_png
+
+    if f"cid:{COMPANY_LOGO_CID}" not in message.html_body:
+        return
+    if any(a.content_id == COMPANY_LOGO_CID for a in message.attachments):
+        return
+    raw = company_logo_png()
+    if raw is None:
+        return
+    kind = "jpeg" if raw[:2] == bytes((0xFF, 0xD8)) else "png"
+    message.attachments.append(
+        EmailAttachment(filename=f"logo.{kind}", content=raw, content_type=f"image/{kind}", content_id=COMPANY_LOGO_CID)
+    )
 
 
 @lru_cache(maxsize=4)

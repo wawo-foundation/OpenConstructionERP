@@ -22,6 +22,7 @@ import {
   triggerDownload,
 } from '@/shared/lib/api';
 import type { Page } from '@/shared/lib/api';
+import { downloadRecordPdf } from '@/shared/lib/documentExport';
 
 /* ── Enums / unions ───────────────────────────────────────────────────── */
 
@@ -33,7 +34,9 @@ export type ContractType =
   | 'unit_price'
   | 'design_build'
   | 'combination'
-  | 'remeasurement';
+  | 'remeasurement'
+  | 'framework'
+  | 'call_off';
 
 export type CounterpartyType = 'client' | 'subcontractor';
 
@@ -100,6 +103,8 @@ export interface ContractItem {
   currency: string;
   retention_percent: number | string;
   retention_release_event: RetentionReleaseEvent;
+  /** Payment is conditional on the payer being paid; void where a security-of-payment law says so. */
+  pay_when_paid?: boolean;
   status: ContractStatus;
   signed_at: string | null;
   /**
@@ -211,6 +216,11 @@ export interface ProgressClaimLine {
    */
   retention_to_date?: number | string | null;
   retention_stored_to_date?: number | string | null;
+  /** The payer's assessed and certified quantity; submitted is ``period_completed_qty``. */
+  assessed_qty?: number | string;
+  certified_qty?: number | string;
+  /** Translated ``valuation.*`` findings for this line (assessed above submitted, and so on). */
+  findings?: Array<{ rule_id: string; severity: string; element_ref: string | null; message: string; suggestion: string | null }>;
   retention_rate?: number | string | null;
   created_at: string;
   updated_at: string;
@@ -328,6 +338,7 @@ export interface ContractCreatePayload {
   retention_cap_percent?: number | null;
   retention_release_split?: ReleaseSplitStep[] | null;
   payment_period_days?: number | null;
+  pay_when_paid?: boolean;
   valuation_interval?: ValuationInterval | null;
   certificate_name?: string | null;
   status?: ContractStatus;
@@ -599,6 +610,15 @@ export function deleteContract(id: string): Promise<void> {
   return apiDelete(`/v1/contracts/contracts/${id}`);
 }
 
+/** Download the printable form of one contract (GET /contracts/{id}/export/pdf/). */
+export function downloadContractPdf(id: string, locale: string, code?: string): Promise<void> {
+  return downloadRecordPdf(
+    `/v1/contracts/contracts/${encodeURIComponent(id)}/export/pdf/`,
+    locale,
+    code || 'contract',
+  );
+}
+
 /** Why the server refused to delete a contract. */
 export type ContractDeleteRefusal =
   | 'contract_not_draft'
@@ -818,7 +838,7 @@ export function createClaimLine(data: {
 export function updateClaimLine(
   lineId: string,
   data: {
-    period_completed_qty?: number;
+    period_completed_qty?: number | string;
     period_completed_value?: number;
     period_completed_pct?: number;
     cumulative_completed_value?: number;
@@ -828,6 +848,14 @@ export function updateClaimLine(
     `/v1/contracts/progress-claim-lines/${lineId}`,
     data,
   );
+}
+
+/** Record the assessed and/or certified quantity of a claim line (open until approved / certified). */
+export function updateClaimLineQuantities(
+  lineId: string,
+  data: { assessed_qty?: string; certified_qty?: string },
+): Promise<ProgressClaimLine> {
+  return apiPatch<ProgressClaimLine>(`/v1/contracts/progress-claim-lines/${lineId}/quantities`, data);
 }
 
 /* ── Progress bridge (Gap I) ──────────────────────────────────────────── */

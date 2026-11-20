@@ -299,6 +299,10 @@
     "unit_exportable": {
       "fail": "Post {ordinal}: eenheid '{unit}' past niet in het GAEB-veld QU van 4 tekens en wordt bij export afgekapt",
       "suggestion": "Gebruik een GAEB-eenheidscode van maximaal 4 tekens (m, m2, m3, St, h, psch, kg, t)"
+    },
+    "short_text_length": {
+      "fail": "Post {ordinal}: korte tekst heeft {length} tekens; GAEB-export kort deze in tot 70",
+      "suggestion": "Kort de korte tekst in tot 70 tekens en houd de details in de lange tekst"
     }
   },
   "nrm": {
@@ -412,7 +416,10 @@
       "suggestion": "Wijs een negencijferige GB/T 50500-code toe (bijvoorbeeld 010101001)"
     },
     "valid_code": {
-      "fail": "Ongeldige GB/T 50500-code '{code}'; verwacht worden 9 of 12 cijfers"
+      "fail": "Ongeldige GB/T 50500-code '{code}'; verwacht worden 9 of 12 cijfers of een aanvullende code zoals 01B001"
+    },
+    "code_unique": {
+      "fail": "Postcode '{code}' wordt meer dan eens gebruikt in hetzelfde deelproject"
     }
   },
   "cpwd": {
@@ -931,6 +938,36 @@
     "change_time_within_owner": {
       "fail": "De tijdseffecten van onderaannemers voor {code} bedragen samen {sub_days} dagen, meer dan de {owner_days} dagen die de opdrachtgever toekende",
       "suggestion": "Controleer de tijdsclaims van de onderaannemers of vraag de opdrachtgever om een gelijkwaardige verlenging"
+    },
+    "pay_app_over_complete": {
+      "fail": "Regel {line} bereikt na deze periode {percent}% van de geplande waarde ({completed} van {scheduled})",
+      "suggestion": "Verlaag het bedrag van deze periode of leg de reden vast voor facturering boven de geplande waarde"
+    },
+    "pay_app_line_negative": {
+      "fail": "Regel {line} zou tot nu toe {completed} bedragen, dus minder dan nul"
+    },
+    "pay_app_within_agreement": {
+      "fail": "De betalingsaanvragen bedragen samen {billed}, meer dan de overeenkomstwaarde plus goedgekeurde meerwerken van {limit}"
+    },
+    "pay_app_correct": {
+      "suggestion": "Corrigeer de bedragen van deze betalingsaanvraag of verhoog de overeenkomstwaarde via goedgekeurd meerwerk"
+    },
+    "required_documents": {
+      "fail": "Vereist document: {document} ({state})",
+      "suggestion": "Voeg het document, ondertekend en geldig, toe aan de onderaannemingsovereenkomst",
+      "states": {
+        "missing": "ontbreekt",
+        "unsigned": "niet ondertekend",
+        "expired": "verlopen"
+      }
+    },
+    "document_roles": {
+      "terms_and_conditions": "Algemene voorwaarden",
+      "safety_agreement": "Veiligheidsovereenkomst",
+      "safety_plan": "Veiligheidsplan",
+      "insurance": "Verzekering",
+      "method_statement": "Werkmethode",
+      "other": "Overig document"
     }
   },
   "submittal": {
@@ -2014,6 +2051,510 @@
     "crew_without_record": {
       "fail": "Een ploeg van {headcount} was op de bouwplaats, maar er is geen werk, keuring of vertraging vastgelegd.",
       "suggestion": "Voeg toe wat de ploeg deed, of de vertraging die het werk stillegde."
+    }
+  },
+  "framework_agreement": {
+    "item_not_in_agreement": {
+      "fail": "Regel {code} is geen actief item van overeenkomst {agreement}; voer het in als meerwerk.",
+      "suggestion": "Verwijder de regel uit de order en registreer het werk als meerwerk op de order."
+    },
+    "rate_deviates": {
+      "fail": "Tarief {rate} van regel {code} wijkt af van het overeenkomsttarief {expected}.",
+      "suggestion": "Tarieven op een order komen uit de raamovereenkomst; herprijs de regel vanuit de prijslijst."
+    },
+    "order_outside_validity": {
+      "fail": "Orderdatum {date} valt buiten de looptijd van {from} tot {to}.",
+      "suggestion": "Dateer de order binnen de looptijd, of verleng eerst de overeenkomst."
+    },
+    "rate_period_gap": {
+      "fail": "Geen tariefperiode dekt {date}.",
+      "suggestion": "Voeg op het tabblad Tarieven en indexering een tariefperiode toe die deze datum dekt."
+    },
+    "escalation_unresolved": {
+      "fail": "Index {series} heeft geen waarde voor {period}; het tarief kan niet worden aangepast.",
+      "suggestion": "Vul de indexwaarde van die maand in bij Prijsindex en herprijs daarna de order."
+    },
+    "cap_exceeded": {
+      "fail": "Deze order brengt de overeenkomst op {total} van een plafond van {cap}; ruimte {headroom}.",
+      "suggestion": "Verklein de order tot de beschikbare ruimte, of geef hem uit met een gemotiveerde uitzondering."
+    },
+    "cap_threshold": {
+      "fail": "Het gebruik van de overeenkomst heeft {pct} % van het plafond bereikt.",
+      "suggestion": "Meld dit tijdig aan de opdrachtgever zodat een vervolgovereenkomst kan worden voorbereid."
+    },
+    "item_max_qty": {
+      "fail": "Item {code}: tot nu toe {qty} besteld, boven het opgegeven maximum {max}.",
+      "suggestion": "Stem de extra hoeveelheid af met de opdrachtgever vóór de volgende order."
+    },
+    "min_at_risk": {
+      "fail": "Nog {days} dagen en {pct} % van het gegarandeerde minimum is besteld.",
+      "suggestion": "Bespreek het tekort met de opdrachtgever zolang er nog tijd is om te bestellen."
+    },
+    "currency_mismatch": {
+      "fail": "Valuta van de order {cur} wijkt af van de valuta van de overeenkomst {agr}.",
+      "suggestion": "Orders worden geprijsd in de valuta van de overeenkomst."
+    },
+    "adjustment_unknown": {
+      "fail": "Voorwaarde {tag} heeft in deze overeenkomst geen aanpassing.",
+      "suggestion": "Voeg de aanpassing toe op het tabblad Voorwaarden, of verwijder de voorwaarde uit de order."
+    },
+    "direct_claim": {
+      "fail": "Claims worden ingediend op afroeporders, niet op de raamovereenkomst.",
+      "suggestion": "Open de order waaronder het werk is uitgevoerd en dien de claim daar in."
+    },
+    "duplicate_item": {
+      "fail": "Itemcode {code} komt twee keer voor in tariefperiode {period}.",
+      "suggestion": "Houd vóór het opslaan van de prijslijst één regel per itemcode."
+    },
+    "measured_over_ordered": {
+      "fail": "Opgemeten {m} overschrijdt besteld {o} op regel {code}; overweeg meerwerk.",
+      "suggestion": "Registreer de extra hoeveelheid als wijziging op de order."
+    },
+    "term_over_legal_max": {
+      "fail": "Looptijd van {years} jaar overschrijdt de limiet van {max} jaar in {source} (pakket).",
+      "suggestion": "Controleer de looptijd met de opdrachtgever; de limiet staat in het pakket maar wordt niet afgedwongen."
+    }
+  },
+  "estimate_archive": {
+    "arc_hash_mismatch": {
+      "fail": "Vingerafdruk wijkt af: het record geeft {actual}, het zegel zegt {sealed}. Beschouw het record als gewijzigd."
+    },
+    "arc_total_mismatch": {
+      "fail": "Het verzegelde totaal {seal} wijkt {diff} af van de gunning {award}."
+    },
+    "arc_no_breakdown": {
+      "fail": "{n} posten hebben geen uitsplitsing; hun prijzen zijn later niet te herleiden."
+    },
+    "arc_no_markups": {
+      "fail": "De begroting heeft geen opslagen om te verzegelen."
+    },
+    "arc_sealed_after_signing": {
+      "fail": "Verzegeld {days} dagen na ondertekening van het contract."
+    },
+    "arc_no_receipt": {
+      "fail": "De wederpartij heeft de vingerafdruk nog niet bevestigd."
+    },
+    "arc_open_not_closed": {
+      "fail": "Opening {id} staat al {days} dagen open zonder verslag."
+    },
+    "arc_open_no_reason": {
+      "fail": "Een opening vraagt een reden en een referentie."
+    },
+    "arc_open_one_party": {
+      "fail": "Er staat maar één partij; leg vast waarom de andere ontbreekt."
+    },
+    "var_basis_no_seal": {
+      "fail": "Post {code} is geprijsd op de oorspronkelijke basis, maar er is geen verzegelde begroting."
+    },
+    "var_basis_deviation": {
+      "fail": "Post {code}: {field} gewijzigd van {old} naar {new} zonder notitie."
+    },
+    "var_new_resource_no_evidence": {
+      "fail": "Nieuwe resource {res} heeft geen prijsdatum of offertereferentie."
+    },
+    "var_markup_not_sealed": {
+      "fail": "Post {code} past opslag {m} toe die niet in het zegel staat."
+    },
+    "var_abnormal_carried_rate": {
+      "fail": "Overgenomen kosten {c} wijken {pct} % af van de referentie."
+    },
+    "arc_mutation_refused": {
+      "fail": "Een verzegelde begroting kan niet worden gewijzigd of verwijderd. Verzegel een nieuwe versie die haar vervangt."
+    },
+    "contents_locked": "De inhoud blijft verzegeld tot een formele opening begint.",
+    "market_off": "Verzegelde begrotingen horen niet bij het marktprofiel van dit project.",
+    "contract_required": "Er is een opdrachtgeverscontract nodig voordat een raming als contractbasis kan worden verzegeld."
+  },
+  "boq_revision": {
+    "superseded_still_editable": {
+      "fail": "Revisie {label} is nog bewerkbaar terwijl daarna {later} is aangemaakt; wijzigingen hier worden niet overgenomen",
+      "suggestion": "Vergrendel {label} om haar te bevriezen, of werk verder in de nieuwste revisie"
+    }
+  },
+  "schedule_baseline": {
+    "single_approved": {
+      "fail": "Deze planning heeft meer dan één goedgekeurde basisplanning ({baselines}).",
+      "suggestion": "Keur de basisplanning goed die moet gelden; goedkeuren van één trekt de goedkeuring van de andere in."
+    }
+  },
+  "project_catalogue": {
+    "unit_present": {
+      "fail": "Het tarief {code} heeft geen eenheid.",
+      "suggestion": "Vul de eenheid in waarop het tarief betrekking heeft, bijvoorbeeld m2, m3 of h."
+    },
+    "duplicate_code": {
+      "fail": "De code {code} wordt in dit project door meer dan één tarief gebruikt.",
+      "suggestion": "Houd één tarief per code aan of geef de variant een eigen code."
+    },
+    "currency_differs": {
+      "fail": "Het tarief {code} staat in {currency}, maar het project wordt begroot in {project_currency}.",
+      "suggestion": "Reken het tarief om naar de projectvaluta of bevestig dat de vreemde valuta bedoeld is."
+    },
+    "override_far": {
+      "fail": "Het lokale tarief van {code} wijkt {percent} % af van het brontarief {source_rate}.",
+      "suggestion": "Controleer op een verschoven komma of noteer waarom dit project een ander tarief nodig heeft."
+    },
+    "source_changed": {
+      "fail": "Het brontarief van {code} is gewijzigd van {old} naar {new} sinds het project het kopieerde.",
+      "suggestion": "Neem het nieuwe brontarief over of behoud bewust het lokale tarief."
+    }
+  },
+  "schedule_mspdi_import": {
+    "task_dates": {
+      "missing_dates": "Taak {ref} \"{name}\" heeft geen begin- of einddatum.",
+      "finish_before_start": "Taak {ref} \"{name}\" eindigt ({finish}) voordat hij begint ({start}).",
+      "suggestion": "Corrigeer de datums in de bronplanning en exporteer die opnieuw. Datums worden bij import nooit geraden."
+    },
+    "unique_ids": {
+      "duplicate_uid": "Taak-ID {ref} komt meer dan eens voor; alleen de eerste taak wordt behouden.",
+      "suggestion": "Geef elke taak een unieke ID in de bronplanning."
+    },
+    "links_resolve": {
+      "dangling_link": "Taak {ref} \"{name}\": voorganger {predecessor} staat niet in het bestand, de koppeling wordt overgeslagen.",
+      "duplicate_link": "Taak {ref} \"{name}\": een tweede koppeling vanaf voorganger {predecessor} wordt overgeslagen, per paar blijft één koppeling.",
+      "self_link": "Taak {ref} \"{name}\" is aan zichzelf gekoppeld, de koppeling wordt overgeslagen.",
+      "unknown_link_type": "Taak {ref} \"{name}\": koppelingstype {type} is onbekend en wordt gelezen als einde-begin.",
+      "suggestion": "Controleer de logische koppelingen in de bronplanning."
+    },
+    "values_in_range": {
+      "percent_out_of_range": "Taak {ref} \"{name}\": {value}% voltooid ligt buiten 0-100 en wordt begrensd.",
+      "outline_gap": "Taak {ref} \"{name}\" slaat een overzichtsniveau over ({level}); hij wordt onder de dichtstbijzijnde samenvattingstaak erboven geplaatst.",
+      "suggestion": "Controleer % voltooid en het inspringen in de bronplanning."
+    },
+    "calendar_work_days": {
+      "calendar_no_work_days": "Kalender {calendar} heeft geen werkdag.",
+      "suggestion": "Markeer de werkdagen van deze kalender in de bronplanning."
+    }
+  },
+  "schedule_pdf_import": {
+    "no_text_layer": {
+      "fail": "De PDF heeft geen tekstlaag, de tabel kan niet worden gelezen.",
+      "suggestion": "Exporteer de planning als MS Project-XML, XER of Excel en importeer dat bestand."
+    },
+    "dates_parsed": {
+      "fail": "Rij {row}: een begin of einde is geen datum.",
+      "suggestion": "Controleer de datumkolommen en de volgorde dag/maand, of corrigeer de datum in de bron."
+    },
+    "finish_before_start": {
+      "fail": "Rij {row}: het einde ligt vóór het begin.",
+      "suggestion": "Corrigeer de datums in de bronplanning."
+    },
+    "duration_mismatch": {
+      "fail": "Rij {row}: de afgedrukte duur wijkt af van de werkdagen tussen begin en einde.",
+      "suggestion": "De datums blijven behouden; controleer de duurkolom en de projectkalender."
+    },
+    "unique_ids": {
+      "fail": "Rij {row}: de activiteit-ID wordt door een andere rij gebruikt.",
+      "suggestion": "Geef elke activiteit een unieke ID in de bronplanning."
+    },
+    "links_resolve": {
+      "fail": "Rij {row}: een voorganger is geen activiteit uit de tabel.",
+      "suggestion": "Controleer de kolom voorgangers; onopgeloste koppelingen worden overgeslagen."
+    }
+  },
+  "commercial_control": {
+    "ok": "Gecontroleerd, geen bevindingen",
+    "cvr": {
+      "target_rate_basis": {
+        "fail": "{missing} van {total} geprijsde posten hebben geen doelprijs en zijn begroot tegen de verkoopprijs (bijvoorbeeld {sample})",
+        "suggestion": "Vul de doelkostprijs in op deze posten zodat het budget de kosten zijn waaraan de bouwplaats wordt gehouden"
+      },
+      "unmapped_cost": {
+        "fail": "{kind} {label} heeft geen WBS of kostencode: verplicht {committed}, werkelijk {actual}",
+        "suggestion": "Boek de orderregel, onderaanneming of factuur op een WBS-element zodat de CVR hem kan plaatsen"
+      }
+    },
+    "procurement": {
+      "line_over_committed": {
+        "fail": "Post {ordinal} is overgecontracteerd: {committed_qty} van {budget_qty} besteld, {committed_value} tegenover een budget van {budget_value}",
+        "suggestion": "Controleer op een dubbele bestelling of leg een meerwerk of budgetoverheveling vast voordat u meer vastlegt"
+      }
+    },
+    "approval_routes": {
+      "bands_contiguous": {
+        "gap": {
+          "fail": "Bedragen van {low} tot {high} bereiken geen goedkeurder (stap {step})",
+          "suggestion": "Verbreed een aangrenzende band of voeg een stap toe zodat elk bedrag een goedkeurder heeft"
+        },
+        "overlap": {
+          "fail": "Stap {step} overlapt een lagere band van {low} tot {high}; beide goedkeurders tekenen die bedragen",
+          "suggestion": "Laat elke band beginnen waar de vorige eindigt, tenzij beide moeten tekenen"
+        },
+        "empty": {
+          "fail": "Stap {step} heeft een band van {low} tot {high} die geen bedrag bevat",
+          "suggestion": "Zet het minimum onder het maximum of laat het maximum leeg voor geen plafond"
+        }
+      }
+    },
+    "valuation": {
+      "assessed_within_submitted": {
+        "fail": "Regel {line}: beoordeelde hoeveelheid {assessed} ligt boven de ingediende {submitted}",
+        "suggestion": "Beoordeel hooguit wat is ingediend en leg extra werk vast als meerwerk"
+      },
+      "certified_within_assessed": {
+        "fail": "Regel {line}: gecertificeerde hoeveelheid {certified} ligt boven de beoordeelde {assessed}",
+        "suggestion": "Certificeer hooguit wat is beoordeeld, of beoordeel de regel eerst opnieuw"
+      }
+    }
+  },
+  "norm_base": {
+    "code_present": {
+      "fail": "Regel {ordinal} noemt geen normcode van {base}. Een normgebaseerde begroting noemt op elke regel een norm.",
+      "suggestion": "Vul de normcode in onder de classificatie {classification} van de regel."
+    },
+    "code_shape": {
+      "fail": "„{code}” op regel {ordinal} is geen code van {base}. Verwacht wordt een code zoals {example}."
+    },
+    "legacy_prefix": {
+      "fail": "„{code}” op regel {ordinal} gebruikt het vervallen voorvoegsel {old}. De geldende code is {new}."
+    },
+    "resource_breakdown": {
+      "fail": "Normregel {code} heeft geen arbeidsuren of geen gemiddelde loongroep.",
+      "suggestion": "Voeg de arbeidsresource toe met de uren per eenheid en de gemiddelde loongroep van de norm."
+    },
+    "grade_range": {
+      "fail": "Loongroep {grade} op regel {ordinal} ligt buiten {min} tot {max} of niet in stappen van {step}."
+    }
+  },
+  "public_funding": {
+    "markup_cap": {
+      "fail": "{funding}: {markup} is {percent} %, het plafond is {cap} % van de directe kosten ({source}).",
+      "suggestion": "Verlaag de opslag tot het plafond, of zet de financiering op privaat als geen publiek geld het werk betaalt."
+    },
+    "investor_exact": {
+      "fail": "Begroting van de opdrachtgever met {funding}: {markup} hoort precies {cap} % te zijn ({source})."
+    },
+    "material_price_evidence": {
+      "fail": "{funding}: materiaal {material} op regel {ordinal} heeft {count} van {required} prijsoffertes en geen prijsanalyse.",
+      "suggestion": "Leg de offertes van leveranciers voor het materiaal vast of voeg het prijsanalyserapport toe."
+    }
+  },
+  "vat_rate": {
+    "standard_rate": {
+      "fail": "{markup} is {percent} %; het standaard btw-tarief in {country} is {rate} %.",
+      "suggestion": "Zet de belastingregel op het standaardtarief of leg in de begroting vast waarom een ander tarief of een vrijstelling geldt."
+    }
+  },
+  "survey": {
+    "no_crs": {
+      "fail": "Puntenset {name} heeft geen CRS: geef een EPSG of lokaal stelsel op vóór volumes of percelen.",
+      "suggestion": "Stel het coördinatenstelsel van het project in en geef aan in welk stelsel dit bestand is gemeten."
+    },
+    "crs_unconfirmed": {
+      "fail": "CRS automatisch herkend (betrouwbaarheid {confidence}); bevestig vóór gebruik.",
+      "suggestion": "Open Project-CRS instellen en bevestig het herkende stelsel of kies een ander."
+    },
+    "duplicate_point": {
+      "fail": "Dubbel puntnummer {point_id} met verschillende coördinaten.",
+      "suggestion": "Houd één meting: verwijder de puntenset met de foute en importeer die opnieuw."
+    },
+    "traverse_misclosure": {
+      "fail": "Veelhoek {name} sluit op 1:{r}, onder het profielminimum 1:{min}.",
+      "suggestion": "Zoek een grove fout in de zijden, meet de zwakste zijde opnieuw of bevestig de profielwaarde."
+    },
+    "level_misclosure": {
+      "fail": "Sluitfout van de waterpassing {f} mm overschrijdt k·√km met k = {k} mm.",
+      "suggestion": "Waterpas opnieuw of controleer de hoogten van de gebruikte peilmerken."
+    }
+  },
+  "volumes": {
+    "no_overlap": {
+      "fail": "De twee oppervlakken overlappen slechts {p} % van het gebied: het volume is zinloos.",
+      "suggestion": "Controleer of beide oppervlakken in hetzelfde coördinatenstelsel liggen en hetzelfde terrein dekken."
+    },
+    "low_coverage": {
+      "fail": "Slechts {c} % van het gebied heeft gegevens in beide oppervlakken (minimum {min} %).",
+      "suggestion": "Voeg meetpunten toe waar een oppervlak ontbreekt of verklein de begrenzing tot het gedekte gebied."
+    },
+    "coarse_scan": {
+      "fail": "Een grove scan (LOA10) voedt dit volume zonder opgegeven reden.",
+      "suggestion": "Gebruik een scan van meetkwaliteit of leg uit waarom deze scan volstaat."
+    },
+    "bank_volume": {
+      "fail": "De hoeveelheid is vast volume (in de grond); de opbulkingsfactor is niet toegepast.",
+      "suggestion": "Stuur in plaats daarvan de losse ontgraving als de bestekpost in losse grond wordt gemeten."
+    }
+  },
+  "setting_out": {
+    "stake_off": {
+      "fail": "Uitzetpunt {id} wijkt {d} mm af, tolerantie {t} mm",
+      "suggestion": "Zet het punt opnieuw uit en leg het vast, of maak een NCR-concept."
+    },
+    "record_untraceable": {
+      "fail": "Uitzetregistratie {id} heeft geen instrument of aansluitpunten.",
+      "suggestion": "Vul het instrument en de vaste punten van de opstelling in."
+    },
+    "sheet": {
+      "title": "Uitzetstaat",
+      "project": "Projectnaam",
+      "crs": "Coördinatenstelsel",
+      "request": "Opdracht",
+      "tolerance": "Tolerantie",
+      "element": "Bouwdeel",
+      "generated": "Gemaakt",
+      "point": "Punt",
+      "design_e": "Ontwerp E",
+      "design_n": "Ontwerp N",
+      "design_z": "Ontwerp Z",
+      "measured_e": "Gemeten E",
+      "measured_n": "Gemeten N",
+      "verdict": "Uitslag",
+      "by": "Gemeten door",
+      "verdict_pass": "Goed",
+      "verdict_fail": "Afgekeurd",
+      "verdict_open": "Nog open",
+      "verdict_no_tolerance": "Geen profiel",
+      "counts": "Goed: {passed} · Afgekeurd: {failed} · Open: {open}",
+      "findings": "Bevindingen",
+      "no_profile": "Geen profiel, stel er een in",
+      "d": "d (mm)",
+      "dz": "dZ (mm)"
+    }
+  },
+  "land_parcels": {
+    "area_mismatch": {
+      "fail": "Perceel {id}: berekende oppervlakte {a} m2 wijkt meer dan de tolerantie af van de kadastrale oppervlakte {l} m2 ({t}).",
+      "suggestion": "Controleer de grenspunten tegen het uittreksel uit het register, of noteer waarom de oppervlakten verschillen."
+    },
+    "ring_invalid": {
+      "fail": "Perceel {id}: contour niet gesloten of zelfdoorsnijdend.",
+      "suggestion": "Corrigeer de grenspunten zodat ze één keer rond het perceel lopen zonder te kruisen."
+    },
+    "zone_not_acquired": {
+      "fail": "Werkzone overlapt het nog niet verworven perceel {id} ({area} m2).",
+      "suggestion": "Verwerf het perceel of spreek toegang af vóór de start van het werk, of verplaats de werkzone."
+    },
+    "overlap": {
+      "fail": "Percelen {a} en {b} overlappen {area} m2.",
+      "suggestion": "Corrigeer de gemeenschappelijke grens zodat beide percelen dezelfde punten gebruiken."
+    },
+    "gap": {
+      "fail": "Kier van {gap} m tussen de percelen {a} en {b}.",
+      "suggestion": "Laat beide percelen dezelfde grenspunten gebruiken, of bevestig dat de strook bij een ander perceel hoort."
+    },
+    "id_format": {
+      "fail": "Perceelnummer {id} volgt het formaat {label} niet (bijvoorbeeld {example}).",
+      "suggestion": "Neem het nummer precies over zoals het register het schrijft."
+    },
+    "pdf": {
+      "title": "Perceelstaat",
+      "project": "Projectnaam",
+      "crs": "Coördinatenstelsel",
+      "method": "Methode",
+      "method_value": "Oppervlakte uit grenscoördinaten (formule van Gauss), afgerond op {decimals} decimalen, m2",
+      "printed": "Afgedrukt door",
+      "legal": "Kadastrale oppervlakte (m2)",
+      "computed": "Berekend (m2)",
+      "diff": "Verschil (m2)",
+      "status": "Perceelstatus",
+      "rights": "Rechten",
+      "cost": "Kosten",
+      "findings": "Bevindingen",
+      "total": "Totaal, {count} percelen",
+      "acquired_of": "Verworven {acquired} van {total}",
+      "findings_title": "Bevindingen",
+      "no_findings": "Geen bevindingen.",
+      "disclaimer": "Eigenaren en rechten worden getoond zoals vastgelegd in dit project. Deze staat is geen juridisch advies en geen uittreksel uit het register.",
+      "status_needed": "Nodig",
+      "status_negotiating": "In onderhandeling",
+      "status_acquired": "Verworven",
+      "status_expropriation": "Onteigening"
+    }
+  },
+  "monitoring": {
+    "crossed": {
+      "fail": "Meetpunt {id}: verplaatsing {d} mm of snelheid {r} mm/day overschreed {level}",
+      "suggestion": "Controleer het meetpunt en de constructie en bevestig daarna de melding met een notitie."
+    },
+    "level": {
+      "ok": "Normaal",
+      "alert": "Signaalwaarde",
+      "action": "Actiewaarde",
+      "alarm": "Alarmwaarde"
+    },
+    "risk": {
+      "title": "Meetpunt {id} bij {level}",
+      "description": "Verplaatsing {d} mm, snelheid {r} mm/day ten opzichte van {profile}. Concept geopend door monitoring: beoordeel het en wijs een eigenaar aan."
+    },
+    "report": {
+      "title": "Alarmrapport monitoring",
+      "project": "Bouwproject",
+      "crs": "Coördinatenstelsel",
+      "profile": "Drempelprofiel",
+      "generated": "Gegenereerd",
+      "point": "Meetpunt",
+      "baseline": "Nulmeting (m)",
+      "latest": "Laatste (m)",
+      "displacement": "Verplaatsing (mm)",
+      "rate": "Snelheid (mm/day)",
+      "level": "Niveau",
+      "acknowledged": "Bevestigd",
+      "counts": "Alarmwaarde: {alarm} · Actiewaarde: {action} · Signaalwaarde: {alert} · Normaal: {ok}",
+      "findings": "Bevindingen",
+      "no_profile": "Geen profiel, stel er een in",
+      "ack_yes": "Ja",
+      "ack_no": "Nee"
+    }
+  },
+  "stockpiles": {
+    "density_assumed": {
+      "fail": "De dichtheid is aangenomen, niet gemeten: de tonnen zijn zo betrouwbaar als die schatting.",
+      "suggestion": "Weeg een monster of neem de dichtheid uit de leveringsbonnen van de leverancier."
+    },
+    "variance_high": {
+      "fail": "De meting wijkt {v} % af van de boekvoorraad, boven de tolerantie van {t} %.",
+      "suggestion": "Controleer de dichtheid en het basisvlak, stel dan een correctie voor en bevestig die als het verschil echt is."
+    }
+  },
+  "mine_survey": {
+    "compliance_outside": {
+      "fail": "De uitvoering van de periode, {c} %, ligt buiten de bandbreedte {lo}-{hi} %.",
+      "suggestion": "Controleer het plan en de meting en leg het verschil uit in de periodenotitie vóór de claim."
+    },
+    "truck_differs": {
+      "fail": "De tonnen volgens vrachtentelling wijken {v} % af van de gemeten tonnen, boven de controle van {t} %.",
+      "suggestion": "Controleer de lading per rit en de dichtheid en vergelijk daarna de twee oppervlakken opnieuw."
+    }
+  },
+  "hongkong": {
+    "sopo_applicability": {
+      "fail": "Cap. 652 (Security of Payment) geldt voor dit contract: antwoord binnen 30 dagen, betaling binnen 60 dagen na de claim"
+    },
+    "sopo_private_scope_check": {
+      "fail": "Een privécontract valt alleen onder Cap. 652 bij nieuwbouw of werken met goedkeuring van de Building Authority: bevestig de omvang"
+    },
+    "sopo_response_late": {
+      "fail": "Vóór {date} is geen betalingsantwoord betekend: het geclaimde bedrag is betwist en kan naar adjudicatie"
+    },
+    "sopo_payment_term_exceeds_60": {
+      "fail": "De betalingstermijn van {n} dagen overschrijdt de 60 dagen die Cap. 652 toestaat"
+    },
+    "sopo_response_term_exceeds_30": {
+      "fail": "De antwoordtermijn van {n} dagen overschrijdt de 30 dagen die Cap. 652 toestaat"
+    },
+    "sopo_adjudication_window": {
+      "fail": "Er is een betalingsgeschil ontstaan: betekent de adjudicatiekennisgeving vóór {date}"
+    },
+    "contract_pay_when_paid": {
+      "fail": "Pay-when-paid-clausule: Cap. 652 maakt voorwaardelijke betaling onafdwingbaar"
+    },
+    "levy_missing": {
+      "fail": "Het werk overschrijdt HK$3,000,000 maar de begroting mist de CIC-heffing (0,5%) of de CWR-heffing (0,03%)"
+    },
+    "levy_below_threshold": {
+      "fail": "Het werk bedraagt ten hoogste HK$3,000,000: geen CIC- of CWR-heffing verschuldigd"
+    },
+    "tax_nonzero": {
+      "fail": "Er wordt btw of GST berekend, maar Hongkong kent die belasting niet: zet op nul"
+    },
+    "retention_over_limit": {
+      "fail": "De inhouding van {x} overschrijdt de contractuele grens van {limit}"
+    },
+    "pc_sum_no_attendance": {
+      "fail": "Een prime-cost-som heeft geen posten voor winst en bijstand"
+    },
+    "index_attribution": {
+      "fail": "De ArchSD-prijsindex vermeldt geen bron: vermeld het Architectural Services Department"
     }
   }
 }

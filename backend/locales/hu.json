@@ -1644,7 +1644,8 @@
         "no_rejections": "Nem utasítottunk vissza semmit.",
         "sig_delivered_by": "Szállította",
         "counterparty_tax_id": "Adószám",
-        "counterparty_address": "Cím"
+        "counterparty_address": "Cím",
+        "delivery_address": "Szállítási cím"
       },
       "labels": {
         "po_status": {
@@ -1717,7 +1718,8 @@
         "gross_settled": "Elszámolt bruttó összeg",
         "no_withholding": "Ebből a kifizetésből nem tartottunk vissza semmit.",
         "counterparty_tax_id": "Adószám",
-        "counterparty_address": "Cím"
+        "counterparty_address": "Cím",
+        "supply_date": "Teljesítés dátuma"
       },
       "labels": {
         "invoice_status": {
@@ -1786,6 +1788,81 @@
         "col_min": "Legkisebb",
         "col_max": "Legnagyobb",
         "col_count": "Mérések"
+      }
+    },
+    "gantt_pdf": {
+      "strings": {
+        "title": "Ütemterv (Gantt-diagram)",
+        "project": "Projekt",
+        "schedule": "Ütemterv",
+        "baseline": "Alapterv",
+        "no_baseline": "nincs",
+        "exported": "Exportálva",
+        "data_date": "Állapot dátuma",
+        "col_wbs": "WBS",
+        "col_activity": "Tevékenység",
+        "col_start": "Kezdés",
+        "col_finish": "Befejezés",
+        "col_duration": "Nap",
+        "legend_current": "Aktuális terv",
+        "legend_progress": "Előrehaladás",
+        "legend_critical": "Kritikus út",
+        "legend_baseline": "Alapterv",
+        "legend_actual": "Tényleges",
+        "legend_milestone": "Mérföldkő",
+        "legend_summary": "Összesítő",
+        "week_short": "H{n}",
+        "quarter_short": "N{n}",
+        "sheet_of": "{page}. lap / {total}",
+        "no_activities": "Ennek az ütemtervnek még nincsenek tevékenységei."
+      }
+    },
+    "contracts": {
+      "strings": {
+        "doc_title": "Szerződés",
+        "col_code": "Kód",
+        "col_title": "Megnevezés",
+        "col_type": "Szerződés típusa",
+        "col_role": "Szerződő fél szerepe",
+        "col_counterparty": "Szerződő partner",
+        "col_original_value": "Eredeti érték",
+        "col_total_value": "Szerződéses érték",
+        "col_retention": "Visszatartás",
+        "col_start": "Kezdés dátuma",
+        "col_end": "Befejezés dátuma",
+        "col_signed": "Aláírás dátuma",
+        "line_code": "Kód",
+        "line_description": "Leírás",
+        "line_unit": "Mértékegység",
+        "line_quantity": "Mennyiség",
+        "line_unit_rate": "Egységár",
+        "lines": "Tételes értékjegyzék",
+        "signer_company": "A cég részéről"
+      },
+      "labels": {
+        "status": {
+          "draft": "Tervezet",
+          "active": "Hatályos",
+          "suspended": "Felfüggesztett",
+          "completed": "Teljesített",
+          "terminated": "Felmondott"
+        },
+        "type": {
+          "lump_sum": "Átalányáras",
+          "gmp": "GMP",
+          "cost_plus": "Költség plusz",
+          "tm": "Idő- és anyagalapú",
+          "unit_price": "Egységáras",
+          "design_build": "Tervezés és kivitelezés",
+          "combination": "Kombinált",
+          "remeasurement": "Újramérés",
+          "framework": "Keretszerződés",
+          "call_off": "Lehívás"
+        },
+        "party": {
+          "client": "Megrendelői szerződés",
+          "subcontractor": "Alvállalkozói szerződés"
+        }
       }
     }
   },
@@ -2076,7 +2153,11 @@
       "notifications.portal.message_received.title": "Új üzenet a portálon",
       "notifications.portal.message_received.body": "{buyer_name} üzenetet küldött.",
       "dispatch.notify.plan_title": "Your daily plan is ready",
-      "dispatch.notify.plan_body": "Plan for {day}: {lines} lines."
+      "dispatch.notify.plan_body": "Plan for {day}: {lines} lines.",
+      "notifications.monitoring.alert.title": "Monitoring riasztás",
+      "notifications.monitoring.action.title": "Monitoring beavatkozási szint",
+      "notifications.monitoring.alarm.title": "Monitoring riadó",
+      "notifications.monitoring.crossed.body": "{point} pont: {displacement} mm, {rate} mm/day."
     },
     "schedule_headers": {
       "headers": {
@@ -2697,5 +2778,30 @@
         "gap": "Hiány"
       }
     }
-  }
+  },
+  "monitoring.crossed.fail": "{id} pont: a {d} mm-es elmozdulás vagy a {r} mm/nap sebesség átlépte a(z) {level} szintet",
+  "monitoring.crossed.suggestion": "Ellenőrizze a pontot és a szerkezetet, majd nyugtázza a riasztást megjegyzéssel.",
+  "monitoring.level.ok": "OK",
+  "monitoring.level.alert": "Figyelmeztetés",
+  "monitoring.level.action": "Beavatkozás",
+  "monitoring.level.alarm": "Riasztás",
+  "monitoring.risk.title": "{id} megfigyelési pont, {level} szint",
+  "monitoring.risk.description": "Elmozdulás {d} mm, sebesség {r} mm/nap, ehhez képest: {profile}. A tervezetet a monitoring nyitotta: nézze át, és nevezzen meg felelőst.",
+  "monitoring.report.title": "Monitoring riasztási jelentés",
+  "monitoring.report.project": "Projekt",
+  "monitoring.report.crs": "Koordináta-rendszer",
+  "monitoring.report.profile": "Határértékprofil",
+  "monitoring.report.generated": "Létrehozva",
+  "monitoring.report.point": "Pont",
+  "monitoring.report.baseline": "Kiindulási érték (m)",
+  "monitoring.report.latest": "Legutóbbi érték (m)",
+  "monitoring.report.displacement": "Elmozdulás (mm)",
+  "monitoring.report.rate": "Sebesség (mm/nap)",
+  "monitoring.report.level": "Szint",
+  "monitoring.report.acknowledged": "Nyugtázva",
+  "monitoring.report.counts": "Riasztás: {alarm} · Beavatkozás: {action} · Figyelmeztetés: {alert} · OK: {ok}",
+  "monitoring.report.findings": "Megállapítások",
+  "monitoring.report.no_profile": "Nincs profil, állítson be egyet",
+  "monitoring.report.ack_yes": "Igen",
+  "monitoring.report.ack_no": "Nem"
 }

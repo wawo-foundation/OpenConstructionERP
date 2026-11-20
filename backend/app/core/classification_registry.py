@@ -111,6 +111,8 @@ CLASSIFICATION_STANDARD_LABELS: Mapping[str, str] = MappingProxyType(
         "sfb_ccs": "SfB/CCS",
         "ns3451": "NS 3451",
         "bsab": "BSAB",
+        # Hong Kong SMM, 4th edition (HKIS). Codes only: the method text is the publisher's.
+        "hksmm4": "HKSMM4",
     }
 )
 
@@ -185,7 +187,8 @@ COUNTRY_TO_STANDARD: Mapping[str, str] = MappingProxyType(
         "GH": "nrm",
         "UG": "nrm",
         "TZ": "nrm",
-        "HK": "nrm",
+        # Hong Kong bills are measured under HKSMM4 (HKIS), which the hongkong-hk pack codes.
+        "HK": "hksmm4",
         "SG": "nrm",
         "MY": "nrm",
         # ── MasterFormat, CSI-aligned ────────────────────────────────

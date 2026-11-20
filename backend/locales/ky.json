@@ -1660,7 +1660,8 @@
         "no_rejections": "Эч нерсе четке кагылган жок.",
         "sig_delivered_by": "Жеткирген",
         "counterparty_tax_id": "Салык ID",
-        "counterparty_address": "Дареги"
+        "counterparty_address": "Дареги",
+        "delivery_address": "Жеткирүү дареги"
       },
       "labels": {
         "po_status": {
@@ -1733,7 +1734,8 @@
         "gross_settled": "Жалпы төлөнгөн сумма",
         "no_withholding": "Бул төлөмдөн эч нерсе кармалган жок.",
         "counterparty_tax_id": "Салык ID",
-        "counterparty_address": "Дареги"
+        "counterparty_address": "Дареги",
+        "supply_date": "Жеткирүү күнү"
       },
       "labels": {
         "invoice_status": {
@@ -1802,6 +1804,81 @@
         "col_min": "Эң аз",
         "col_max": "Эң көп",
         "col_count": "Көрсөткүчтөр"
+      }
+    },
+    "gantt_pdf": {
+      "strings": {
+        "title": "Иш графиги (Гант диаграммасы)",
+        "project": "Долбоор",
+        "schedule": "График",
+        "baseline": "Базалык план",
+        "no_baseline": "жок",
+        "exported": "Экспорттолду",
+        "data_date": "Отчёт күнү",
+        "col_wbs": "WBS",
+        "col_activity": "Иш",
+        "col_start": "Башталышы",
+        "col_finish": "Бүтүшү",
+        "col_duration": "Күн",
+        "legend_current": "Учурдагы план",
+        "legend_progress": "Аткарылышы",
+        "legend_critical": "Критикалык жол",
+        "legend_baseline": "Базалык план",
+        "legend_actual": "Факт",
+        "legend_milestone": "Этап",
+        "legend_summary": "Жыйынтык",
+        "week_short": "А{n}",
+        "quarter_short": "{n} чей.",
+        "sheet_of": "{total} барактын {page}-барагы",
+        "no_activities": "Бул графикте азырынча иштер жок."
+      }
+    },
+    "contracts": {
+      "strings": {
+        "doc_title": "Келишим",
+        "col_code": "Код",
+        "col_title": "Аталышы",
+        "col_type": "Келишим түрү",
+        "col_role": "Келишим тарабы",
+        "col_counterparty": "Контрагент",
+        "col_original_value": "Баштапкы наркы",
+        "col_total_value": "Келишимдин наркы",
+        "col_retention": "Кармалып калуучу сумма",
+        "col_start": "Башталган күнү",
+        "col_end": "Аяктаган күнү",
+        "col_signed": "Кол коюлган күнү",
+        "line_code": "Код",
+        "line_description": "Сүрөттөмө",
+        "line_unit": "Өлчөө бирдиги",
+        "line_quantity": "Саны",
+        "line_unit_rate": "Бирдик баасы",
+        "lines": "Иштердин наркынын бөлүштүрүлүшү",
+        "signer_company": "Компаниянын атынан"
+      },
+      "labels": {
+        "status": {
+          "draft": "Долбоор",
+          "active": "Күчүндө",
+          "suspended": "Токтотулган",
+          "completed": "Аткарылган",
+          "terminated": "Бузулган"
+        },
+        "type": {
+          "lump_sum": "Топтолгон сумма",
+          "gmp": "GMP",
+          "cost_plus": "Чыгымдар плюс",
+          "tm": "Убакыт жана материалдар",
+          "unit_price": "Бирдик баасы боюнча",
+          "design_build": "Долбоорлоо жана куруу",
+          "combination": "Айкалыштырылган",
+          "remeasurement": "Кайра ченөө",
+          "framework": "Алкактык келишим",
+          "call_off": "Алкактык келишим боюнча заказ"
+        },
+        "party": {
+          "client": "Буйрутмачынын келишими",
+          "subcontractor": "Субподряддык келишим"
+        }
       }
     }
   },
@@ -2092,7 +2169,11 @@
       "notifications.portal.message_received.title": "Порталдан жаңы билдирүү",
       "notifications.portal.message_received.body": "{buyer_name} билдирүү жөнөттү.",
       "dispatch.notify.plan_title": "Your daily plan is ready",
-      "dispatch.notify.plan_body": "Plan for {day}: {lines} lines."
+      "dispatch.notify.plan_body": "Plan for {day}: {lines} lines.",
+      "notifications.monitoring.alert.title": "Байкоо эскертүүсү",
+      "notifications.monitoring.action.title": "Байкоонун аракет деңгээли",
+      "notifications.monitoring.alarm.title": "Байкоо дабышы",
+      "notifications.monitoring.crossed.body": "Чекит {point}: {displacement} mm, {rate} mm/day."
     },
     "schedule_headers": {
       "headers": {
@@ -2699,5 +2780,30 @@
       "file_missing": "'{name}' сүрөтүнүн файлы сактоочуда жок",
       "file_missing_fix": "Сүрөттү кайра жүктөңүз же камдык нускадан калыбына келтириңиз"
     }
-  }
+  },
+  "monitoring.crossed.fail": "Чекит {id}: жылышуу {d} мм же ылдамдык {r} мм/күн {level} деңгээлинен ашты",
+  "monitoring.crossed.suggestion": "Чекитти жана имаратты текшериңиз, андан кийин эскертүүнү эскертме менен ырастаңыз.",
+  "monitoring.level.ok": "OK",
+  "monitoring.level.alert": "Эскертүү",
+  "monitoring.level.action": "Аракет",
+  "monitoring.level.alarm": "Аларм",
+  "monitoring.risk.title": "Көзөмөл чекити {id}, деңгээл {level}",
+  "monitoring.risk.description": "Жылышуу {d} мм, ылдамдык {r} мм/күн, {profile} боюнча. Жобону көзөмөл ачты: карап чыгып, жоопкерди аныктаңыз.",
+  "monitoring.report.title": "Көзөмөлдүн аларм отчету",
+  "monitoring.report.project": "Долбоор",
+  "monitoring.report.crs": "Координаталар системасы",
+  "monitoring.report.profile": "Чектер профили",
+  "monitoring.report.generated": "Түзүлдү",
+  "monitoring.report.point": "Чекит",
+  "monitoring.report.baseline": "Баштапкы маани (м)",
+  "monitoring.report.latest": "Акыркы маани (м)",
+  "monitoring.report.displacement": "Жылышуу (мм)",
+  "monitoring.report.rate": "Ылдамдык (мм/күн)",
+  "monitoring.report.level": "Деңгээл",
+  "monitoring.report.acknowledged": "Ырасталды",
+  "monitoring.report.counts": "Аларм: {alarm} · Аракет: {action} · Эскертүү: {alert} · OK: {ok}",
+  "monitoring.report.findings": "Корутундулар",
+  "monitoring.report.no_profile": "Профиль жок, бирин коюңуз",
+  "monitoring.report.ack_yes": "Ооба",
+  "monitoring.report.ack_no": "Жок"
 }

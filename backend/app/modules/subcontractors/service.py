@@ -45,6 +45,7 @@ from app.modules.subcontractors.models import (
     SubcontractorRating,
     WorkPackage,
 )
+from app.modules.subcontractors.progress_service import ProgressBillingMixin
 from app.modules.subcontractors.repository import (
     AgreementRepository,
     CertificateRepository,
@@ -55,6 +56,8 @@ from app.modules.subcontractors.repository import (
     PrimeContractReader,
     RatingRepository,
     RetentionLedgerRepository,
+    SubcontractDocumentPolicyRepository,
+    SubcontractDocumentRepository,
     SubcontractorContactRepository,
     SubcontractorRepository,
     WorkPackageRepository,
@@ -70,6 +73,7 @@ from app.modules.subcontractors.schemas import (
     CurrencyAmount,
     ExpiryAlert,
     PaymentApplicationCreate,
+    PaymentApplicationLineQuantities,
     PaymentApplicationLineUpdate,
     PaymentApplicationUpdate,
     PaymentBlockResult,
@@ -785,7 +789,7 @@ def _approved_payable(
 # ── Service ─────────────────────────────────────────────────────────────
 
 
-class SubcontractorService:
+class SubcontractorService(ProgressBillingMixin):
     """Orchestrates the subcontractor lifecycle."""
 
     def __init__(self, session: AsyncSession) -> None:
@@ -801,6 +805,8 @@ class SubcontractorService:
         self.retention = RetentionLedgerRepository(session)
         self.ratings = RatingRepository(session)
         self.lien_waivers = LienWaiverRepository(session)
+        self.agreement_documents = SubcontractDocumentRepository(session)
+        self.document_policy_repo = SubcontractDocumentPolicyRepository(session)
 
     # ── Subcontractor CRUD ─────────────────────────────────────────────
 
@@ -1377,6 +1383,7 @@ class SubcontractorService:
             # or rejected/suspended vendor.
             if fields["status"] == "active" and entity.status != "active":
                 await self._assert_subcontractor_awardable(entity.subcontractor_id)
+                await self.enforce_required_documents(entity, operation="activate")
                 activating = True
         if fields.get("prime_contract_id") is not None:
             await self._assert_prime_contract(fields["prime_contract_id"], entity.project_id)
@@ -1445,6 +1452,7 @@ class SubcontractorService:
             "contract_id": str(agreement.contract_id) if agreement.contract_id else None,
             "twin_candidates": await self._twin_candidates_for(agreement),
             "unlinked_contacts": await self._unlinked_contact_names(agreement.subcontractor_id),
+            **await self._documents_payload(agreement),
             "work_packages": [
                 {
                     "name": package.name,
@@ -1930,6 +1938,14 @@ class SubcontractorService:
                 },
             )
 
+        # Progress billing: a period percentage becomes an amount of the
+        # line's scheduled value, and a claim the schedule of values cannot
+        # carry (cumulative below zero, total above the agreement value plus
+        # approved variations) is refused before anything is written. A line
+        # over 100 percent is only a warning; the reason is recorded below.
+        resolved_lines = await self.assert_submission_within_limits(
+            agreement, list(data.lines), gross=gross, reason=data.overage_reason, today=today
+        )
         retention_pct = Decimal(str(agreement.retention_percent))
         retention_amount = (gross * retention_pct / Decimal("100")).quantize(
             Decimal("0.01"),
@@ -1951,16 +1967,17 @@ class SubcontractorService:
             status="submitted",
             submitted_at=datetime.now(UTC),
             created_by=user_id,
+            metadata_={"override_reason": data.overage_reason.strip()} if (data.overage_reason or "").strip() else {},
         )
         await self.payments.create(entity)
 
         # Persist lines (if any).
-        for line in data.lines:
+        for line, resolved in zip(data.lines, resolved_lines, strict=True):
             await self.payment_lines.create(
                 PaymentApplicationLine(
                     payment_application_id=entity.id,
                     work_package_id=line.work_package_id,
-                    claimed_amount=line.claimed_amount,
+                    claimed_amount=resolved["claimed_amount"],
                     certified_amount=line.certified_amount,
                     approved_amount=line.approved_amount,
                     contract_line_id=line.contract_line_id,
@@ -2048,11 +2065,21 @@ class SubcontractorService:
             await self.session.refresh(entity)
         return entity
 
+    async def _enforce_documents_for_payment(self, payment_id: uuid.UUID) -> None:
+        """Approval waits for the agreement's required documents when the policy blocks."""
+        entity = await self.payments.get_by_id(payment_id)
+        if entity is None:
+            return
+        agreement = await self.agreements.get_by_id(entity.agreement_id)
+        if agreement is not None:
+            await self.enforce_required_documents(agreement, operation="approve_payment")
+
     async def approve_payment_application_foreman(
         self,
         payment_id: uuid.UUID,
         user_id: str,
     ) -> PaymentApplication:
+        await self._enforce_documents_for_payment(payment_id)
         return await self._transition_payment(
             payment_id,
             "foreman_approved",
@@ -2089,6 +2116,7 @@ class SubcontractorService:
         """
         await self._assert_insurance_ok(payment_id)
         await self._assert_lien_waiver_ok(payment_id)
+        await self._enforce_documents_for_payment(payment_id)
         entity = await self.payments.get_by_id(payment_id)
         if entity is None:
             raise HTTPException(status_code=404, detail="Payment application not found")
@@ -2900,6 +2928,52 @@ class SubcontractorService:
         if fields:
             await self.payment_lines.update_fields(line_id, **fields)
         return line
+
+    #: A pay application past these statuses has had its quantities acted on.
+    _QTY_EDITABLE_STATUSES = frozenset({"submitted", "foreman_approved"})
+
+    async def update_payment_application_line_quantities(
+        self,
+        line_id: uuid.UUID,
+        data: PaymentApplicationLineQuantities,
+        *,
+        actor_id: str | None = None,
+    ) -> PaymentApplicationLine:
+        """Record the claimed, assessed and certified quantity of one line.
+
+        Open while the pay application is submitted or foreman-approved. Once
+        finance has approved it, it is paid or rejected, the quantities are what
+        the money was decided on and stay as they are. The change is audited.
+        """
+        line = await self.payment_lines.get_by_id(line_id)
+        if line is None:
+            raise HTTPException(status_code=404, detail="Payment application line not found")
+        pay_app = await self.payments.get_by_id(line.payment_application_id)
+        if pay_app is not None and pay_app.status not in self._QTY_EDITABLE_STATUSES:
+            raise self._refuse(
+                status.HTTP_409_CONFLICT,
+                "quantities_locked",
+                f"The pay application is {pay_app.status!r}; its quantities can no longer change.",
+                pay_app_status=pay_app.status,
+            )
+        fields = {k: v for k, v in data.model_dump(exclude_unset=True).items() if v is not None}
+        if not fields:
+            return line
+        before = {k: str(getattr(line, k)) for k in fields}
+        await self.payment_lines.update_fields(line_id, **fields)
+        from app.core.audit_log import log_activity  # noqa: PLC0415
+
+        await log_activity(
+            self.session,
+            actor_id=actor_id,
+            entity_type="subcontract_payment_line",
+            entity_id=str(line_id),
+            action="quantities_updated",
+            module="subcontractors",
+            metadata={k: {"from": before[k], "to": str(v)} for k, v in fields.items()},
+        )
+        refreshed = await self.payment_lines.get_by_id(line_id)
+        return refreshed if refreshed is not None else line
 
     async def suggested_claim_lines(self, claim_id: uuid.UUID) -> dict[str, Any]:
         """Claim lines derived from the subs' approved amounts, for the preview.

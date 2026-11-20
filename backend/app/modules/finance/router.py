@@ -42,6 +42,7 @@ from fastapi.responses import StreamingResponse
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.active_markets import ActiveMarkets
 from app.core.content_disposition import attachment_disposition
 from app.core.file_signature import (
     SIGNATURE_BYTES_REQUIRED,
@@ -50,19 +51,17 @@ from app.core.file_signature import (
 from app.core.file_signature import (
     require as require_signature,
 )
-from app.core.party_names import resolve_party_details, resolve_party_names
 from app.core.pdf_appearance import resolve_sections
 from app.core.rate_limiter import approval_limiter
 from app.core.register_context import (
     AcceptLanguageHeader,
     LocaleQuery,
-    generated_now,
-    load_project_header,
     record_download,
 )
 from app.core.upload_guards import reject_if_xlsx_bomb
 from app.dependencies import (
     CurrentUserId,
+    CurrentUserPayload,
     RequirePermission,
     SessionDep,
     accessible_project_ids,
@@ -750,37 +749,38 @@ async def export_invoice_br_pdf(
 async def export_invoice_pdf(
     invoice_id: uuid.UUID,
     session: SessionDep,
+    payload: CurrentUserPayload,
     user_id: CurrentUserId = None,  # type: ignore[assignment]
     locale: LocaleQuery = None,
     accept_language: AcceptLanguageHeader = None,
+    variant: str | None = Query(None, max_length=40, description="Named layout variant; the default one when absent"),
+    layout_version: uuid.UUID | None = Query(None, description="Print with this published layout version (reprint)"),
     _perm: None = Depends(RequirePermission("finance.read")),
-    service: FinanceService = Depends(_get_service),
 ) -> StreamingResponse:
     """Download one invoice as a printable PDF form with its lines, totals and payments."""
-    from app.modules.finance.pdf_export import invoice_record
-    from app.modules.finance.pdf_translations import invoice_pdf_filename, resolve_pdf_locale, tr
+    from app.modules.doc_templates.layout_service import issue_for_user
+    from app.modules.finance.layouts import INVOICE, invoice_layout_context, invoice_standard, load_invoice
+    from app.modules.finance.pdf_translations import invoice_pdf_filename, resolve_pdf_locale
 
     await _require_invoice_access(session, invoice_id, user_id)
-    invoice = await service.get_invoice(invoice_id)
+    invoice = await load_invoice(session, invoice_id)
     doc_locale = resolve_pdf_locale(locale, accept_language)
-    project = await load_project_header(session, invoice.project_id)
-    po_number = None
-    if invoice.purchase_order_id is not None:
-        from app.modules.procurement.models import PurchaseOrder
-
-        po_number = (
-            await session.execute(select(PurchaseOrder.po_number).where(PurchaseOrder.id == invoice.purchase_order_id))
-        ).scalar_one_or_none()
-    document = invoice_record(
-        invoice,
-        project=project,
-        people=await resolve_party_names(session, [invoice.contact_id, invoice.created_by]),
-        parties=await resolve_party_details(session, [invoice.contact_id]),
-        purchase_order_number=po_number,
-        sections=resolve_sections("invoice"),
-        locale=doc_locale,
-        generated=generated_now(tr(doc_locale, "datetime_format"), project),
+    ctx = await invoice_layout_context(session, invoice, doc_locale)
+    document = await issue_for_user(
+        session,
+        INVOICE,
+        ctx,
+        standard=invoice_standard(resolve_sections("invoice")),
+        record_id=str(invoice.id),
+        project_id=invoice.project_id,
+        user_id=str(user_id),
+        payload=payload,
+        variant=variant,
+        version_id=layout_version,
+        # A supplier's invoice is received, not issued: the packs' rules for invoices the firm sends do not apply.
+        legal=invoice.invoice_direction != "payable",
     )
+    await session.commit()
     return await record_download(document, invoice_pdf_filename(invoice.invoice_number), doc_locale)
 
 
@@ -788,31 +788,38 @@ async def export_invoice_pdf(
 async def export_payment_pdf(
     payment_id: uuid.UUID,
     session: SessionDep,
+    payload: CurrentUserPayload,
     user_id: CurrentUserId = None,  # type: ignore[assignment]
     locale: LocaleQuery = None,
     accept_language: AcceptLanguageHeader = None,
+    variant: str | None = Query(None, max_length=40, description="Named layout variant; the default one when absent"),
+    layout_version: uuid.UUID | None = Query(None, description="Print with this published layout version (reprint)"),
     _perm: None = Depends(RequirePermission("finance.read")),
 ) -> StreamingResponse:
     """Download the record of one payment, with the invoice it settles, as a PDF form."""
-    from app.modules.finance.pdf_export import payment_record
-    from app.modules.finance.pdf_translations import payment_pdf_filename, resolve_pdf_locale, tr
+    from app.modules.doc_templates.layout_service import issue_for_user
+    from app.modules.finance.layouts import PAYMENT, payment_layout_context, payment_standard
+    from app.modules.finance.pdf_translations import payment_pdf_filename, resolve_pdf_locale
 
     payment = await session.get(Payment, payment_id)
     if payment is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Payment {payment_id} not found")
     invoice = await _require_invoice_access(session, payment.invoice_id, user_id)
     doc_locale = resolve_pdf_locale(locale, accept_language)
-    project = await load_project_header(session, invoice.project_id)
-    document = payment_record(
-        payment,
-        invoice=invoice,
-        project=project,
-        people=await resolve_party_names(session, [invoice.contact_id]),
-        parties=await resolve_party_details(session, [invoice.contact_id]),
-        sections=resolve_sections("payment"),
-        locale=doc_locale,
-        generated=generated_now(tr(doc_locale, "datetime_format"), project),
+    ctx = await payment_layout_context(session, payment, invoice, doc_locale)
+    document = await issue_for_user(
+        session,
+        PAYMENT,
+        ctx,
+        standard=payment_standard(resolve_sections("payment")),
+        record_id=str(payment.id),
+        project_id=invoice.project_id,
+        user_id=str(user_id),
+        payload=payload,
+        variant=variant,
+        version_id=layout_version,
     )
+    await session.commit()
     filename = payment_pdf_filename(invoice.invoice_number, payment.payment_date)
     return await record_download(document, filename, doc_locale)
 
@@ -854,6 +861,10 @@ async def list_einvoice_profiles(
     }
 
 
+#: ``default``, or one legal entity's own seller details.
+_EINVOICE_SCOPE_PATTERN = r"^(default|entity:[0-9a-fA-F-]{36})$"
+
+
 @router.get(
     "/einvoice-settings",
     response_model=EInvoiceSettingsRead,
@@ -868,11 +879,15 @@ async def list_einvoice_profiles(
 async def read_einvoice_settings(
     session: SessionDep,
     _perm: None = Depends(RequirePermission("finance.read")),
+    scope: str = Query("default", pattern=_EINVOICE_SCOPE_PATTERN),
 ) -> EInvoiceSettingsRead:
-    """Return the configuration, and which of its required fields are still blank."""
+    """Return the configuration, and which of its required fields are still blank.
+
+    ``scope`` is ``default`` or ``entity:<id>``, one legal entity's own seller details.
+    """
     from app.modules.finance.einvoice_settings_service import get_settings
 
-    return EInvoiceSettingsRead.from_row(await get_settings(session))
+    return EInvoiceSettingsRead.from_row(await get_settings(session, scope))
 
 
 @router.put(
@@ -892,11 +907,12 @@ async def write_einvoice_settings(
     session: SessionDep,
     user_id: CurrentUserId,
     _perm: None = Depends(RequirePermission("finance.einvoice_settings")),
+    scope: str = Query("default", pattern=_EINVOICE_SCOPE_PATTERN),
 ) -> EInvoiceSettingsRead:
     """Store the seller identity and payment details for every future e-invoice."""
     from app.modules.finance.einvoice_settings_service import update_settings
 
-    row = await update_settings(session, payload, user_id=user_id)
+    row = await update_settings(session, payload, user_id=user_id, scope=scope)
     await session.commit()
     return EInvoiceSettingsRead.from_row(row)
 
@@ -1146,6 +1162,7 @@ async def export_invoice_einvoice(
     defaults = await einvoice_defaults_for_invoice(
         session,
         contact_id=fresh.contact_id,
+        project_id=fresh.project_id,
         invoice_direction=fresh.invoice_direction,
     )
 
@@ -2601,10 +2618,11 @@ def _get_connector_service(session: SessionDep) -> ConnectorService:
     description="Catalogue of registered ERP / accounting connector types and their config fields.",
 )
 async def list_connector_types(
+    markets: ActiveMarkets,
     _perm: None = Depends(RequirePermission("finance.connector.read")),
 ) -> list[ConnectorTypeInfo]:
-    """Return the connector-type catalogue for the UI form builder."""
-    return [ConnectorTypeInfo(**entry) for entry in connector_registry.list_types()]
+    """Return the connector-type catalogue for the UI form builder (pack types only where active)."""
+    return [ConnectorTypeInfo(**entry) for entry in connector_registry.list_types(markets)]
 
 
 @router.get(
@@ -3308,3 +3326,7 @@ router.include_router(capture_router)
 from app.modules.finance.payment_run_router import payment_run_router  # noqa: E402
 
 router.include_router(payment_run_router)
+
+from app.modules.finance.booking_router import booking_router  # noqa: E402
+
+router.include_router(booking_router)

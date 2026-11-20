@@ -401,6 +401,7 @@ const standardLabels: Record<string, string> = {
   birimfiyat: 'Birim Fiyat',
   nlsfb: 'NL/SfB',
   knr: 'KNR',
+  hksmm4: 'HKSMM4',
 };
 
 // ---------------------------------------------------------------------------
@@ -1844,6 +1845,29 @@ export function ProjectDetailPage() {
           ))}
         </div>
         <Skeleton height={200} className="w-full" />
+      </div>
+    );
+  }
+
+  // A member of one company opening another company's project.
+  const isCompanyForbidden =
+    projectQueryError instanceof ApiError &&
+    projectQueryError.status === 403 &&
+    (projectQueryError.body as { detail?: { code?: string } } | null)?.detail?.code === 'legal_entities.forbidden';
+  if (!project && isCompanyForbidden) {
+    return (
+      <div className="w-full">
+        <EmptyState
+          title={t('legal_entities.forbidden_title', { defaultValue: 'No access to this project' })}
+          description={t('legal_entities.forbidden', {
+            defaultValue: 'This project belongs to a company you are not a member of.',
+          })}
+          action={
+            <Button variant="primary" onClick={() => navigate('/projects')}>
+              {t('projects.browse_projects', { defaultValue: 'Browse projects' })}
+            </Button>
+          }
+        />
       </div>
     );
   }

@@ -3,10 +3,11 @@
 import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useNormBaseColumns } from '@/features/norm-pricing/useNormBaseColumns';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useUnitsSystem } from '@/features/market/api';
 // lucide-react icons used by sub-components (BOQToolbar, BOQGrid, etc.) — none needed directly here
-import { Database, Download, ExternalLink, X, Sparkles, AlertTriangle as WarnTriangle, Lock, Copy, Wallet, Keyboard, GitCompare, RefreshCw, ShieldCheck, FlaskConical, Send, Percent, CheckCircle, ArrowLeft, LayoutList, SlidersHorizontal, LayoutTemplate } from 'lucide-react';
+import { Database, Download, ExternalLink, X, Sparkles, AlertTriangle as WarnTriangle, Lock, Copy, Wallet, Keyboard, GitCompare, RefreshCw, ShieldCheck, FlaskConical, Send, Percent, CheckCircle, ArrowLeft, LayoutList, SlidersHorizontal, LayoutTemplate, Layers } from 'lucide-react';
 import { Button, Badge, Breadcrumb, ModuleHelpButton, ModuleGuideButton, ConfirmDialog, DismissibleInfo, IntroRichText, PageHeader } from '@/shared/ui';
 import { useConfirm } from '@/shared/hooks/useConfirm';
 import { useProgressStore } from '@/shared/ui/GlobalProgress';
@@ -30,6 +31,7 @@ import { useDisplayQuantity } from '@/shared/hooks/useDisplayQuantity';
 import {
   boqApi,
   billDirectCost,
+  billTaxInclusiveCost,
   exportablePositions,
   groupPositionsIntoSections,
   isEmptyPosition,
@@ -67,7 +69,7 @@ import { AISmartPanel } from './AISmartPanel';
 import { AIPositionCopilot } from './AIPositionCopilot';
 // ClassificationPicker used in sub-components
 // import { ClassificationPicker } from './ClassificationPicker';
-import { VersionHistoryDrawer } from './VersionHistoryDrawer';
+import { VersionHistoryDrawer, type VersionHistoryTab } from './VersionHistoryDrawer';
 import { ModelLinkPanel } from './ModelLinkPanel';
 import { ModelLinkReviewPanel } from './ModelLinkReviewPanel';
 import { ChangeReviewButton, ChangeReviewPanel, type ChangeReviewTab } from './ChangeReviewPanel';
@@ -83,6 +85,7 @@ import { CostAllocationDrawer } from './CostAllocationDrawer';
 import { DrawingRefsDrawer } from './DrawingRefsDrawer';
 import { drawingRefViewerUrl, isOnOutdatedDrawing, useBoqDrawingRefs, type DrawingRef } from './drawingRefsApi';
 import { PdfCompareDrawer } from '@/features/takeoff/PdfCompareDrawer';
+import { SealAsBasisAction } from '@/features/estimate-archive/SealedEstimateEntry';
 import { takeoffApi } from '@/features/takeoff/api';
 import { CostAllocationCoverageBar, CostAllocationCoverageError } from './CostAllocationCoverage';
 import { PositionProcurementDrawer } from '@/features/procurement/PositionProcurementDrawer';
@@ -95,6 +98,7 @@ import { changeKindLabel } from '@/features/variations/VariationSourcePicker';
 import { SensitivityChart } from './SensitivityChart';
 import { CostRiskPanel } from './CostRiskPanel';
 import { MarkupPanel } from './MarkupPanel';
+import { levyAdjusted } from './markupLevy';
 import BOQGrid from './BOQGrid';
 import type { BOQGridHandle } from './BOQGrid';
 import { allResourcesExpanded, type ResourceExpansionState } from './resourceExpansion';
@@ -271,6 +275,9 @@ export function BOQEditorPage() {
   });
 
   /* ── Load project for region/currency/locale settings ────────────── */
+
+  // Norm code and grade columns, only where the project's country pack declares a norm base.
+  const normBaseColumns = useNormBaseColumns(boq?.project_id);
 
   const { data: project } = useQuery({
     queryKey: ['project', boq?.project_id],
@@ -753,7 +760,14 @@ export function BOQEditorPage() {
           ...cur,
           positions: cur.positions.map((p) => {
             if (p.id !== id) return p;
-            const next = { ...p, ...data } as Position;
+            const { long_text: longText, ...rest } = data;
+            const next = { ...p, ...rest } as Position;
+            if (longText !== undefined) {
+              const meta = { ...(next.metadata ?? {}) } as Record<string, unknown>;
+              if (longText.trim()) meta.gaeb_long_text = longText.trim();
+              else delete meta.gaeb_long_text;
+              next.metadata = meta;
+            }
             if (data.quantity !== undefined || data.unit_rate !== undefined) {
               // Mirror backend semantics (boq/service.py::_compute_total):
               // total = quantity × unit_rate, no VAT, no markups. Markups
@@ -1090,6 +1104,7 @@ export function BOQEditorPage() {
     mutationFn: () => apiPost<{ id: string }>(`/v1/boq/boqs/${boqId}/create-revision/`, {}),
     onSuccess: (result) => {
       invalidateAll();
+      queryClient.invalidateQueries({ queryKey: ['boq-revisions'] });
       addToast({
         type: 'success',
         title: t('boq.revision_created', { defaultValue: 'Revision created' }),
@@ -2195,6 +2210,12 @@ export function BOQEditorPage() {
           e.stopPropagation();
           toggleAICopilotRef.current?.();
           return;
+        case 'edit_texts':
+          if (boqGridRef.current?.openTextEditorForFocused()) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+          return;
         case 'delete_selected':
           // Same tracked-delete pipeline as the context menu / batch bar, so
           // the undo toast and the 5 s deferred API call still apply.
@@ -2243,6 +2264,9 @@ export function BOQEditorPage() {
   /* ── Export / Version History state ─────────────────────────────────── */
 
   const [showVersionHistory, setShowVersionHistory] = useState(false);
+  const [versionHistoryTab, setVersionHistoryTab] = useState<VersionHistoryTab | undefined>(undefined);
+  // Two revisions picked in the revision navigator, older first, for the BOQ compare.
+  const [revisionCompare, setRevisionCompare] = useState<{ base: string; other: string } | null>(null);
   const [exportWarning, setExportWarning] = useState<{ format: string; score: number } | null>(null);
   const [gaebPreviewOpen, setGaebPreviewOpen] = useState(false);
   // Exchange report of the last export or import, or the check dialog (id null).
@@ -2566,6 +2590,11 @@ export function BOQEditorPage() {
     return billDirectCost(boq.positions, currencyCode, fxRates);
   }, [boq, currencyCode, fxRates]);
 
+  const taxInclusiveCost = useMemo(
+    () => (boq ? billTaxInclusiveCost(boq.positions, currencyCode, fxRates) : 0),
+    [boq, currencyCode, fxRates],
+  );
+
   const markupTotals = useMemo(() => {
     let running = directCost;
     return markups
@@ -2585,7 +2614,10 @@ export function BOQEditorPage() {
         } else {
           amount = directCost * (m.percentage / 100);
         }
-        running += amount;
+        const base = m.apply_to === 'cumulative' || m.apply_to === 'subtotal' ? running : directCost;
+        const levy = levyAdjusted(m.metadata, base, amount);
+        amount = levy.amount;
+        if (levy.compounds) running += amount;
         return { ...m, amount, runningTotal: running };
       });
   }, [directCost, markups]);
@@ -2607,7 +2639,7 @@ export function BOQEditorPage() {
    * ``cost-breakdown.grand_total`` (see the ``costBreakdown`` query above),
    * which is what the toolbar card, the Markup panel and the Cost Breakdown
    * panel print. Audit #156. */
-  const vatAmount = netTotal * vatRate;
+  const vatAmount = (netTotal - taxInclusiveCost) * vatRate;
   const grossTotal = netTotal + vatAmount;
 
   /* ── Display currency (Issue #88) ─────────────────────────────────────
@@ -5377,6 +5409,7 @@ export function BOQEditorPage() {
                 {t('boq.create_budget', { defaultValue: 'Create Budget' })}
               </Button>
             )}
+            <SealAsBasisAction projectId={boq.project_id} boqId={boq.id} locked={!!boq.is_locked} />
             {/* Deep link OUT to the Validation dashboard, carrying this BOQ and
                 its project so the target lands pre-selected (2 clicks to a
                 result). The dashboard persists a server-side report; the
@@ -5416,6 +5449,16 @@ export function BOQEditorPage() {
             <Button variant="secondary" onClick={handleCreateRevision} disabled={createRevisionMutation.isPending}>
               <Copy size={14} className="mr-1" />
               {t('boq.create_revision', { defaultValue: 'Create Revision' })}
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setVersionHistoryTab('revisions');
+                setShowVersionHistory(true);
+              }}
+            >
+              <Layers size={14} className="mr-1" />
+              {t('boq.tab_revisions', { defaultValue: 'Revisions' })}
             </Button>
             <Button
               variant="secondary"
@@ -5866,6 +5909,7 @@ export function BOQEditorPage() {
           onShowProcurementTrace={setProcurementPositionId}
           onShowMeasurement={setMeasurementPositionId}
           classificationStandard={project?.classification_standard}
+          normBase={normBaseColumns}
           onTraceLine={variationRequestId ? setTracePositionId : undefined}
           variationTraces={variationTraceBadges}
           variationUntracedBadge={variationUntracedBadge}
@@ -5949,6 +5993,7 @@ export function BOQEditorPage() {
             fmt={fmt}
             openSignal={markupOpenSignal}
             pricedFromPublishedRates={boq?.metadata?.priced_from_published_rates === true}
+            taxInclusiveCost={taxInclusiveCost}
             readOnly={Boolean(boq?.is_locked)}
           />
         </div>
@@ -6285,7 +6330,20 @@ export function BOQEditorPage() {
         <VersionHistoryDrawer
           boqId={boqId}
           isOpen={showVersionHistory}
-          onClose={() => setShowVersionHistory(false)}
+          initialTab={versionHistoryTab}
+          onClose={() => {
+            setShowVersionHistory(false);
+            setVersionHistoryTab(undefined);
+          }}
+          onOpenRevision={(id) => {
+            setShowVersionHistory(false);
+            navigate(`/boq/${id}`);
+          }}
+          onCompareRevisions={(older, newer) => {
+            setShowVersionHistory(false);
+            setRevisionCompare({ base: older, other: newer });
+            setCompareOpen(true);
+          }}
         />
       )}
 
@@ -6331,11 +6389,15 @@ export function BOQEditorPage() {
       {/* ── Feature 2: Estimate baseline / line-level compare ───────── */}
       {boqId && boq?.project_id && (
         <BOQCompareDrawer
-          boqId={boqId}
+          boqId={revisionCompare?.base ?? boqId}
           projectId={boq.project_id}
           isOpen={compareOpen}
-          onClose={() => setCompareOpen(false)}
-          parentEstimateId={boq.parent_estimate_id}
+          onClose={() => {
+            setCompareOpen(false);
+            setRevisionCompare(null);
+          }}
+          parentEstimateId={revisionCompare ? null : boq.parent_estimate_id}
+          initialOtherId={revisionCompare?.other ?? null}
         />
       )}
 
@@ -6756,6 +6818,9 @@ export function BOQEditorPage() {
 
               <kbd className="inline-flex items-center rounded border border-border-light bg-surface-secondary px-1.5 py-0.5 text-xs font-mono">{t('boq.shortcut_ctrl_l', { defaultValue: 'Ctrl+L' })}</kbd>
               <span className="text-content-secondary">{t('boq.shortcut_lock', { defaultValue: 'Lock / Unlock Estimate' })}</span>
+
+              <kbd className="inline-flex items-center rounded border border-border-light bg-surface-secondary px-1.5 py-0.5 text-xs font-mono">Alt+L</kbd>
+              <span className="text-content-secondary">{t('boq.edit_texts', { defaultValue: 'Edit Kurztext and Langtext' })}</span>
 
               <kbd className="inline-flex items-center rounded border border-border-light bg-surface-secondary px-1.5 py-0.5 text-xs font-mono">{t('boq.shortcut_ctrl_z', { defaultValue: 'Ctrl+Z' })}</kbd>
               <span className="text-content-secondary">{t('boq.shortcut_undo', { defaultValue: 'Undo' })}</span>

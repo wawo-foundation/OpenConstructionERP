@@ -33,7 +33,7 @@ from app.modules.contracts.retention import (
 #: Largest magnitude the NUMERIC(18,4) money columns hold; larger input would be a database overflow, not a 422.
 _MONEY_LIMIT = Decimal(10**14)
 
-CONTRACT_TYPES = "lump_sum|gmp|cost_plus|tm|unit_price|design_build|combination|remeasurement"
+CONTRACT_TYPES = "lump_sum|gmp|cost_plus|tm|unit_price|design_build|combination|remeasurement|framework|call_off"
 COUNTERPARTY_TYPES = "client|subcontractor"
 CONTRACT_STATUSES = "draft|active|suspended|completed|terminated"
 #: Every name a contract's release event has been written under. Accepted on
@@ -143,6 +143,7 @@ class ContractCreate(ContractPaymentTermFields):
         default=None,
         pattern=rf"^({RETENTION_RELEASE_EVENTS})$",
     )
+    pay_when_paid: bool = False
     status: str = Field(default="draft", pattern=rf"^({CONTRACT_STATUSES})$")
     signed_at: str | None = None
     terms: ContractTerms = Field(default_factory=dict)
@@ -177,6 +178,7 @@ class ContractUpdate(ContractPaymentTermFields):
         default=None,
         pattern=rf"^({RETENTION_RELEASE_EVENTS})$",
     )
+    pay_when_paid: bool | None = None
     status: str | None = Field(default=None, pattern=rf"^({CONTRACT_STATUSES})$")
     signed_at: str | None = None
     terms: ContractTerms | None = None
@@ -204,6 +206,7 @@ class ContractResponse(BaseModel):
     retention_percent: Decimal
     # Rows stored before the vocabulary was unified still hold an alias.
     retention_release_event: ReleaseEvent
+    pay_when_paid: bool = False
     status: str
     signed_at: str | None = None
     terms: dict[str, Any] = Field(default_factory=dict)
@@ -884,6 +887,17 @@ class ProgressClaimLineUpdate(BaseModel):
     certified_qty: Decimal18_4 | None = Field(default=None, gt=-_MONEY_LIMIT, lt=_MONEY_LIMIT)
 
 
+class ProgressClaimLineQuantities(BaseModel):
+    """The payer's side of a valuation line: the assessed and certified quantity.
+
+    The submitted quantity is ``period_completed_qty`` and is edited with the
+    line while the claim is a draft. These two are recorded after it is sent.
+    """
+
+    assessed_qty: Decimal18_4 | None = Field(default=None, ge=0, lt=_MONEY_LIMIT)
+    certified_qty: Decimal18_4 | None = Field(default=None, ge=0, lt=_MONEY_LIMIT)
+
+
 class ProgressClaimLineResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -907,6 +921,8 @@ class ProgressClaimLineResponse(BaseModel):
     certified_qty: Decimal
     created_at: datetime
     updated_at: datetime
+    # ``valuation.*`` findings for this line (assessed above submitted, and so on).
+    findings: list[dict[str, Any]] = Field(default_factory=list)
 
 
 class AutoGenerateClaimRequest(BaseModel):

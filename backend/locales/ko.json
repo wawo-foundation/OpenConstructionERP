@@ -1644,7 +1644,8 @@
         "no_rejections": "반품 내역이 없습니다.",
         "sig_delivered_by": "납품자",
         "counterparty_tax_id": "사업자등록번호",
-        "counterparty_address": "주소"
+        "counterparty_address": "주소",
+        "delivery_address": "납품 주소"
       },
       "labels": {
         "po_status": {
@@ -1717,7 +1718,8 @@
         "gross_settled": "정산 총액",
         "no_withholding": "이 지급에서 공제된 금액이 없습니다.",
         "counterparty_tax_id": "사업자등록번호",
-        "counterparty_address": "주소"
+        "counterparty_address": "주소",
+        "supply_date": "공급일"
       },
       "labels": {
         "invoice_status": {
@@ -1786,6 +1788,81 @@
         "col_min": "최저",
         "col_max": "최고",
         "col_count": "측정값"
+      }
+    },
+    "gantt_pdf": {
+      "strings": {
+        "title": "공정표(간트 차트)",
+        "project": "프로젝트",
+        "schedule": "공정표",
+        "baseline": "기준 계획",
+        "no_baseline": "없음",
+        "exported": "내보낸 날짜",
+        "data_date": "데이터 날짜",
+        "col_wbs": "WBS",
+        "col_activity": "작업",
+        "col_start": "시작",
+        "col_finish": "종료",
+        "col_duration": "일수",
+        "legend_current": "현재 계획",
+        "legend_progress": "진척",
+        "legend_critical": "주공정선",
+        "legend_baseline": "기준 계획",
+        "legend_actual": "실적",
+        "legend_milestone": "마일스톤",
+        "legend_summary": "요약",
+        "week_short": "{n}주",
+        "quarter_short": "{n}분기",
+        "sheet_of": "{total}장 중 {page}장",
+        "no_activities": "이 공정표에는 아직 작업이 없습니다."
+      }
+    },
+    "contracts": {
+      "strings": {
+        "doc_title": "계약서",
+        "col_code": "코드",
+        "col_title": "제목",
+        "col_type": "계약 유형",
+        "col_role": "계약 구분",
+        "col_counterparty": "상대방",
+        "col_original_value": "최초 금액",
+        "col_total_value": "계약 금액",
+        "col_retention": "유보금",
+        "col_start": "시작일",
+        "col_end": "종료일",
+        "col_signed": "서명일",
+        "line_code": "코드",
+        "line_description": "내용",
+        "line_unit": "단위",
+        "line_quantity": "수량",
+        "line_unit_rate": "단가",
+        "lines": "금액 내역서",
+        "signer_company": "당사 서명"
+      },
+      "labels": {
+        "status": {
+          "draft": "초안",
+          "active": "진행 중",
+          "suspended": "일시 중지",
+          "completed": "완료",
+          "terminated": "해지"
+        },
+        "type": {
+          "lump_sum": "총액 계약",
+          "gmp": "GMP",
+          "cost_plus": "실비정산 보수가산",
+          "tm": "시간 및 자재",
+          "unit_price": "단가 계약",
+          "design_build": "설계시공 일괄",
+          "combination": "복합",
+          "remeasurement": "재측정",
+          "framework": "기본 계약",
+          "call_off": "개별 발주"
+        },
+        "party": {
+          "client": "발주자 계약",
+          "subcontractor": "하도급 계약"
+        }
       }
     }
   },
@@ -2076,7 +2153,11 @@
       "notifications.portal.message_received.title": "포털에 새 메시지가 있습니다",
       "notifications.portal.message_received.body": "{buyer_name} 님이 메시지를 보냈습니다.",
       "dispatch.notify.plan_title": "Your daily plan is ready",
-      "dispatch.notify.plan_body": "Plan for {day}: {lines} lines."
+      "dispatch.notify.plan_body": "Plan for {day}: {lines} lines.",
+      "notifications.monitoring.alert.title": "모니터링 경고",
+      "notifications.monitoring.action.title": "모니터링 조치 기준",
+      "notifications.monitoring.alarm.title": "모니터링 경보",
+      "notifications.monitoring.crossed.body": "측점 {point}: {displacement} mm, {rate} mm/day."
     },
     "schedule_headers": {
       "headers": {
@@ -2698,5 +2779,30 @@
         "gap": "차액"
       }
     }
-  }
+  },
+  "monitoring.crossed.fail": "점 {id}: 변위 {d} mm 또는 속도 {r} mm/일이 {level} 단계를 넘었습니다",
+  "monitoring.crossed.suggestion": "점과 구조물을 확인한 뒤 메모와 함께 알림을 확인하세요.",
+  "monitoring.level.ok": "OK",
+  "monitoring.level.alert": "주의",
+  "monitoring.level.action": "조치",
+  "monitoring.level.alarm": "경보",
+  "monitoring.risk.title": "모니터링 점 {id}, 수준 {level}",
+  "monitoring.risk.description": "변위 {d} mm, 속도 {r} mm/일 ({profile} 기준). 모니터링이 초안을 열었습니다. 내용을 검토하고 담당자를 지정하세요.",
+  "monitoring.report.title": "모니터링 경보 보고서",
+  "monitoring.report.project": "프로젝트",
+  "monitoring.report.crs": "좌표계",
+  "monitoring.report.profile": "한계값 프로파일",
+  "monitoring.report.generated": "생성됨",
+  "monitoring.report.point": "점",
+  "monitoring.report.baseline": "기준값 (m)",
+  "monitoring.report.latest": "최근값 (m)",
+  "monitoring.report.displacement": "변위 (mm)",
+  "monitoring.report.rate": "속도 (mm/일)",
+  "monitoring.report.level": "수준",
+  "monitoring.report.acknowledged": "확인됨",
+  "monitoring.report.counts": "경보: {alarm} · 조치: {action} · 주의: {alert} · OK: {ok}",
+  "monitoring.report.findings": "결과",
+  "monitoring.report.no_profile": "프로파일이 없습니다. 하나를 설정하세요",
+  "monitoring.report.ack_yes": "예",
+  "monitoring.report.ack_no": "아니요"
 }

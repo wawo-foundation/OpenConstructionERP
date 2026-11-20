@@ -1620,7 +1620,8 @@
         "no_rejections": "Hiçbir şey reddedilmedi.",
         "sig_delivered_by": "Teslim eden",
         "counterparty_tax_id": "Vergi no.",
-        "counterparty_address": "Adres"
+        "counterparty_address": "Adres",
+        "delivery_address": "Teslimat adresi"
       },
       "labels": {
         "po_status": {
@@ -1693,7 +1694,8 @@
         "gross_settled": "Brüt kapatılan tutar",
         "no_withholding": "Bu ödemeden herhangi bir kesinti yapılmadı.",
         "counterparty_tax_id": "Vergi no.",
-        "counterparty_address": "Adres"
+        "counterparty_address": "Adres",
+        "supply_date": "Teslim tarihi"
       },
       "labels": {
         "invoice_status": {
@@ -1765,6 +1767,81 @@
         "col_min": "En düşük",
         "col_max": "En yüksek",
         "col_count": "Ölçümler"
+      }
+    },
+    "gantt_pdf": {
+      "strings": {
+        "title": "İş programı (Gantt şeması)",
+        "project": "Proje",
+        "schedule": "İş programı",
+        "baseline": "Temel plan",
+        "no_baseline": "yok",
+        "exported": "Dışa aktarıldı",
+        "data_date": "Durum tarihi",
+        "col_wbs": "İKY",
+        "col_activity": "Faaliyet",
+        "col_start": "Başlangıç",
+        "col_finish": "Bitiş",
+        "col_duration": "Gün",
+        "legend_current": "Güncel plan",
+        "legend_progress": "İlerleme",
+        "legend_critical": "Kritik yol",
+        "legend_baseline": "Temel plan",
+        "legend_actual": "Gerçekleşen",
+        "legend_milestone": "Kilometre taşı",
+        "legend_summary": "Özet",
+        "week_short": "H{n}",
+        "quarter_short": "Ç{n}",
+        "sheet_of": "Sayfa {page} / {total}",
+        "no_activities": "Bu iş programında henüz faaliyet yok."
+      }
+    },
+    "contracts": {
+      "strings": {
+        "doc_title": "Sözleşme",
+        "col_code": "Kod",
+        "col_title": "Başlık",
+        "col_type": "Sözleşme türü",
+        "col_role": "Sözleşme tarafı",
+        "col_counterparty": "Karşı taraf",
+        "col_original_value": "İlk bedel",
+        "col_total_value": "Sözleşme bedeli",
+        "col_retention": "Teminat kesintisi",
+        "col_start": "Başlangıç tarihi",
+        "col_end": "Bitiş tarihi",
+        "col_signed": "İmza tarihi",
+        "line_code": "Kod",
+        "line_description": "Açıklama",
+        "line_unit": "Birim",
+        "line_quantity": "Miktar",
+        "line_unit_rate": "Birim fiyat",
+        "lines": "İş kalemleri bedel cetveli",
+        "signer_company": "Şirket adına"
+      },
+      "labels": {
+        "status": {
+          "draft": "Taslak",
+          "active": "Aktif",
+          "suspended": "Askıya alındı",
+          "completed": "Tamamlandı",
+          "terminated": "Feshedildi"
+        },
+        "type": {
+          "lump_sum": "Götürü bedel",
+          "gmp": "GMP",
+          "cost_plus": "Maliyet artı kâr",
+          "tm": "Zaman ve malzeme",
+          "unit_price": "Birim fiyat",
+          "design_build": "Tasarla ve yap",
+          "combination": "Karma",
+          "remeasurement": "Yeniden ölçüm",
+          "framework": "Çerçeve sözleşme",
+          "call_off": "Çağrı siparişi"
+        },
+        "party": {
+          "client": "İşveren sözleşmesi",
+          "subcontractor": "Alt yüklenici sözleşmesi"
+        }
       }
     }
   },
@@ -2055,7 +2132,11 @@
       "notifications.portal.message_received.title": "Yeni portal mesajı",
       "notifications.portal.message_received.body": "Gönderen: {buyer_name}. Yeni bir mesajınız var.",
       "dispatch.notify.plan_title": "Günlük planınız hazır",
-      "dispatch.notify.plan_body": "{day} planı: {lines} satır."
+      "dispatch.notify.plan_body": "{day} planı: {lines} satır.",
+      "notifications.monitoring.alert.title": "İzleme uyarısı",
+      "notifications.monitoring.action.title": "İzleme eylem seviyesi",
+      "notifications.monitoring.alarm.title": "İzleme alarmı",
+      "notifications.monitoring.crossed.body": "Nokta {point}: {displacement} mm, {rate} mm/day."
     },
     "schedule_headers": {
       "headers": {
@@ -2659,5 +2740,30 @@
         "gap": "Açık"
       }
     }
-  }
+  },
+  "monitoring.crossed.fail": "Nokta {id}: {d} mm yer değiştirme veya {r} mm/gün hız {level} seviyesini aştı",
+  "monitoring.crossed.suggestion": "Noktayı ve yapıyı kontrol edin, ardından uyarıyı bir notla onaylayın.",
+  "monitoring.level.ok": "OK",
+  "monitoring.level.alert": "Uyarı",
+  "monitoring.level.action": "Müdahale",
+  "monitoring.level.alarm": "Alarm",
+  "monitoring.risk.title": "{level} seviyesindeki izleme noktası {id}",
+  "monitoring.risk.description": "{profile} profiline göre {d} mm yer değiştirme, {r} mm/gün hız. Taslak izleme tarafından açıldı: gözden geçirin ve bir sorumlu atayın.",
+  "monitoring.report.title": "İzleme alarm raporu",
+  "monitoring.report.project": "Proje",
+  "monitoring.report.crs": "Koordinat sistemi",
+  "monitoring.report.profile": "Sınır profili",
+  "monitoring.report.generated": "Oluşturuldu",
+  "monitoring.report.point": "Nokta",
+  "monitoring.report.baseline": "Referans (m)",
+  "monitoring.report.latest": "Son değer (m)",
+  "monitoring.report.displacement": "Yer değiştirme (mm)",
+  "monitoring.report.rate": "Hız (mm/gün)",
+  "monitoring.report.level": "Seviye",
+  "monitoring.report.acknowledged": "Onaylandı",
+  "monitoring.report.counts": "Alarm: {alarm} · Müdahale: {action} · Uyarı: {alert} · OK: {ok}",
+  "monitoring.report.findings": "Bulgular",
+  "monitoring.report.no_profile": "Profil yok, bir profil belirleyin",
+  "monitoring.report.ack_yes": "Evet",
+  "monitoring.report.ack_no": "Hayır"
 }

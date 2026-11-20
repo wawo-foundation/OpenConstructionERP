@@ -299,6 +299,10 @@
     "unit_exportable": {
       "fail": "Position {ordinal}: unit '{unit}' does not fit the 4-character GAEB QU field and would be cut on export",
       "suggestion": "Use a GAEB unit code of at most 4 characters (m, m2, m3, St, h, psch, kg, t)"
+    },
+    "short_text_length": {
+      "fail": "Position {ordinal}: Kurztext has {length} characters; GAEB export cuts it to 70",
+      "suggestion": "Shorten the Kurztext to 70 characters and keep the details in the Langtext"
     }
   },
   "nrm": {
@@ -412,7 +416,10 @@
       "suggestion": "Assign a 9-digit GB/T 50500 code (e.g., 010101001)"
     },
     "valid_code": {
-      "fail": "Invalid GB/T 50500 code '{code}' - expected 9 or 12 digits"
+      "fail": "Invalid GB/T 50500 code '{code}' - expected 9 or 12 digits or a supplementary code such as 01B001"
+    },
+    "code_unique": {
+      "fail": "Item code '{code}' is used more than once in the same sub-project"
     }
   },
   "cpwd": {
@@ -967,6 +974,36 @@
     "change_time_within_owner": {
       "fail": "Subcontract time impacts for {code} total {sub_days} days, more than the {owner_days} days the owner granted",
       "suggestion": "Check the subcontract time claims or request a matching extension from the owner"
+    },
+    "pay_app_over_complete": {
+      "fail": "Line {line} reaches {percent}% of its scheduled value after this period ({completed} of {scheduled})",
+      "suggestion": "Lower this period's amount, or record the reason for billing above the scheduled value"
+    },
+    "pay_app_line_negative": {
+      "fail": "Line {line} would total {completed} to date, which is below zero"
+    },
+    "pay_app_within_agreement": {
+      "fail": "Pay applications together total {billed}, above the agreement value plus approved variations of {limit}"
+    },
+    "pay_app_correct": {
+      "suggestion": "Correct the amounts on this pay application, or raise the agreement value through an approved variation"
+    },
+    "required_documents": {
+      "fail": "Required document: {document} ({state})",
+      "suggestion": "Attach the document, signed and current, to the subcontract agreement",
+      "states": {
+        "missing": "missing",
+        "unsigned": "not signed",
+        "expired": "expired"
+      }
+    },
+    "document_roles": {
+      "terms_and_conditions": "Terms and conditions",
+      "safety_agreement": "Safety agreement",
+      "safety_plan": "Safety plan",
+      "insurance": "Insurance",
+      "method_statement": "Method statement",
+      "other": "Other document"
     }
   },
   "submittal": {
@@ -2014,6 +2051,510 @@
     "crew_without_record": {
       "fail": "A crew of {headcount} was on site but no work, inspection or delay is recorded.",
       "suggestion": "Add what the crew did, or record the delay that stopped work."
+    }
+  },
+  "framework_agreement": {
+    "item_not_in_agreement": {
+      "fail": "Line {code} is not an active item of agreement {agreement}; raise it as an extra.",
+      "suggestion": "Remove the line from the order and raise the work as an extra on the order."
+    },
+    "rate_deviates": {
+      "fail": "Line {code} rate {rate} differs from the agreement rate {expected}.",
+      "suggestion": "Rates on an order come from the agreement; reprice the line from the price list."
+    },
+    "order_outside_validity": {
+      "fail": "Order date {date} is outside the agreement term {from} to {to}.",
+      "suggestion": "Date the order inside the term, or extend the agreement first."
+    },
+    "rate_period_gap": {
+      "fail": "No rate period covers {date}.",
+      "suggestion": "Add a rate period that covers this date on the Rates and escalation tab."
+    },
+    "escalation_unresolved": {
+      "fail": "Index {series} has no value for {period}; the rate cannot be adjusted.",
+      "suggestion": "Enter the index value for that month in Price index, then price the order again."
+    },
+    "cap_exceeded": {
+      "fail": "This order takes the agreement to {total} of a {cap} cap; headroom {headroom}.",
+      "suggestion": "Reduce the order to the headroom, or issue it with a reasoned override."
+    },
+    "cap_threshold": {
+      "fail": "Agreement use has reached {pct} % of the cap.",
+      "suggestion": "Tell the client early so a follow-on agreement can be prepared."
+    },
+    "item_max_qty": {
+      "fail": "Item {code}: {qty} ordered to date exceeds the stated maximum {max}.",
+      "suggestion": "Agree the extra quantity with the client before the next order."
+    },
+    "min_at_risk": {
+      "fail": "{days} days left and {pct} % of the guaranteed minimum is ordered.",
+      "suggestion": "Raise the shortfall with the client while there is still time to order."
+    },
+    "currency_mismatch": {
+      "fail": "Order currency {cur} differs from agreement currency {agr}.",
+      "suggestion": "Orders are priced in the agreement currency."
+    },
+    "adjustment_unknown": {
+      "fail": "Condition {tag} has no adjustment in this agreement.",
+      "suggestion": "Add the adjustment on the Conditions tab, or remove the condition from the order."
+    },
+    "direct_claim": {
+      "fail": "Claims are raised on call-off orders, not on the agreement.",
+      "suggestion": "Open the order the work was done under and claim there."
+    },
+    "duplicate_item": {
+      "fail": "Item code {code} appears twice in rate period {period}.",
+      "suggestion": "Keep one row per item code before saving the price list."
+    },
+    "measured_over_ordered": {
+      "fail": "Measured {m} exceeds ordered {o} on line {code}; consider an extra.",
+      "suggestion": "Raise the extra quantity as a variation on the order."
+    },
+    "term_over_legal_max": {
+      "fail": "Term {years} years exceeds the {max}-year limit in {source} (pack).",
+      "suggestion": "Check the term with the client; the limit is stated by the pack, not enforced."
+    }
+  },
+  "estimate_archive": {
+    "arc_hash_mismatch": {
+      "fail": "Fingerprint mismatch: the record reads {actual}, the seal says {sealed}. Treat the record as altered."
+    },
+    "arc_total_mismatch": {
+      "fail": "The sealed total {seal} differs from the award {award} by {diff}."
+    },
+    "arc_no_breakdown": {
+      "fail": "{n} positions have no resource breakdown; their rates cannot be traced later."
+    },
+    "arc_no_markups": {
+      "fail": "The bill has no markups to seal."
+    },
+    "arc_sealed_after_signing": {
+      "fail": "Sealed {days} days after the contract was signed."
+    },
+    "arc_no_receipt": {
+      "fail": "The counterparty has not acknowledged the fingerprint yet."
+    },
+    "arc_open_not_closed": {
+      "fail": "Opening {id} has been open for {days} days without minutes."
+    },
+    "arc_open_no_reason": {
+      "fail": "An opening needs a reason and a reference."
+    },
+    "arc_open_one_party": {
+      "fail": "Only one party is listed; record why the other party is absent."
+    },
+    "var_basis_no_seal": {
+      "fail": "Position {code} is priced on the original basis, but no sealed estimate exists."
+    },
+    "var_basis_deviation": {
+      "fail": "Position {code}: {field} changed from {old} to {new} without a note."
+    },
+    "var_new_resource_no_evidence": {
+      "fail": "New resource {res} has no price date or quote reference."
+    },
+    "var_markup_not_sealed": {
+      "fail": "Position {code} applies markup {m}, which is not in the seal."
+    },
+    "var_abnormal_carried_rate": {
+      "fail": "Carried cost {c} is {pct} % away from the benchmark."
+    },
+    "arc_mutation_refused": {
+      "fail": "A sealed estimate cannot be changed or deleted. Seal a new version that supersedes it."
+    },
+    "contents_locked": "The contents stay sealed until a formal opening starts.",
+    "market_off": "Sealed estimates are not part of this project's market profile.",
+    "contract_required": "A client contract is needed before an estimate can be sealed as the contract basis."
+  },
+  "boq_revision": {
+    "superseded_still_editable": {
+      "fail": "Revision {label} can still be edited although {later} has been raised since; changes made here do not carry over",
+      "suggestion": "Lock {label} to freeze it, or open the latest revision to keep working"
+    }
+  },
+  "schedule_baseline": {
+    "single_approved": {
+      "fail": "This schedule has more than one approved baseline ({baselines}).",
+      "suggestion": "Approve the baseline that should be current; approving one withdraws the approval of the others."
+    }
+  },
+  "project_catalogue": {
+    "unit_present": {
+      "fail": "The rate {code} has no unit.",
+      "suggestion": "Enter the unit the rate is priced per, such as m2, m3 or h."
+    },
+    "duplicate_code": {
+      "fail": "The code {code} is used by more than one rate in this project.",
+      "suggestion": "Keep one rate per code, or give the variant a code of its own."
+    },
+    "currency_differs": {
+      "fail": "The rate {code} is in {currency}, but the project is priced in {project_currency}.",
+      "suggestion": "Convert the rate to the project currency, or confirm that the foreign currency is intended."
+    },
+    "override_far": {
+      "fail": "The local rate of {code} is {percent} % away from its source rate {source_rate}.",
+      "suggestion": "Check for a misplaced decimal point, or note why this project needs a different price."
+    },
+    "source_changed": {
+      "fail": "The source rate of {code} changed from {old} to {new} since the project copied it.",
+      "suggestion": "Take the new source rate, or keep the local rate on purpose."
+    }
+  },
+  "schedule_mspdi_import": {
+    "task_dates": {
+      "missing_dates": "Task {ref} \"{name}\" has no start or finish date.",
+      "finish_before_start": "Task {ref} \"{name}\" finishes ({finish}) before it starts ({start}).",
+      "suggestion": "Correct the dates in the source programme and export it again. Dates are never guessed on import."
+    },
+    "unique_ids": {
+      "duplicate_uid": "Task ID {ref} appears more than once; only the first task with it is kept.",
+      "suggestion": "Give every task a unique ID in the source programme."
+    },
+    "links_resolve": {
+      "dangling_link": "Task {ref} \"{name}\": predecessor {predecessor} is not in the file, the link is skipped.",
+      "duplicate_link": "Task {ref} \"{name}\": a second link from predecessor {predecessor} is skipped, one link per pair is kept.",
+      "self_link": "Task {ref} \"{name}\" is linked to itself, the link is skipped.",
+      "unknown_link_type": "Task {ref} \"{name}\": link type {type} is unknown and is read as finish-to-start.",
+      "suggestion": "Check the logic links in the source programme."
+    },
+    "values_in_range": {
+      "percent_out_of_range": "Task {ref} \"{name}\": {value}% complete is outside 0-100 and is capped.",
+      "outline_gap": "Task {ref} \"{name}\" skips an outline level ({level}); it is placed under the nearest summary above it.",
+      "suggestion": "Check % complete and the indentation in the source programme."
+    },
+    "calendar_work_days": {
+      "calendar_no_work_days": "Calendar {calendar} has no working weekday.",
+      "suggestion": "Mark the working weekdays of this calendar in the source programme."
+    }
+  },
+  "schedule_pdf_import": {
+    "no_text_layer": {
+      "fail": "The PDF has no text layer, so its table cannot be read.",
+      "suggestion": "Export the schedule as MS Project XML, XER or Excel and import that file instead."
+    },
+    "dates_parsed": {
+      "fail": "Row {row}: a start or finish is not a date.",
+      "suggestion": "Check the date columns and the day/month order, or correct the date in the source."
+    },
+    "finish_before_start": {
+      "fail": "Row {row}: the finish is before the start.",
+      "suggestion": "Correct the dates in the source programme."
+    },
+    "duration_mismatch": {
+      "fail": "Row {row}: the printed duration differs from the working days between start and finish.",
+      "suggestion": "The dates are kept; check the duration column and the project calendar."
+    },
+    "unique_ids": {
+      "fail": "Row {row}: the activity ID is used by another row.",
+      "suggestion": "Give every activity a unique ID in the source programme."
+    },
+    "links_resolve": {
+      "fail": "Row {row}: a predecessor is not an activity of the table.",
+      "suggestion": "Check the predecessor column; links that do not resolve are skipped."
+    }
+  },
+  "commercial_control": {
+    "ok": "Checked, no issues",
+    "cvr": {
+      "target_rate_basis": {
+        "fail": "{missing} of {total} priced positions have no target rate and are budgeted at their sale rate (for example {sample})",
+        "suggestion": "Enter the target cost rate on these positions so the budget is the cost the site is held to"
+      },
+      "unmapped_cost": {
+        "fail": "{kind} {label} has no WBS or cost code: committed {committed}, actual {actual}",
+        "suggestion": "Book the order line, subcontract or invoice to a WBS element so the CVR can place it"
+      }
+    },
+    "procurement": {
+      "line_over_committed": {
+        "fail": "Line {ordinal} is over-committed: {committed_qty} of {budget_qty} ordered, {committed_value} against a budget of {budget_value}",
+        "suggestion": "Check for a double order, or raise a variation or budget transfer before committing more"
+      }
+    },
+    "approval_routes": {
+      "bands_contiguous": {
+        "gap": {
+          "fail": "Amounts from {low} up to {high} reach no approver (step {step})",
+          "suggestion": "Extend a neighbouring band or add a step so every amount has an approver"
+        },
+        "overlap": {
+          "fail": "Step {step} overlaps a lower band from {low} up to {high}, so both approvers sign those amounts",
+          "suggestion": "Let each band start where the one before it ends, unless both approvers should sign"
+        },
+        "empty": {
+          "fail": "Step {step} has a band from {low} to {high}, which contains no amount",
+          "suggestion": "Set the minimum below the maximum, or leave the maximum empty for no ceiling"
+        }
+      }
+    },
+    "valuation": {
+      "assessed_within_submitted": {
+        "fail": "Line {line}: assessed quantity {assessed} is above the submitted {submitted}",
+        "suggestion": "Assess at most what was submitted and record extra work as a variation"
+      },
+      "certified_within_assessed": {
+        "fail": "Line {line}: certified quantity {certified} is above the assessed {assessed}",
+        "suggestion": "Certify at most what was assessed, or reassess the line first"
+      }
+    }
+  },
+  "norm_base": {
+    "code_present": {
+      "fail": "Line {ordinal} cites no {base} norm code. A norm-based estimate cites a norm on every line.",
+      "suggestion": "Enter the norm code under the {classification} classification of the line."
+    },
+    "code_shape": {
+      "fail": "\"{code}\" on line {ordinal} is not a {base} code. Expected a code like {example}."
+    },
+    "legacy_prefix": {
+      "fail": "\"{code}\" on line {ordinal} uses the retired prefix {old}. The current code is {new}."
+    },
+    "resource_breakdown": {
+      "fail": "Norm line {code} has no labour hours or no average grade.",
+      "suggestion": "Add the labour resource with its hours per unit and the average grade of the norm."
+    },
+    "grade_range": {
+      "fail": "Grade {grade} on line {ordinal} is outside {min} to {max} or not in steps of {step}."
+    }
+  },
+  "public_funding": {
+    "markup_cap": {
+      "fail": "{funding}: {markup} is {percent} %, the cap is {cap} % of direct costs ({source}).",
+      "suggestion": "Lower the markup to the cap, or set the project's funding type to private if no public money pays for the work."
+    },
+    "investor_exact": {
+      "fail": "Client estimate on {funding}: {markup} should be exactly {cap} % ({source})."
+    },
+    "material_price_evidence": {
+      "fail": "{funding}: material {material} on line {ordinal} has {count} of {required} price offers and no price analysis.",
+      "suggestion": "Record the supplier offers on the material or attach the price analysis report."
+    }
+  },
+  "vat_rate": {
+    "standard_rate": {
+      "fail": "{markup} is {percent} %; the standard VAT rate in {country} is {rate} %.",
+      "suggestion": "Set the tax line to the standard rate, or record on the bill why another rate or an exemption applies."
+    }
+  },
+  "survey": {
+    "no_crs": {
+      "fail": "Point set {name} has no CRS: declare EPSG or a local grid before volumes or parcels.",
+      "suggestion": "Set the project coordinate system, then declare which system this file was measured in."
+    },
+    "crs_unconfirmed": {
+      "fail": "CRS auto-detected (confidence {confidence}); confirm before use.",
+      "suggestion": "Open Set project CRS and confirm the detected system or choose another."
+    },
+    "duplicate_point": {
+      "fail": "Duplicate point id {point_id} with different coordinates.",
+      "suggestion": "Keep one reading: delete the point set with the wrong one and import it again."
+    },
+    "traverse_misclosure": {
+      "fail": "Traverse {name} closes at 1:{r}, below the profile minimum 1:{min}.",
+      "suggestion": "Check the legs for a blunder, re-observe the weakest leg, or confirm the profile value."
+    },
+    "level_misclosure": {
+      "fail": "Level run misclosure {f} mm exceeds k·√km with k = {k} mm.",
+      "suggestion": "Re-run the levels or check the benchmark heights used."
+    }
+  },
+  "volumes": {
+    "no_overlap": {
+      "fail": "The two surfaces overlap on only {p} % of the area: the volume is meaningless.",
+      "suggestion": "Check that both surfaces are in the same coordinate system and cover the same ground."
+    },
+    "low_coverage": {
+      "fail": "Only {c} % of the area has data in both surfaces (minimum {min} %).",
+      "suggestion": "Add survey points where a surface is missing, or narrow the boundary to the covered area."
+    },
+    "coarse_scan": {
+      "fail": "A coarse scan (LOA10) feeds this volume and no reason is given.",
+      "suggestion": "Use a survey-grade scan, or write why this scan is good enough."
+    },
+    "bank_volume": {
+      "fail": "The quantity is bank volume (in the ground); the swell factor is not applied.",
+      "suggestion": "Send the loose cut instead if the BOQ line is measured as loose material."
+    }
+  },
+  "setting_out": {
+    "stake_off": {
+      "fail": "Stake {id} off by {d} mm, tolerance {t} mm",
+      "suggestion": "Stake the point again and record it, or create an NCR draft."
+    },
+    "record_untraceable": {
+      "fail": "Stakeout record {id} has no instrument or control reference.",
+      "suggestion": "Enter the instrument and the control points the station was set up on."
+    },
+    "sheet": {
+      "title": "Setting-out sheet",
+      "project": "Project",
+      "crs": "Coordinate system",
+      "request": "Request",
+      "tolerance": "Tolerance",
+      "element": "Element",
+      "generated": "Generated",
+      "point": "Point",
+      "design_e": "Design E",
+      "design_n": "Design N",
+      "design_z": "Design Z",
+      "measured_e": "Measured E",
+      "measured_n": "Measured N",
+      "verdict": "Verdict",
+      "by": "Measured by",
+      "verdict_pass": "Pass",
+      "verdict_fail": "Fail",
+      "verdict_open": "Open",
+      "verdict_no_tolerance": "No profile",
+      "counts": "Pass: {passed} · Fail: {failed} · Open: {open}",
+      "findings": "Findings",
+      "no_profile": "No profile, set one",
+      "d": "Offset d (mm)",
+      "dz": "Offset dZ (mm)"
+    }
+  },
+  "land_parcels": {
+    "area_mismatch": {
+      "fail": "Parcel {id}: computed area {a} m2 differs from legal area {l} m2 by more than tolerance ({t}).",
+      "suggestion": "Check the boundary points against the register extract, or note why the two areas differ."
+    },
+    "ring_invalid": {
+      "fail": "Parcel {id}: ring not closed or self-intersecting.",
+      "suggestion": "Fix the boundary points so they run once around the parcel without crossing."
+    },
+    "zone_not_acquired": {
+      "fail": "Work zone overlaps parcel {id} not yet acquired ({area} m2).",
+      "suggestion": "Acquire the parcel or agree access before the works start, or move the work zone."
+    },
+    "overlap": {
+      "fail": "Parcels {a} and {b} overlap by {area} m2.",
+      "suggestion": "Correct the shared boundary so both parcels use the same points."
+    },
+    "gap": {
+      "fail": "Gap of {gap} m between parcels {a} and {b}.",
+      "suggestion": "Make both parcels use the same boundary points, or confirm the strip belongs to another parcel."
+    },
+    "id_format": {
+      "fail": "Parcel ID {id} does not match the {label} format (for example {example}).",
+      "suggestion": "Copy the ID exactly as the register writes it."
+    },
+    "pdf": {
+      "title": "Parcel schedule",
+      "project": "Project",
+      "crs": "Coordinate system",
+      "method": "Method",
+      "method_value": "Area from boundary coordinates (shoelace), rounded to {decimals} decimals, m2",
+      "printed": "Printed by",
+      "legal": "Legal area (m2)",
+      "computed": "Computed (m2)",
+      "diff": "Diff (m2)",
+      "status": "Status",
+      "rights": "Rights",
+      "cost": "Cost",
+      "findings": "Findings",
+      "total": "Total, {count} parcels",
+      "acquired_of": "Acquired {acquired} of {total}",
+      "findings_title": "Findings",
+      "no_findings": "No findings.",
+      "disclaimer": "Owners and rights are shown as recorded in this project. This schedule is not a legal opinion or a register extract.",
+      "status_needed": "Needed",
+      "status_negotiating": "Negotiating",
+      "status_acquired": "Acquired",
+      "status_expropriation": "Expropriation"
+    }
+  },
+  "monitoring": {
+    "crossed": {
+      "fail": "Point {id} displacement {d} mm or rate {r} mm/day crossed {level}",
+      "suggestion": "Check the point and the structure, then acknowledge the alert with a note."
+    },
+    "level": {
+      "ok": "OK",
+      "alert": "Alert",
+      "action": "Action",
+      "alarm": "Alarm"
+    },
+    "risk": {
+      "title": "Monitoring point {id} at {level}",
+      "description": "Displacement {d} mm, rate {r} mm/day against {profile}. Draft opened by monitoring: review it and name an owner."
+    },
+    "report": {
+      "title": "Monitoring alarm report",
+      "project": "Project",
+      "crs": "Coordinate system",
+      "profile": "Threshold profile",
+      "generated": "Generated",
+      "point": "Point",
+      "baseline": "Baseline (m)",
+      "latest": "Latest (m)",
+      "displacement": "Displacement (mm)",
+      "rate": "Rate (mm/day)",
+      "level": "Level",
+      "acknowledged": "Acknowledged",
+      "counts": "Alarm: {alarm} · Action: {action} · Alert: {alert} · OK: {ok}",
+      "findings": "Findings",
+      "no_profile": "No profile, set one",
+      "ack_yes": "Yes",
+      "ack_no": "No"
+    }
+  },
+  "stockpiles": {
+    "density_assumed": {
+      "fail": "The density is assumed, not measured: the tonnes are only as reliable as that guess.",
+      "suggestion": "Weigh a sample or take the density from the supplier's delivery notes."
+    },
+    "variance_high": {
+      "fail": "The survey differs from the book stock by {v} %, beyond the {t} % tolerance.",
+      "suggestion": "Check the density and the base surface, then propose an adjustment and confirm it if the gap is real."
+    }
+  },
+  "mine_survey": {
+    "compliance_outside": {
+      "fail": "Period compliance {c} % is outside the {lo}-{hi} % band.",
+      "suggestion": "Check the plan and the survey, then explain the gap in the period note before the claim."
+    },
+    "truck_differs": {
+      "fail": "Truck-count tonnes differ from survey tonnes by {v} %, beyond the {t} % check.",
+      "suggestion": "Check the payload per load and the density, then compare the two surfaces again."
+    }
+  },
+  "hongkong": {
+    "sopo_applicability": {
+      "fail": "Cap. 652 (Security of Payment) covers this contract: payment response within 30 days, payment within 60 days of the claim"
+    },
+    "sopo_private_scope_check": {
+      "fail": "A private contract is covered by Cap. 652 only for a new building or works needing Building Authority approval: confirm the scope"
+    },
+    "sopo_response_late": {
+      "fail": "No payment response was served by {date}: the claimed amount is disputed and may go to adjudication"
+    },
+    "sopo_payment_term_exceeds_60": {
+      "fail": "The payment period of {n} days exceeds the 60 days allowed by Cap. 652"
+    },
+    "sopo_response_term_exceeds_30": {
+      "fail": "The payment response period of {n} days exceeds the 30 days allowed by Cap. 652"
+    },
+    "sopo_adjudication_window": {
+      "fail": "A payment dispute has arisen: serve the notice of adjudication by {date}"
+    },
+    "contract_pay_when_paid": {
+      "fail": "Pay-when-paid clause: Cap. 652 makes conditional payment provisions unenforceable"
+    },
+    "levy_missing": {
+      "fail": "The works exceed HK$3,000,000 but the bill lacks the CIC levy (0.5%) or the CWR levy (0.03%)"
+    },
+    "levy_below_threshold": {
+      "fail": "The works are HK$3,000,000 or less: no CIC or CWR levy is due"
+    },
+    "tax_nonzero": {
+      "fail": "A VAT or GST line is charged, but Hong Kong has no such tax: set it to zero"
+    },
+    "retention_over_limit": {
+      "fail": "Retention held {x} exceeds the contract limit {limit}"
+    },
+    "pc_sum_no_attendance": {
+      "fail": "A prime cost sum has no profit and attendance items"
+    },
+    "index_attribution": {
+      "fail": "The ArchSD tender price index has no source attribution: credit the Architectural Services Department"
     }
   }
 }

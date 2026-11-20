@@ -72,6 +72,7 @@ import { ContractExpiryBadge } from './ContractExpiryBadge';
 import { ComplianceGate } from './ComplianceGate';
 import { ContractPartiesPanel } from './ContractPartiesPanel';
 import { ContractSecuritiesPanel } from './ContractSecuritiesPanel';
+import { ContractSealCard } from '@/features/estimate-archive/SealedEstimateEntry';
 import {
   RetentionReleasePanel,
   retentionEventLabel,
@@ -82,6 +83,8 @@ import { SovReconcilePanel } from './SovReconcilePanel';
 import { contractsGuide } from './contractsGuide';
 import { bidPackageDeepLink, boqDeepLink, contractSource, tenderPackageDeepLink } from '@/shared/lib/awardChainLinks';
 import { useToastStore } from '@/stores/useToastStore';
+import { useLayoutCustomizer } from '@/features/doc-templates';
+import { RecordPdfButton } from '@/shared/ui/RegisterExport';
 import { useActiveProjectId } from '@/shared/hooks/useActiveProjectId';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { getErrorMessage } from '@/shared/lib/api';
@@ -105,6 +108,7 @@ import {
   closeContract,
   cloneContract,
   deleteContract,
+  downloadContractPdf,
   contractDeleteRefusal,
   listClauseTemplates,
   submitClaim,
@@ -154,7 +158,8 @@ import { RunAgentButton } from '@/features/ai-agents/components/RunAgentButton';
 // through to the previous default.
 const CONTRACTS_TYPE_LABELS: Record<string, string> = {
   lump_sum: 'Lump sum', gmp: 'GMP', cost_plus: 'Cost plus', tm: 'T&M', unit_price: 'Unit price',
-  design_build: 'Design and build', combination: 'Combination', remeasurement: 'Remeasurement'
+  design_build: 'Design and build', combination: 'Combination', remeasurement: 'Remeasurement',
+  framework: 'Framework agreement', call_off: 'Call-off order'
 };
 
 
@@ -172,6 +177,8 @@ const CONTRACT_TYPE_COLORS: Record<
   design_build: { bg: 'bg-fuchsia-50 dark:bg-fuchsia-950/40', ring: 'ring-fuchsia-200 dark:ring-fuchsia-800', text: 'text-fuchsia-700 dark:text-fuchsia-300' },
   combination: { bg: 'bg-surface-secondary', ring: 'ring-slate-200 dark:ring-slate-700', text: 'text-content-secondary' },
   remeasurement: { bg: 'bg-teal-50 dark:bg-teal-950/40', ring: 'ring-teal-200 dark:ring-teal-800', text: 'text-teal-700 dark:text-teal-300' },
+  framework: { bg: 'bg-semantic-info-bg', ring: 'ring-semantic-info/30', text: 'text-semantic-info' },
+  call_off: { bg: 'bg-surface-secondary', ring: 'ring-slate-200 dark:ring-slate-700', text: 'text-content-secondary' },
 };
 
 /** Neutral fallback so an unknown/missing contract type never crashes the chip. */
@@ -214,6 +221,10 @@ const CONTRACT_TYPES: ContractType[] = [
   'combination',
   'remeasurement',
 ];
+
+// Framework agreements and their call-off orders are created in their own module; the
+// register can still filter by them.
+const CONTRACT_FILTER_TYPES: ContractType[] = [...CONTRACT_TYPES, 'framework', 'call_off'];
 
 const CONTRACT_STATUSES: ContractStatus[] = [
   'draft',
@@ -571,6 +582,27 @@ export function ContractsPage() {
   const [projectId, setProjectId] = useState<string>('');
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState<ContractType | ''>('');
+  // Which side of the business the register shows. Client contracts are income
+  // and subcontracts are cost, so they are never listed or summed as one.
+  const [sideFilter, setSideFilter] = useState<CounterpartyType | ''>('');
+  const [deleteTarget, setDeleteTarget] = useState<ContractItem | null>(null);
+  const pageQc = useQueryClient();
+  const pageToast = useToastStore((s) => s.addToast);
+  const deleteRowMut = useMutation({
+    mutationFn: (id: string) => deleteContract(id),
+    onSuccess: () => {
+      setDeleteTarget(null);
+      pageQc.invalidateQueries({ queryKey: ['contracts', 'list'] });
+      pageToast({
+        type: 'success',
+        title: t('contracts.deleted_ok', { defaultValue: 'Draft contract deleted' }),
+      });
+    },
+    onError: (err) => {
+      setDeleteTarget(null);
+      pageToast({ type: 'error', title: contractDeleteRefusalText(t, err) ?? getErrorMessage(err) });
+    },
+  });
   const [statusFilter, setStatusFilter] = useState<string>('');
   // A tab click clears the filters itself (below). A tab reached through the
   // URL, a menu row clicked while this page is open, has to clear them too:
@@ -662,10 +694,11 @@ export function ContractsPage() {
         return false;
       }
       if (typeFilter && c.contract_type !== typeFilter) return false;
+      if (sideFilter && c.counterparty_type !== sideFilter) return false;
       if (statusFilter && c.status !== statusFilter) return false;
       return matchesSearch(search, c.code, c.title);
     });
-  }, [contracts, search, typeFilter, statusFilter, counterpartyFilter]);
+  }, [contracts, search, typeFilter, sideFilter, statusFilter, counterpartyFilter]);
 
   const filteredClaims = useMemo(() => {
     const items = claimsQ.data?.items ?? [];
@@ -791,7 +824,7 @@ export function ContractsPage() {
 
       {tab === 'contracts' && projectId && contracts.length > 0 && (
         <KpiBand
-          columns={4}
+          columns={5}
           items={[
             {
               key: 'all',
@@ -810,11 +843,25 @@ export function ContractsPage() {
               value: contracts.filter((c) => c.status === 'draft').length,
             },
             {
-              key: 'value',
-              label: t('contracts.value', { defaultValue: 'Value' }),
+              key: 'value_client',
+              label: t('contracts.side_client', { defaultValue: 'Client contracts' }),
               value: (
                 <MultiCurrencyTotal
-                  items={contracts.map((c) => ({ amount: c.total_value, currency: c.currency }))}
+                  items={contracts
+                    .filter((c) => c.counterparty_type === 'client')
+                    .map((c) => ({ amount: c.total_value, currency: c.currency }))}
+                  variant="inline"
+                />
+              ),
+            },
+            {
+              key: 'value_sub',
+              label: t('contracts.side_subcontract', { defaultValue: 'Subcontracts' }),
+              value: (
+                <MultiCurrencyTotal
+                  items={contracts
+                    .filter((c) => c.counterparty_type !== 'client')
+                    .map((c) => ({ amount: c.total_value, currency: c.currency }))}
                   variant="inline"
                 />
               ),
@@ -875,6 +922,62 @@ export function ContractsPage() {
         </nav>
       </div>
 
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        onConfirm={() => deleteTarget && deleteRowMut.mutate(deleteTarget.id)}
+        onCancel={() => setDeleteTarget(null)}
+        title={t('contracts.delete_title', { defaultValue: 'Delete draft contract' })}
+        message={t('contracts.delete_row_message', {
+          defaultValue:
+            'Delete draft contract {{code}}? This removes the draft and everything held under it, including its lines, variations, progress claims and retention. This action cannot be undone.',
+          code: deleteTarget?.code ?? '',
+        })}
+        confirmLabel={t('contracts.delete', { defaultValue: 'Delete' })}
+        cancelLabel={t('common.cancel', { defaultValue: 'Cancel' })}
+        variant="danger"
+        loading={deleteRowMut.isPending}
+      />
+
+      {tab === 'contracts' && projectId && contracts.length > 0 && (
+        <div
+          role="group"
+          aria-label={t('contracts.counterparty', { defaultValue: 'Counterparty' })}
+          data-testid="contracts-side-filter"
+          className="inline-flex rounded-lg border border-border-light bg-surface-secondary p-0.5 text-sm"
+        >
+          {(
+            [
+              { id: '', label: t('common.all', { defaultValue: 'All' }), count: contracts.length },
+              {
+                id: 'client',
+                label: t('contracts.side_client', { defaultValue: 'Client contracts' }),
+                count: contracts.filter((c) => c.counterparty_type === 'client').length,
+              },
+              {
+                id: 'subcontractor',
+                label: t('contracts.side_subcontract', { defaultValue: 'Subcontracts' }),
+                count: contracts.filter((c) => c.counterparty_type !== 'client').length,
+              },
+            ] as { id: CounterpartyType | ''; label: string; count: number }[]
+          ).map((o) => (
+            <button
+              key={o.id || 'all'}
+              type="button"
+              aria-pressed={sideFilter === o.id}
+              onClick={() => setSideFilter(o.id)}
+              className={clsx(
+                'rounded-md px-3 py-1.5 font-medium transition-colors',
+                sideFilter === o.id
+                  ? 'bg-surface-elevated text-content-primary shadow-sm'
+                  : 'text-content-secondary hover:text-content-primary',
+              )}
+            >
+              {o.label} <span className="text-content-tertiary">({o.count})</span>
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Filters — the project is chosen in the global top bar, so the
           previous in-page project select is gone; only entity-level filters
           (search / type / status) remain here. */}
@@ -905,7 +1008,7 @@ export function ContractsPage() {
             <option value="">
               {t('contracts.all_types', { defaultValue: 'All types' })}
             </option>
-            {CONTRACT_TYPES.map((tp) => (
+            {CONTRACT_FILTER_TYPES.map((tp) => (
               <option key={tp} value={tp}>
                 {t(`contracts.type_${tp}`, {
                   defaultValue: CONTRACTS_TYPE_LABELS[tp] ?? (tp === 'tm' ? 'T&M' : tp.replace(/_/g, ' ')),
@@ -1023,6 +1126,7 @@ export function ContractsPage() {
           <ContractTable
             rows={filteredContracts}
             onSelect={setSelectedContractId}
+            onDelete={setDeleteTarget}
             emptyAction={() => setCreateOpen(true)}
           />
         ) : tab === 'claims' ? (
@@ -1076,10 +1180,12 @@ export function ContractsPage() {
 function ContractTable({
   rows,
   onSelect,
+  onDelete,
   emptyAction,
 }: {
   rows: ContractItem[];
   onSelect: (id: string) => void;
+  onDelete: (row: ContractItem) => void;
   emptyAction: () => void;
 }) {
   const { t } = useTranslation();
@@ -1171,6 +1277,7 @@ function ContractTable({
             <th className="text-right">
               {t('contracts.value', { defaultValue: 'Value' })}
             </th>
+            <th className="w-10" />
           </tr>
         </thead>
         <tbody>
@@ -1219,6 +1326,32 @@ function ContractTable({
                   currency={r.currency || undefined}
                 />
               </td>
+              {/* Only a draft can be deleted (the server enforces it too); a
+                  signed contract shows the button disabled with the reason, so
+                  nobody hunts for a delete that is not there. */}
+              <td className="text-right" onClick={(e) => e.stopPropagation()}>
+                <button
+                  type="button"
+                  data-testid={`contract-row-delete-${r.id}`}
+                  disabled={r.status !== 'draft'}
+                  onClick={() => onDelete(r)}
+                  aria-label={t('contracts.delete_row', {
+                    defaultValue: 'Delete contract {{code}}',
+                    code: r.code,
+                  })}
+                  title={
+                    r.status === 'draft'
+                      ? t('contracts.delete', { defaultValue: 'Delete' })
+                      : t('contracts.delete_only_draft', {
+                          defaultValue:
+                            'Only a draft can be deleted. Close or terminate a signed contract instead.',
+                        })
+                  }
+                  className="rounded p-1.5 text-content-tertiary hover:bg-surface-secondary hover:text-semantic-error disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-content-tertiary"
+                >
+                  <Trash2 size={14} />
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>
@@ -1226,30 +1359,40 @@ function ContractTable({
             currencies into a single number (the previous footer would
             have done arithmetic on €+$ values without warning). */}
         <tfoot className="bg-surface-secondary/60">
-          <tr>
-            <td colSpan={5} className="text-content-tertiary">
-              {t('contracts.register_total', { defaultValue: 'Register total' })}
-              <span className="ml-2 normal-case text-content-secondary">
-                ({t('contracts.register_count', {
-                  count: rows.length,
-                  defaultValue_one: '{{count}} contract',
-                  defaultValue_other: '{{count}} contracts',
-                })})
-              </span>
-            </td>
-            <td className="text-right font-medium">
-              {/* Not compacted: the Value column above prints every figure in
-                  full, and a register total written to a different precision
-                  than the column it sums makes the reader do the conversion. */}
-              <MultiCurrencyTotal
-                items={rows.map((r) => ({
-                  amount: r.total_value,
-                  currency: r.currency,
-                }))}
-                variant="inline"
-              />
-            </td>
-          </tr>
+          {/* One total per side. Client contracts are what the firm will bill,
+              subcontracts what it will pay; adding them gave a number that
+              meant neither. */}
+          {(['client', 'subcontractor'] as const)
+            .map((side) => ({
+              side,
+              list: rows.filter((r) =>
+                side === 'client' ? r.counterparty_type === 'client' : r.counterparty_type !== 'client',
+              ),
+            }))
+            .filter((g) => g.list.length > 0)
+            .map((g) => (
+              <tr key={g.side} data-testid={`contracts-total-${g.side}`}>
+                <td colSpan={5} className="text-content-tertiary">
+                  {g.side === 'client'
+                    ? t('contracts.side_client', { defaultValue: 'Client contracts' })
+                    : t('contracts.side_subcontract', { defaultValue: 'Subcontracts' })}
+                  <span className="ml-2 normal-case text-content-secondary">
+                    ({t('contracts.register_count', {
+                      count: g.list.length,
+                      defaultValue_one: '{{count}} contract',
+                      defaultValue_other: '{{count}} contracts',
+                    })})
+                  </span>
+                </td>
+                <td className="text-right font-medium">
+                  <MultiCurrencyTotal
+                    items={g.list.map((r) => ({ amount: r.total_value, currency: r.currency }))}
+                    variant="inline"
+                  />
+                </td>
+                <td />
+              </tr>
+            ))}
         </tfoot>
       </table>
     </div>
@@ -1888,6 +2031,10 @@ export function ContractDetailDrawer({
   onClose: () => void;
 }) {
   const { t } = useTranslation();
+  const contractLayout = useLayoutCustomizer(
+    'contracts.contract',
+    t('contracts.tab_contracts', { defaultValue: 'Contracts' }),
+  );
   const qc = useQueryClient();
   const canCostContract = useHasPermission('costmodel.write');
   const addToast = useToastStore((s) => s.addToast);
@@ -2178,6 +2325,11 @@ export function ContractDetailDrawer({
 
           {/* Workflow buttons */}
           <div className="flex flex-wrap gap-2 pt-1">
+            <RecordPdfButton
+              download={(locale) => downloadContractPdf(contract.id, locale, contract.code)}
+              testId="contract-pdf"
+              onCustomize={contractLayout.open({ recordId: contract.id, projectId: contract.project_id })}
+            />
             {contract.status === 'draft' && (
               <>
                 <Button
@@ -2754,6 +2906,10 @@ export function ContractDetailDrawer({
             currency={contract.currency}
           />
 
+          {contract.counterparty_type === 'client' && (
+            <ContractSealCard projectId={contract.project_id} contractId={contractId} />
+          )}
+
           {/* Retention, and the way it goes back. It sits under the bonds
               because a release at substantial completion regularly needs the
               surety's consent, which is a row in the register above. */}
@@ -2787,6 +2943,7 @@ export function ContractDetailDrawer({
       {/* Compliance gate (Item #27) — runs the project rule packs before
           allowing the draft → active signature. Rendered via a portal so it
           stacks above the detail drawer. */}
+      {contractLayout.drawer}
       {gateOpen && (
         <ComplianceGate
           contractId={contractId}

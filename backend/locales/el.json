@@ -1644,7 +1644,8 @@
         "no_rejections": "Δεν απορρίφθηκε τίποτα.",
         "sig_delivered_by": "Παραδόθηκε από",
         "counterparty_tax_id": "ΑΦΜ",
-        "counterparty_address": "Διεύθυνση"
+        "counterparty_address": "Διεύθυνση",
+        "delivery_address": "Διεύθυνση παράδοσης"
       },
       "labels": {
         "po_status": {
@@ -1717,7 +1718,8 @@
         "gross_settled": "Ακαθάριστο διακανονισμένο ποσό",
         "no_withholding": "Δεν παρακρατήθηκε τίποτα από την πληρωμή αυτή.",
         "counterparty_tax_id": "ΑΦΜ",
-        "counterparty_address": "Διεύθυνση"
+        "counterparty_address": "Διεύθυνση",
+        "supply_date": "Ημερομηνία παράδοσης"
       },
       "labels": {
         "invoice_status": {
@@ -1786,6 +1788,81 @@
         "col_min": "Ελάχ.",
         "col_max": "Μέγ.",
         "col_count": "Μετρήσεις"
+      }
+    },
+    "gantt_pdf": {
+      "strings": {
+        "title": "Χρονοδιάγραμμα (διάγραμμα Gantt)",
+        "project": "Έργο",
+        "schedule": "Χρονοδιάγραμμα",
+        "baseline": "Βασικό πλάνο",
+        "no_baseline": "κανένα",
+        "exported": "Εξήχθη",
+        "data_date": "Ημερομηνία κατάστασης",
+        "col_wbs": "WBS",
+        "col_activity": "Δραστηριότητα",
+        "col_start": "Έναρξη",
+        "col_finish": "Λήξη",
+        "col_duration": "Ημέρες",
+        "legend_current": "Τρέχον πλάνο",
+        "legend_progress": "Πρόοδος",
+        "legend_critical": "Κρίσιμη διαδρομή",
+        "legend_baseline": "Βασικό πλάνο",
+        "legend_actual": "Πραγματικό",
+        "legend_milestone": "Ορόσημο",
+        "legend_summary": "Σύνοψη",
+        "week_short": "Ε{n}",
+        "quarter_short": "Τ{n}",
+        "sheet_of": "Φύλλο {page} από {total}",
+        "no_activities": "Αυτό το χρονοδιάγραμμα δεν έχει ακόμη δραστηριότητες."
+      }
+    },
+    "contracts": {
+      "strings": {
+        "doc_title": "Σύμβαση",
+        "col_code": "Κωδικός",
+        "col_title": "Τίτλος",
+        "col_type": "Τύπος σύμβασης",
+        "col_role": "Πλευρά σύμβασης",
+        "col_counterparty": "Αντισυμβαλλόμενος",
+        "col_original_value": "Αρχική αξία",
+        "col_total_value": "Αξία σύμβασης",
+        "col_retention": "Παρακράτηση",
+        "col_start": "Ημερομηνία έναρξης",
+        "col_end": "Ημερομηνία λήξης",
+        "col_signed": "Υπογράφηκε στις",
+        "line_code": "Κωδικός",
+        "line_description": "Περιγραφή",
+        "line_unit": "Μονάδα",
+        "line_quantity": "Ποσότητα",
+        "line_unit_rate": "Τιμή μονάδας",
+        "lines": "Πίνακας αξιών",
+        "signer_company": "Για την εταιρεία"
+      },
+      "labels": {
+        "status": {
+          "draft": "Πρόχειρο",
+          "active": "Ενεργή",
+          "suspended": "Σε αναστολή",
+          "completed": "Ολοκληρωμένη",
+          "terminated": "Καταγγελθείσα"
+        },
+        "type": {
+          "lump_sum": "Κατ’ αποκοπή",
+          "gmp": "GMP",
+          "cost_plus": "Κόστος πλέον",
+          "tm": "Χρόνος και υλικά",
+          "unit_price": "Τιμή μονάδας",
+          "design_build": "Μελέτη και κατασκευή",
+          "combination": "Συνδυασμός",
+          "remeasurement": "Επαναμέτρηση",
+          "framework": "Συμφωνία πλαίσιο",
+          "call_off": "Εκτελεστική παραγγελία"
+        },
+        "party": {
+          "client": "Σύμβαση με τον κύριο του έργου",
+          "subcontractor": "Υπεργολαβία"
+        }
       }
     }
   },
@@ -2076,7 +2153,11 @@
       "notifications.portal.message_received.title": "Νέο μήνυμα στην πύλη",
       "notifications.portal.message_received.body": "Μήνυμα από: {buyer_name}.",
       "dispatch.notify.plan_title": "Your daily plan is ready",
-      "dispatch.notify.plan_body": "Plan for {day}: {lines} lines."
+      "dispatch.notify.plan_body": "Plan for {day}: {lines} lines.",
+      "notifications.monitoring.alert.title": "Ειδοποίηση παρακολούθησης",
+      "notifications.monitoring.action.title": "Επίπεδο δράσης παρακολούθησης",
+      "notifications.monitoring.alarm.title": "Συναγερμός παρακολούθησης",
+      "notifications.monitoring.crossed.body": "Σημείο {point}: {displacement} mm, {rate} mm/day."
     },
     "schedule_headers": {
       "headers": {
@@ -2699,5 +2780,30 @@
         "gap": "Διαφορά"
       }
     }
-  }
+  },
+  "monitoring.crossed.fail": "Σημείο {id}: μετατόπιση {d} mm ή ταχύτητα {r} mm/ημέρα ξεπέρασε το επίπεδο {level}",
+  "monitoring.crossed.suggestion": "Ελέγξτε το σημείο και τη κατασκευή, και επιβεβαιώστε την ειδοποίηση με σημείωση.",
+  "monitoring.level.ok": "OK",
+  "monitoring.level.alert": "Προειδοποίηση",
+  "monitoring.level.action": "Ενέργεια",
+  "monitoring.level.alarm": "Συναγερμός",
+  "monitoring.risk.title": "Σημείο παρακολούθησης {id} στο επίπεδο {level}",
+  "monitoring.risk.description": "Μετατόπιση {d} mm, ταχύτητα {r} mm/ημέρα σε σχέση με το {profile}. Το προσχέδιο άνοιξε από την παρακολούθηση: ελέγξτε το και ορίστε υπεύθυνο.",
+  "monitoring.report.title": "Αναφορά συναγερμού παρακολούθησης",
+  "monitoring.report.project": "Έργο",
+  "monitoring.report.crs": "Σύστημα συντεταγμένων",
+  "monitoring.report.profile": "Προφίλ ορίων",
+  "monitoring.report.generated": "Δημιουργήθηκε",
+  "monitoring.report.point": "Σημείο",
+  "monitoring.report.baseline": "Αρχική τιμή (μ)",
+  "monitoring.report.latest": "Τελευταία τιμή (μ)",
+  "monitoring.report.displacement": "Μετατόπιση (mm)",
+  "monitoring.report.rate": "Ταχύτητα (mm/ημέρα)",
+  "monitoring.report.level": "Επίπεδο",
+  "monitoring.report.acknowledged": "Επιβεβαιώθηκε",
+  "monitoring.report.counts": "Συναγερμός: {alarm} · Ενέργεια: {action} · Προειδοποίηση: {alert} · OK: {ok}",
+  "monitoring.report.findings": "Ευρήματα",
+  "monitoring.report.no_profile": "Δεν υπάρχει προφίλ, ορίστε ένα",
+  "monitoring.report.ack_yes": "Ναι",
+  "monitoring.report.ack_no": "Όχι"
 }

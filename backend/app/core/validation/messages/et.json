@@ -299,6 +299,10 @@
     "unit_exportable": {
       "fail": "Positsioon {ordinal}: ühik '{unit}' ei mahu 4-märgilisse GAEB välja QU ja lõigatakse ekspordil",
       "suggestion": "Kasutage kuni 4-märgilist GAEB ühikukoodi (m, m2, m3, St, h, psch, kg, t)"
+    },
+    "short_text_length": {
+      "fail": "Positsioon {ordinal}: lühitekstis on {length} märki; GAEB-eksport lõikab selle 70-ni",
+      "suggestion": "Lühendage lühitekst 70 märgini ja jätke üksikasjad pikka teksti"
     }
   },
   "nrm": {
@@ -412,7 +416,10 @@
       "suggestion": "Määrake üheksakohaline GB/T 50500 kood (nt 010101001)"
     },
     "valid_code": {
-      "fail": "Vigane GB/T 50500 kood '{code}'; oodatud on 9 või 12 numbrit"
+      "fail": "Vigane GB/T 50500 kood '{code}'; oodatud on 9 või 12 numbrit või lisakood nagu 01B001"
+    },
+    "code_unique": {
+      "fail": "Kirje koodi '{code}' on samas alamprojektis kasutatud mitu korda"
     }
   },
   "cpwd": {
@@ -931,6 +938,36 @@
     "change_time_within_owner": {
       "fail": "Alltöövõtjate ajamõju muudatusel {code} on kokku {sub_days} päeva, rohkem kui tellija antud {owner_days} päeva",
       "suggestion": "Kontrollige alltöövõtjate ajanõudeid või taotlege tellijalt vastavat pikendust"
+    },
+    "pay_app_over_complete": {
+      "fail": "Rida {line} jõuab pärast seda perioodi {percent} %-ni plaanitud väärtusest ({completed} / {scheduled})",
+      "suggestion": "Vähendage selle perioodi summat või märkige põhjus, miks arveldatakse üle plaanitud väärtuse"
+    },
+    "pay_app_line_negative": {
+      "fail": "Rea {line} summa oleks seni {completed}, ehk alla nulli"
+    },
+    "pay_app_within_agreement": {
+      "fail": "Maksetaotlused kokku {billed} ületavad lepingu väärtust koos kinnitatud muudatustega ({limit})"
+    },
+    "pay_app_correct": {
+      "suggestion": "Parandage selle maksetaotluse summad või suurendage lepingu väärtust kinnitatud muudatusega"
+    },
+    "required_documents": {
+      "fail": "Nõutav dokument: {document} ({state})",
+      "suggestion": "Lisage dokument, allkirjastatud ja kehtiv, alltöövõtulepingule",
+      "states": {
+        "missing": "puudub",
+        "unsigned": "allkirjastamata",
+        "expired": "aegunud"
+      }
+    },
+    "document_roles": {
+      "terms_and_conditions": "Üldtingimused",
+      "safety_agreement": "Ohutuskokkulepe",
+      "safety_plan": "Ohutuskava",
+      "insurance": "Kindlustus",
+      "method_statement": "Töömeetod",
+      "other": "Muu dokument"
     }
   },
   "submittal": {
@@ -2014,6 +2051,510 @@
     "crew_without_record": {
       "fail": "Objektil oli {headcount} liikmeline brigaad, kuid tööd, kontrolli ega viivitust pole kirjendatud.",
       "suggestion": "Lisage, mida brigaad tegi, või viivitus, mis töö peatas."
+    }
+  },
+  "framework_agreement": {
+    "item_not_in_agreement": {
+      "fail": "Rida {code} ei ole lepingu {agreement} aktiivne positsioon; lisage see lisatööna.",
+      "suggestion": "Eemaldage rida tellimusest ja lisage töö tellimusele lisatööna."
+    },
+    "rate_deviates": {
+      "fail": "Rea {code} hind {rate} erineb lepingu hinnast {expected}.",
+      "suggestion": "Tellimuse hinnad tulevad raamlepingust; hinnastage rida uuesti hinnakirja järgi."
+    },
+    "order_outside_validity": {
+      "fail": "Tellimuse kuupäev {date} jääb lepingu kehtivusajast {from} kuni {to} välja.",
+      "suggestion": "Dateerige tellimus kehtivusaja sisse või pikendage kõigepealt lepingut."
+    },
+    "rate_period_gap": {
+      "fail": "Ükski hinnaperiood ei kata kuupäeva {date}.",
+      "suggestion": "Lisage vahekaardil Hinnad ja indekseerimine periood, mis katab selle kuupäeva."
+    },
+    "escalation_unresolved": {
+      "fail": "Indeksil {series} puudub väärtus perioodile {period}; hinda ei saa korrigeerida.",
+      "suggestion": "Sisestage selle kuu indeksiväärtus hinnaindeksisse ja hinnastage tellimus uuesti."
+    },
+    "cap_exceeded": {
+      "fail": "See tellimus viib lepingu summani {total} piirmäära {cap} juures; vaba ruumi jääk {headroom}.",
+      "suggestion": "Vähendage tellimust jäägini või esitage see põhjendatud erandiga."
+    },
+    "cap_threshold": {
+      "fail": "Lepingu kasutus on jõudnud {pct} %-ni piirmäärast.",
+      "suggestion": "Teavitage klienti varakult, et järgleping saaks valmistada."
+    },
+    "item_max_qty": {
+      "fail": "Positsioon {code}: tellitud on seni {qty}, mis ületab märgitud maksimumi {max}.",
+      "suggestion": "Kokku leppige lisakogus kliendiga enne järgmist tellimust."
+    },
+    "min_at_risk": {
+      "fail": "Jäänud on {days} päeva ja tellitud on {pct} % garanteeritud miinimumist.",
+      "suggestion": "Tooge puudujääk kliendi ette, kuni tellimiseks veel aega on."
+    },
+    "currency_mismatch": {
+      "fail": "Tellimuse valuuta {cur} erineb lepingu valuutast {agr}.",
+      "suggestion": "Tellimused hinnastatakse lepingu valuutas."
+    },
+    "adjustment_unknown": {
+      "fail": "Tingimusel {tag} puudub selle lepingu korrigeerimine.",
+      "suggestion": "Lisage korrigeerimine vahekaardil Tingimused või eemaldage tingimus tellimusest."
+    },
+    "direct_claim": {
+      "fail": "Nõuded esitatakse tellimuste alusel, mitte raamlepingu alusel.",
+      "suggestion": "Avage tellimus, mille alusel töö tehti, ja esitage nõue seal."
+    },
+    "duplicate_item": {
+      "fail": "Positsiooni kood {code} esineb hinnaperioodis {period} kaks korda.",
+      "suggestion": "Jätke hinnakirja salvestamisel igale positsioonikoodile üks rida."
+    },
+    "measured_over_ordered": {
+      "fail": "Mõõdetud {m} ületab tellitud {o} real {code}; kaaluge lisatööd.",
+      "suggestion": "Esitage lisakogus tellimuse muudatusena."
+    },
+    "term_over_legal_max": {
+      "fail": "Kestus {years} aastat ületab {source} (pakett) piiri {max} aastat.",
+      "suggestion": "Kontrollige kestust kliendiga; piiri esitab pakett, kuid seda ei rakendata."
+    }
+  },
+  "estimate_archive": {
+    "arc_hash_mismatch": {
+      "fail": "Sõrmejälg ei klapi: kirje annab {actual}, pitser näitab {sealed}. Pidage kirjet muudetuks."
+    },
+    "arc_total_mismatch": {
+      "fail": "Pitseeritud summa {seal} erineb lepingust {award} summa {diff} võrra."
+    },
+    "arc_no_breakdown": {
+      "fail": "{n} positsioonil puudub ressursside jaotus; nende hindu ei saa hiljem jälgida."
+    },
+    "arc_no_markups": {
+      "fail": "Eelarves pole pitseeritavaid juurdehindlusi."
+    },
+    "arc_sealed_after_signing": {
+      "fail": "Pitseeritud {days} päeva pärast lepingu allkirjastamist."
+    },
+    "arc_no_receipt": {
+      "fail": "Vastaspool pole sõrmejälge veel kinnitanud."
+    },
+    "arc_open_not_closed": {
+      "fail": "Avamine {id} on olnud avatud {days} päeva ilma protokollita."
+    },
+    "arc_open_no_reason": {
+      "fail": "Avamine vajab põhjust ja viidet."
+    },
+    "arc_open_one_party": {
+      "fail": "Märgitud on ainult üks pool; kirjutage, miks teine puudub."
+    },
+    "var_basis_no_seal": {
+      "fail": "Positsioon {code} on hinnatud algse aluse järgi, kuid pitseeritud eelarvet pole."
+    },
+    "var_basis_deviation": {
+      "fail": "Positsioon {code}: {field} muudeti {old} väärtuseks {new} ilma märkuseta."
+    },
+    "var_new_resource_no_evidence": {
+      "fail": "Uuel ressursil {res} puudub hinnakuupäev ja pakkumise viide."
+    },
+    "var_markup_not_sealed": {
+      "fail": "Positsioon {code} rakendab juurdehindlust {m}, mida pitseris pole."
+    },
+    "var_abnormal_carried_rate": {
+      "fail": "Ülekantud kulu {c} erineb võrdlusväärtusest {pct} %."
+    },
+    "arc_mutation_refused": {
+      "fail": "Pitseeritud eelarvet ei saa muuta ega kustutada. Pitseerige uus versioon, mis selle asendab."
+    },
+    "contents_locked": "Sisu jääb pitseerituks, kuni algab ametlik avamine.",
+    "market_off": "Pitseeritud eelarved ei kuulu selle projekti turuprofiili.",
+    "contract_required": "Enne hinnangu pitseerimist lepingu aluseks on vaja kliendilepingut."
+  },
+  "boq_revision": {
+    "superseded_still_editable": {
+      "fail": "Revisjon {label} on endiselt muudetav, kuigi pärast seda on loodud {later}; siin tehtud muudatused üle ei kandu",
+      "suggestion": "Lukusta {label} või jätka tööd uusimas revisjonis"
+    }
+  },
+  "schedule_baseline": {
+    "single_approved": {
+      "fail": "Sellel ajakaval on rohkem kui üks kinnitatud baasplaan ({baselines}).",
+      "suggestion": "Kinnitage baasplaan, mis peab kehtima; ühe kinnitamine tühistab teiste kinnituse."
+    }
+  },
+  "project_catalogue": {
+    "unit_present": {
+      "fail": "Hinnal {code} puudub ühik.",
+      "suggestion": "Sisestage ühik, mille kohta hind kehtib, näiteks m2, m3 või h."
+    },
+    "duplicate_code": {
+      "fail": "Koodi {code} kasutab selles projektis rohkem kui üks hind.",
+      "suggestion": "Jätke ühe koodi kohta üks hind või andke variandile oma kood."
+    },
+    "currency_differs": {
+      "fail": "Hind {code} on valuutas {currency}, kuid projekt arvestatakse valuutas {project_currency}.",
+      "suggestion": "Arvestage hind ümber projekti valuutasse või kinnitage, et võõrvaluuta on taotluslik."
+    },
+    "override_far": {
+      "fail": "Koodi {code} kohalik hind erineb lähtehinnast {source_rate} {percent} %.",
+      "suggestion": "Kontrollige, kas koma on nihkunud, või märkige, miks projekt vajab teist hinda."
+    },
+    "source_changed": {
+      "fail": "Koodi {code} lähtehind on pärast projekti kopeerimist muutunud {old} pealt {new} peale.",
+      "suggestion": "Võtke üle uus lähtehind või jätke teadlikult kohalik hind."
+    }
+  },
+  "schedule_mspdi_import": {
+    "task_dates": {
+      "missing_dates": "Tööl {ref} \"{name}\" puudub algus- või lõppkuupäev.",
+      "finish_before_start": "Töö {ref} \"{name}\" lõpeb ({finish}) enne algust ({start}).",
+      "suggestion": "Parandage kuupäevad lähtegraafikus ja eksportige see uuesti. Importimisel kuupäevi kunagi ei oletata."
+    },
+    "unique_ids": {
+      "duplicate_uid": "Töö ID {ref} esineb mitu korda; alles jäetakse ainult esimene töö.",
+      "suggestion": "Andke lähtegraafikus igale tööle kordumatu ID."
+    },
+    "links_resolve": {
+      "dangling_link": "Töö {ref} \"{name}\": eelnevat tööd {predecessor} failis pole, seos jäetakse vahele.",
+      "duplicate_link": "Töö {ref} \"{name}\": teine seos eelkäijast {predecessor} jäetakse vahele, paari kohta jääb üks seos.",
+      "self_link": "Töö {ref} \"{name}\" on seotud iseendaga, seos jäetakse vahele.",
+      "unknown_link_type": "Töö {ref} \"{name}\": seose tüüp {type} on tundmatu ja seda loetakse lõpp-algus seoseks.",
+      "suggestion": "Kontrollige lähtegraafiku loogilisi seoseid."
+    },
+    "values_in_range": {
+      "percent_out_of_range": "Töö {ref} \"{name}\": valmidus {value}% on väljaspool vahemikku 0-100 ja seda piiratakse.",
+      "outline_gap": "Töö {ref} \"{name}\" jätab struktuuritaseme vahele ({level}); see paigutatakse lähima ülemise koondtöö alla.",
+      "suggestion": "Kontrollige valmidusprotsenti ja taandeid lähtegraafikus."
+    },
+    "calendar_work_days": {
+      "calendar_no_work_days": "Kalendris {calendar} pole ühtegi tööpäeva.",
+      "suggestion": "Märkige lähtegraafikus selle kalendri tööpäevad."
+    }
+  },
+  "schedule_pdf_import": {
+    "no_text_layer": {
+      "fail": "PDF-il puudub tekstikiht, seega tabelit ei saa lugeda.",
+      "suggestion": "Eksportige ajakava MS Project XML-, XER- või Excel-vormingusse ja importige see fail."
+    },
+    "dates_parsed": {
+      "fail": "Rida {row}: algus või lõpp ei ole kuupäev.",
+      "suggestion": "Kontrollige kuupäevaveerge ja järjekorda päev/kuu või parandage kuupäev allikas."
+    },
+    "finish_before_start": {
+      "fail": "Rida {row}: lõpp on enne algust.",
+      "suggestion": "Parandage kuupäevad lähteajakavas."
+    },
+    "duration_mismatch": {
+      "fail": "Rida {row}: trükitud kestus erineb alguse ja lõpu vahelistest tööpäevadest.",
+      "suggestion": "Kuupäevad säilivad; kontrollige kestuse veergu ja projekti kalendrit."
+    },
+    "unique_ids": {
+      "fail": "Rida {row}: tegevuse ID-d kasutab teine rida.",
+      "suggestion": "Andke lähteajakavas igale tegevusele unikaalne ID."
+    },
+    "links_resolve": {
+      "fail": "Rida {row}: eelnev tegevus ei ole tabeli tegevus.",
+      "suggestion": "Kontrollige eelnevate veergu; lahendamata seosed jäetakse vahele."
+    }
+  },
+  "commercial_control": {
+    "ok": "Kontrollitud, märkusi pole",
+    "cvr": {
+      "target_rate_basis": {
+        "fail": "{missing} {total}-st hinnatud positsioonist ei ole sihthinda ja need on eelarvestatud müügihinnaga (nt {sample})",
+        "suggestion": "Sisestage nendele positsioonidele sihtkulu, et eelarve oleks kulu, mille järgi objekti hinnatakse"
+      },
+      "unmapped_cost": {
+        "fail": "{kind} {label}: puudub WBS ja kulukood, kohustus {committed}, tegelik {actual}",
+        "suggestion": "Siduge tellimuse rida, alltöövõtt või arve WBS-elemendiga, et CVR saaks selle paigutada"
+      }
+    },
+    "procurement": {
+      "line_over_committed": {
+        "fail": "Positsioon {ordinal} on ülekohustatud: tellitud {committed_qty} / {budget_qty}, {committed_value} eelarve {budget_value} vastu",
+        "suggestion": "Kontrollige topelttellimust või registreerige muudatus või eelarve ümberpaigutus enne uute kohustuste võtmist"
+      }
+    },
+    "approval_routes": {
+      "bands_contiguous": {
+        "gap": {
+          "fail": "Summad {low} kuni {high} ei jõua ühegi kinnitajani (samm {step})",
+          "suggestion": "Laiendage naabervahemikku või lisage samm, et igal summal oleks kinnitaja"
+        },
+        "overlap": {
+          "fail": "Samm {step} kattub madalama vahemikuga {low} kuni {high}; neid summasid allkirjastavad mõlemad kinnitajad",
+          "suggestion": "Alustage iga vahemikku sealt, kus eelmine lõpeb, kui just mõlemad ei pea allkirjastama"
+        },
+        "empty": {
+          "fail": "Sammul {step} on vahemik {low} kuni {high}, kuhu ei mahu ühtki summat",
+          "suggestion": "Seadke miinimum alla maksimumi või jätke maksimum tühjaks, kui ülempiiri pole"
+        }
+      }
+    },
+    "valuation": {
+      "assessed_within_submitted": {
+        "fail": "Rida {line}: hinnatud kogus {assessed} ületab esitatud {submitted}",
+        "suggestion": "Hinnake kõige rohkem esitatut ja registreerige lisatööd muudatusena"
+      },
+      "certified_within_assessed": {
+        "fail": "Rida {line}: sertifitseeritud kogus {certified} ületab hinnatud {assessed}",
+        "suggestion": "Sertifitseerige kõige rohkem hinnatut või hinnake rida esmalt uuesti"
+      }
+    }
+  },
+  "norm_base": {
+    "code_present": {
+      "fail": "Real {ordinal} ei ole normi koodi ({base}). Normipõhises eelarves viitab iga rida normile.",
+      "suggestion": "Sisestage normi kood rea klassifikaatorisse {classification}."
+    },
+    "code_shape": {
+      "fail": "Rea {ordinal} kood „{code}” ei ole {base} kood. Oodatakse koodi nagu {example}."
+    },
+    "legacy_prefix": {
+      "fail": "Rea {ordinal} kood „{code}” kasutab kehtetut eesliidet {old}. Kehtiv kood on {new}."
+    },
+    "resource_breakdown": {
+      "fail": "Normireal {code} pole töötunde või keskmist palgajärku.",
+      "suggestion": "Lisage tööjõuressurss tundidega ühiku kohta ja normi keskmine palgajärk."
+    },
+    "grade_range": {
+      "fail": "Rea {ordinal} palgajärk {grade} on väljaspool vahemikku {min}–{max} või mitte sammuga {step}."
+    }
+  },
+  "public_funding": {
+    "markup_cap": {
+      "fail": "{funding}: {markup} on {percent} %, ülempiir on {cap} % otsestest kuludest ({source}).",
+      "suggestion": "Vähendage juurdehindlust ülempiirini või märkige rahastus erarahaks, kui tööd ei maksta avalikest vahenditest."
+    },
+    "investor_exact": {
+      "fail": "Tellija eelarve, {funding}: {markup} peab olema täpselt {cap} % ({source})."
+    },
+    "material_price_evidence": {
+      "fail": "{funding}: rea {ordinal} materjalil {material} on {count}/{required} hinnapakkumist ja hinnaanalüüs puudub.",
+      "suggestion": "Salvestage materjali tarnijapakkumised või lisage hinnaanalüüsi aruanne."
+    }
+  },
+  "vat_rate": {
+    "standard_rate": {
+      "fail": "{markup} on {percent} %; käibemaksu tavamäär riigis {country} on {rate} %.",
+      "suggestion": "Seadke maksurida tavamäärale või märkige eelarvesse, miks kehtib muu määr või vabastus."
+    }
+  },
+  "survey": {
+    "no_crs": {
+      "fail": "Punktikogul {name} puudub koordinaatsüsteem: määrake EPSG või kohalik võrk enne mahtude või katastriüksuste arvutamist.",
+      "suggestion": "Määrake projekti koordinaatsüsteem ja seejärel süsteem, milles see fail mõõdeti."
+    },
+    "crs_unconfirmed": {
+      "fail": "Koordinaatsüsteem tuvastati automaatselt (usaldusväärsus {confidence}); kinnitage enne kasutamist.",
+      "suggestion": "Avage projekti koordinaatsüsteemi määramine ja kinnitage leitud süsteem või valige muu."
+    },
+    "duplicate_point": {
+      "fail": "Korduv punkti tunnus {point_id} erinevate koordinaatidega.",
+      "suggestion": "Jätke üks mõõtmine: kustutage vale mõõtmisega punktikogu ja importige see uuesti."
+    },
+    "traverse_misclosure": {
+      "fail": "Polügoonkäik {name} sulgub 1:{r}, alla profiili miinimumi 1:{min}.",
+      "suggestion": "Kontrollige külgi jämeda vea suhtes, mõõtke nõrgim külg uuesti või kinnitage profiili väärtus."
+    },
+    "level_misclosure": {
+      "fail": "Nivelleerimise sulgemisviga {f} mm ületab k·√km, kui k = {k} mm.",
+      "suggestion": "Korrake nivelleerimist või kontrollige kasutatud reeperite kõrgusi."
+    }
+  },
+  "volumes": {
+    "no_overlap": {
+      "fail": "Pinnad kattuvad vaid {p} % alast: maht on mõttetu.",
+      "suggestion": "Kontrollige, et mõlemad pinnad oleksid samas koordinaatsüsteemis ja kataksid sama maastikku."
+    },
+    "low_coverage": {
+      "fail": "Vaid {c} % alast on andmed mõlemas pinnas (miinimum {min} %).",
+      "suggestion": "Lisage punkte, kus pind puudub, või kitsendage piiri kaetud alale."
+    },
+    "coarse_scan": {
+      "fail": "Selle mahu aluseks on jäme skaneering (LOA10) ilma põhjuseta.",
+      "suggestion": "Kasutage geodeetilise täpsusega skaneeringut või kirjutage, miks see skaneering sobib."
+    },
+    "bank_volume": {
+      "fail": "Kogus on tihe maht (pinnases); kobestusteguri ei rakendata.",
+      "suggestion": "Saatke kobestatud kaevis, kui kuluarvestuse rida mõõdetakse kobedana."
+    }
+  },
+  "setting_out": {
+    "stake_off": {
+      "fail": "Mahamärkimise punkt {id} kaldub {d} mm, tolerants {t} mm",
+      "suggestion": "Märgi punkt uuesti maha ja salvesta mõõtmine või loo NCR-i mustand."
+    },
+    "record_untraceable": {
+      "fail": "Mahamärkimise kirjel {id} puudub instrument või lähtepunktid.",
+      "suggestion": "Sisesta instrument ja lähtepunktid, millele jaam seati."
+    },
+    "sheet": {
+      "title": "Mahamärkimise leht",
+      "project": "Projekt",
+      "crs": "Koordinaatsüsteem",
+      "request": "Taotlus",
+      "tolerance": "Tolerants",
+      "element": "Ehituselement",
+      "generated": "Loodud",
+      "point": "Punkt",
+      "design_e": "Projekt E",
+      "design_n": "Projekt N",
+      "design_z": "Projekt Z",
+      "measured_e": "Mõõdetud E",
+      "measured_n": "Mõõdetud N",
+      "verdict": "Tulemus",
+      "by": "Mõõtja",
+      "verdict_pass": "Sobib",
+      "verdict_fail": "Ei sobi",
+      "verdict_open": "Avatud",
+      "verdict_no_tolerance": "Profiil puudub",
+      "counts": "Sobib: {passed} · Ei sobi: {failed} · Avatud: {open}",
+      "findings": "Leiud",
+      "no_profile": "Profiil puudub, määra see",
+      "d": "d (mm)",
+      "dz": "dZ (mm)"
+    }
+  },
+  "land_parcels": {
+    "area_mismatch": {
+      "fail": "Üksus {id}: arvutatud pindala {a} m2 erineb registripindalast {l} m2 rohkem kui lubatud ({t}).",
+      "suggestion": "Kontrolli piiripunkte registriväljavõtte vastu või märgi, miks pindalad erinevad."
+    },
+    "ring_invalid": {
+      "fail": "Üksus {id}: piir pole suletud või lõikab iseennast.",
+      "suggestion": "Paranda piiripunktid nii, et need käiksid üksusest ühe korra ümber ilma ristumata."
+    },
+    "zone_not_acquired": {
+      "fail": "Tööala kattub veel omandamata üksusega {id} ({area} m2).",
+      "suggestion": "Omanda üksus või lepi juurdepääs kokku enne tööde algust või nihuta tööala."
+    },
+    "overlap": {
+      "fail": "Üksused {a} ja {b} kattuvad {area} m2 ulatuses.",
+      "suggestion": "Paranda ühine piir nii, et mõlemad üksused kasutaksid samu punkte."
+    },
+    "gap": {
+      "fail": "{gap} m vahe üksuste {a} ja {b} vahel.",
+      "suggestion": "Lase mõlemal üksusel kasutada samu piiripunkte või kinnita, et riba kuulub teisele üksusele."
+    },
+    "id_format": {
+      "fail": "Tunnus {id} ei vasta vormingule {label} (näiteks {example}).",
+      "suggestion": "Kopeeri tunnus täpselt nii, nagu register selle kirjutab."
+    },
+    "pdf": {
+      "title": "Katastriüksuste loend",
+      "project": "Projekt",
+      "crs": "Koordinaatsüsteem",
+      "method": "Meetod",
+      "method_value": "Pindala piirikoordinaatidest (Gaussi valem), ümardatud {decimals} kümnendkohani, m2",
+      "printed": "Prindis",
+      "legal": "Registripindala (m2)",
+      "computed": "Arvutatud (m2)",
+      "diff": "Vahe (m2)",
+      "status": "Olek",
+      "rights": "Õigused",
+      "cost": "Maksumus",
+      "findings": "Leiud",
+      "total": "Kokku, üksusi {count}",
+      "acquired_of": "Omandatud {acquired} / {total}",
+      "findings_title": "Leiud",
+      "no_findings": "Leide pole.",
+      "disclaimer": "Omanikud ja õigused on näidatud nii, nagu need on selles projektis kirjas. Loend ei ole õiguslik arvamus ega registriväljavõte.",
+      "status_needed": "Vajalik",
+      "status_negotiating": "Läbirääkimised",
+      "status_acquired": "Omandatud",
+      "status_expropriation": "Võõrandamine"
+    }
+  },
+  "monitoring": {
+    "crossed": {
+      "fail": "Punkt {id}: nihe {d} mm või kiirus {r} mm/day ületas taseme {level}",
+      "suggestion": "Kontrollige punkti ja konstruktsiooni ning kinnitage seejärel hoiatus märkusega."
+    },
+    "level": {
+      "ok": "Normaalne",
+      "alert": "Hoiatus",
+      "action": "Meetmed",
+      "alarm": "Alarmtase"
+    },
+    "risk": {
+      "title": "Jälgimispunkt {id} tasemel {level}",
+      "description": "Nihe {d} mm, kiirus {r} mm/day võrreldes profiiliga {profile}. Mustandi avas jälgimine: vaadake see üle ja määrake vastutaja."
+    },
+    "report": {
+      "title": "Jälgimise alarmiaruanne",
+      "project": "Projekt",
+      "crs": "Koordinaatsüsteem",
+      "profile": "Piirväärtuste profiil",
+      "generated": "Loodud",
+      "point": "Punkt",
+      "baseline": "Lähteväärtus (m)",
+      "latest": "Viimane (m)",
+      "displacement": "Nihe (mm)",
+      "rate": "Kiirus (mm/day)",
+      "level": "Tase",
+      "acknowledged": "Kinnitatud",
+      "counts": "Alarmtase: {alarm} · Meetmed: {action} · Hoiatus: {alert} · Normaalne: {ok}",
+      "findings": "Leiud",
+      "no_profile": "Profiil puudub, määrake see",
+      "ack_yes": "Jah",
+      "ack_no": "Ei"
+    }
+  },
+  "stockpiles": {
+    "density_assumed": {
+      "fail": "Tihedus on eeldatud, mitte mõõdetud: tonnid on sama usaldusväärsed kui see hinnang.",
+      "suggestion": "Kaaluge proov või võtke tihedus tarnija saatelehtedelt."
+    },
+    "variance_high": {
+      "fail": "Mõõdistus erineb raamatupidamuslikust jäägist {v} %, ületades {t} % tolerantsi.",
+      "suggestion": "Kontrollige tihedust ja aluspinda, seejärel tehke korrektuuriettepanek ja kinnitage see, kui vahe on tõeline."
+    }
+  },
+  "mine_survey": {
+    "compliance_outside": {
+      "fail": "Perioodi täitmine {c} % jääb vahemikust {lo}-{hi} % välja.",
+      "suggestion": "Kontrollige plaani ja mõõdistust ning selgitage erinevust perioodi märkuses enne nõuet."
+    },
+    "truck_differs": {
+      "fail": "Veokite loenduse tonnid erinevad mõõdistuse tonnidest {v} %, mis ületab kontrollpiiri {t} %.",
+      "suggestion": "Kontrollige koormat ühe sõidu kohta ja tihedust ning võrrelge kaht pinda uuesti."
+    }
+  },
+  "hongkong": {
+    "sopo_applicability": {
+      "fail": "Lepingule kehtib Cap. 652 (Security of Payment): vastus 30 päeva, makse 60 päeva jooksul nõudest"
+    },
+    "sopo_private_scope_check": {
+      "fail": "Eraleping kuulub Cap. 652 alla ainult uue hoone või Building Authority heakskiitu vajavate tööde puhul: kinnitage ulatus"
+    },
+    "sopo_response_late": {
+      "fail": "{date} ei esitatud maksevastust: nõutud summa on vaidlusalune ja võib minna adjudikatsiooni"
+    },
+    "sopo_payment_term_exceeds_60": {
+      "fail": "Maksetähtaeg {n} päeva ületab Cap. 652 lubatud 60 päeva"
+    },
+    "sopo_response_term_exceeds_30": {
+      "fail": "Vastamistähtaeg {n} päeva ületab Cap. 652 lubatud 30 päeva"
+    },
+    "sopo_adjudication_window": {
+      "fail": "Tekkis maksevaidlus: esitage adjudikatsiooniteade {date}"
+    },
+    "contract_pay_when_paid": {
+      "fail": "Pay-when-paid-tingimus: Cap. 652 muudab tingimusliku makse täitmatuks"
+    },
+    "levy_missing": {
+      "fail": "Tööd ületavad HK$3,000,000, kuid eelarves puudub CIC-tasu (0,5%) või CWR-tasu (0,03%)"
+    },
+    "levy_below_threshold": {
+      "fail": "Tööd on kuni HK$3,000,000: CIC- ega CWR-tasu ei maksta"
+    },
+    "tax_nonzero": {
+      "fail": "Arvestatakse käibemaksu või GST rida, kuid Hongkongis sellist maksu pole: määrake null"
+    },
+    "retention_over_limit": {
+      "fail": "Kinnipeetud summa {x} ületab lepingu piiri {limit}"
+    },
+    "pc_sum_no_attendance": {
+      "fail": "Prime cost summal puuduvad kasumi ja teeninduse read"
+    },
+    "index_attribution": {
+      "fail": "ArchSD hinnaindeksil puudub allikaviide: märkige Architectural Services Department"
     }
   }
 }

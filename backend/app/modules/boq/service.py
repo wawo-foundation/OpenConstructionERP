@@ -300,6 +300,7 @@ from app.modules.boq.gaeb_common import is_excluded_from_total
 from app.modules.boq.markup_templates import (
     CONSTRUCTION_TIER_COUNTRIES,
     CONSTRUCTION_TIER_TAX_CODE,
+    EDITION_REGIONS,
     region_key_for_country,
     resolve_region_lines,
 )
@@ -1703,16 +1704,41 @@ def _without_unresolved_escalation(markups: list[BOQMarkup], unresolved: Mapping
 IMPORT_DEDUCTIONS_ROLE = "import_deductions"
 
 
+def _markup_meta(markup: BOQMarkup) -> dict:
+    """A markup's ``metadata_`` dict, or ``{}`` when the row has none (or is a lightweight stand-in)."""
+    meta = getattr(markup, "metadata_", None)
+    return meta if isinstance(meta, dict) else {}
+
+
 def _is_import_deductions_line(markup: BOQMarkup) -> bool:
     """Whether a markup is the bill-wide deductions line an import wrote."""
-    meta = markup.metadata_
-    return isinstance(meta, dict) and meta.get("role") == IMPORT_DEDUCTIONS_ROLE and markup.scope_position_id is None
+    meta = _markup_meta(markup)
+    return meta.get("role") == IMPORT_DEDUCTIONS_ROLE and getattr(markup, "scope_position_id", None) is None
+
+
+def _markup_threshold(markup: BOQMarkup) -> Decimal | None:
+    """The value a line's base must exceed before the line charges anything, or None.
+
+    A statutory levy charged only on works above a value (``metadata.threshold_amount``)
+    is zero at or below it and charged on the whole base above it, not on the excess.
+    """
+    meta = _markup_meta(markup)
+    raw = meta.get("threshold_amount")
+    if raw in (None, ""):
+        return None
+    try:
+        return Decimal(str(raw))
+    except (InvalidOperation, ValueError, TypeError):
+        return None
 
 
 def _calculate_markup_amounts(
     direct_cost: Decimal,
     markups: list[BOQMarkup],
     escalation_factors: Mapping[uuid.UUID, Decimal] | None = None,
+    tax_inclusive_cost: Decimal = Decimal("0"),
+    threshold_bases: Mapping[int, Decimal] | None = None,
+    bases_out: dict[int, Decimal] | None = None,
 ) -> list[tuple[BOQMarkup, Decimal]]:
     """Compute the dollar amount for each active markup line.
 
@@ -1775,6 +1801,11 @@ def _calculate_markup_amounts(
             a total that quietly absorbs an unknown is a number nobody can
             check. If this ever produces a zero for a live line, the caller
             skipped the resolution step.
+        tax_inclusive_cost: The part of ``direct_cost`` priced with its tax
+            already in it (a position flagged ``tax_inclusive``, such as a
+            specialist prime-cost sum). It stays in every base except the base
+            of a ``tax`` line, so tax is not charged on it a second time. Zero,
+            the default, is the bill exactly as before the flag.
 
     Returns:
         List of (markup, computed_amount) tuples preserving input order.
@@ -1798,6 +1829,8 @@ def _calculate_markup_amounts(
             base = direct_cost + running_sum
         else:
             base = direct_cost
+        if tax_inclusive_cost and (markup.category or "").lower() == "tax":
+            base -= tax_inclusive_cost
 
         # Calculate amount based on type
         markup_type = (markup.markup_type or "percentage").lower()
@@ -1807,7 +1840,7 @@ def _calculate_markup_amounts(
         elif markup_type == "fixed":
             amount = Decimal(str(markup.fixed_amount or "0"))
         elif markup_type == "banded":
-            amount = _banded_amount(base, markup.metadata_)
+            amount = _banded_amount(base, _markup_meta(markup))
         elif markup_type == "escalation":
             # ``factor - 1`` because the markup line IS the increase. The base
             # is already in the bill; multiplying by the factor outright would
@@ -1818,10 +1851,29 @@ def _calculate_markup_amounts(
             # per_unit and unknown types default to zero
             amount = Decimal("0")
 
-        running_sum += amount
+        if bases_out is not None:
+            bases_out[id(markup)] = base
+        threshold = _markup_threshold(markup)
+        if threshold is not None:
+            # A scoped bill measures the threshold against the whole bill's base for the line.
+            measured = (threshold_bases or {}).get(id(markup), base)
+            if measured <= threshold:
+                amount = Decimal("0")
+
+        # A levy on the contract value is not part of the value a later line is a
+        # percentage of (``metadata.not_compounded``).
+        meta = _markup_meta(markup)
+        if not meta.get("not_compounded"):
+            running_sum += amount
         results.append((markup, amount))
 
     return results
+
+
+def _is_tax_inclusive(position: Position) -> bool:
+    """Whether a position is priced with its tax already in it (``metadata.tax_inclusive``)."""
+    meta = getattr(position, "metadata_", None)
+    return isinstance(meta, dict) and meta.get("tax_inclusive") is True
 
 
 def _scope_chain(
@@ -1966,8 +2018,10 @@ def _calculate_markup_amounts_scoped(
     scope_ids: set[uuid.UUID] = {
         m.scope_position_id for m in markups if m.scope_position_id is not None and m.is_active
     }
+    amount_of = leaf_amount or (lambda p: Decimal(str(_str_to_float(p.total))))
     if not scope_ids:
-        return _calculate_markup_amounts(direct_cost, markups, escalation_factors)
+        inclusive = sum((amount_of(p) for p in positions if not _is_section(p) and _is_tax_inclusive(p)), Decimal("0"))
+        return _calculate_markup_amounts(direct_cost, markups, escalation_factors, inclusive)
 
     bill_wide = [m for m in markups if m.scope_position_id is None]
     overrides_by_scope: dict[uuid.UUID, list[BOQMarkup]] = {}
@@ -1976,9 +2030,9 @@ def _calculate_markup_amounts_scoped(
             overrides_by_scope.setdefault(markup.scope_position_id, []).append(markup)
 
     parent_of: dict[uuid.UUID, uuid.UUID | None] = {p.id: p.parent_id for p in positions}
-    amount_of = leaf_amount or (lambda p: Decimal(str(_str_to_float(p.total))))
 
     buckets: dict[tuple[uuid.UUID, ...], Decimal] = {}
+    inclusive_by_bucket: dict[tuple[uuid.UUID, ...], Decimal] = {}
     walked = Decimal("0")
     for position in positions:
         if _is_section(position):
@@ -1986,6 +2040,8 @@ def _calculate_markup_amounts_scoped(
         amount = amount_of(position)
         key = _scope_chain(position.id, parent_of, scope_ids)  # type: ignore[arg-type]
         buckets[key] = buckets.get(key, Decimal("0")) + amount
+        if _is_tax_inclusive(position):
+            inclusive_by_bucket[key] = inclusive_by_bucket.get(key, Decimal("0")) + amount
         walked += amount
 
     # The caller's direct cost wins over the tree walk. They can legitimately
@@ -2000,9 +2056,18 @@ def _calculate_markup_amounts_scoped(
     # across bucket stacks, and a caller may hand us lines that were never
     # flushed and so have no id yet.
     earned: dict[int, Decimal] = {id(m): Decimal("0") for m in markups}
+    bill_bases: dict[int, Decimal] = {}
+    _calculate_markup_amounts(
+        direct_cost,
+        bill_wide,
+        escalation_factors,
+        sum(inclusive_by_bucket.values(), Decimal("0")),
+        bases_out=bill_bases,
+    )
     for key, bucket_cost in buckets.items():
         stack = _effective_stack(bill_wide, overrides_by_scope, key)
-        for markup, amount in _calculate_markup_amounts(bucket_cost, stack, escalation_factors):
+        inclusive = inclusive_by_bucket.get(key, Decimal("0"))
+        for markup, amount in _calculate_markup_amounts(bucket_cost, stack, escalation_factors, inclusive, bill_bases):
             earned[id(markup)] = earned.get(id(markup), Decimal("0")) + amount
 
     return [(m, earned.get(id(m), Decimal("0"))) for m in markups]
@@ -4337,6 +4402,19 @@ class BOQService:
         # update (PositionUpdate documents it as ignored). Drop it before it
         # reaches the column writer.
         fields.pop("link_mode", None)
+        # Langtext lives in ``metadata.gaeb_long_text`` (GAEB export, bid portal
+        # read it there); the top-level field saves it without a metadata echo.
+        if "long_text" in fields:
+            long_text = (fields.pop("long_text") or "").replace("\r\n", "\n").strip()
+            sent_meta = fields.get("metadata")
+            stored_meta = position.metadata_ if isinstance(position.metadata_, dict) else {}
+            merged_meta = dict(sent_meta if isinstance(sent_meta, dict) else stored_meta)
+            if long_text:
+                merged_meta["gaeb_long_text"] = long_text
+            else:
+                merged_meta.pop("gaeb_long_text", None)
+            if merged_meta != stored_meta or isinstance(sent_meta, dict):
+                fields["metadata"] = merged_meta
         # Which DEFINITION fields did the client explicitly set? (used for
         # propagate-from-master / unlink-instance). Snapshot the *requested*
         # keys now, before the metadata/cost-item merge logic mutates
@@ -7014,6 +7092,30 @@ class BOQService:
         # a truthiness test here would send both back to the Gulf region's 5.
         return _SeededVat(resolution.combined_rate_pct)
 
+    async def _edition_region(self, project: Any, region_key: str) -> str:
+        """The stack of the project's bill standard edition, when its region has one per edition.
+
+        A region whose older edition prices differently names that edition's
+        stack in :data:`EDITION_REGIONS`. The edition is the one stored on the
+        project's tax profile, or, when none is stored, the edition in force on
+        the day the project was created, so a project begun under the old
+        edition is never seeded with the new one's heads.
+        """
+        by_edition = EDITION_REGIONS.get(region_key)
+        if not by_edition:
+            return region_key
+        try:
+            from app.modules.project_tax import repository as tax_repo
+            from app.modules.project_tax import service as tax_service
+
+            async with self.session.begin_nested():
+                row = await tax_repo.get_for_project(self.session, project.id)
+            edition = tax_service.to_response(project, row).standard_edition
+        except Exception:  # noqa: BLE001 - no tax profile module or table: the region's own stack
+            logger.debug("edition lookup failed for project %s", getattr(project, "id", None), exc_info=True)
+            return region_key
+        return by_edition.get(edition or "", region_key)
+
     async def apply_default_markups(self, boq_id: uuid.UUID, region: str | None = None) -> list[BOQMarkup]:
         """Replace all markups on a BOQ with the default template for a region.
 
@@ -7082,6 +7184,7 @@ class BOQService:
             country_code = getattr(project, "country_code", None)
             if region is None:
                 region_key = region_key_for_country(country_code)
+                region_key = await self._edition_region(project, region_key)
 
         # Where the VAT number comes from, in precedence order, and the answer
         # is recorded on the line rather than only used. A region serves many
@@ -7122,6 +7225,10 @@ class BOQService:
             metadata: dict[str, object] = {}
             if entry["vat_override"]:
                 metadata["vat_override"] = True
+            if entry.get("threshold_amount") not in (None, ""):
+                metadata["threshold_amount"] = str(entry["threshold_amount"])
+            if entry.get("not_compounded"):
+                metadata["not_compounded"] = True
             if entry["category"] == "tax":
                 metadata["vat_rate_source"] = rate_source if entry["vat_override"] else "region_template"
                 if unanswered_on is not None and not entry["vat_override"]:
@@ -7297,6 +7404,8 @@ class BOQService:
         source_base_date = source_boq.base_date
         source_tax_date = source_boq.tax_date
         source_metadata = dict(source_boq.metadata_) if source_boq.metadata_ else {}
+        # A copy is not the source's formal revision; only "Create revision" numbers one.
+        source_metadata.pop("revision", None)
         # Issue #435: a revision or scenario of a variation request's bill is
         # still that request's bill. Dropping the link here would quietly turn
         # the copy into a bill of the project at large - it would appear in the
@@ -9346,12 +9455,16 @@ class BOQService:
         await self.get_boq(boq_id)
 
         entries, total = await self.activity_repo.list_for_boq(boq_id, offset=offset, limit=limit)
+        from app.modules.boq.revisions import display_names
+
+        names = await display_names(self.session, (e.user_id for e in entries))
         items = [
             ActivityLogResponse(
                 id=e.id,
                 project_id=e.project_id,
                 boq_id=e.boq_id,
                 user_id=e.user_id,
+                user_name=names.get(e.user_id) if e.user_id else None,
                 action=e.action,
                 target_type=e.target_type,
                 target_id=e.target_id,

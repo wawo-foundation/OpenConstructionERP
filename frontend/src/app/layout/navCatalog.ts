@@ -26,6 +26,7 @@ import {
   Bot,
   Layers,
   Boxes,
+  BookCopy,
   Compass,
   Box,
   ShieldCheck,
@@ -74,9 +75,12 @@ import {
   Globe,
   Globe2,
   FileSignature,
+  Layers3,
   Briefcase,
   Scale,
+  Lock,
   Percent,
+  Receipt,
   Landmark,
   Stamp,
   GitBranch,
@@ -304,6 +308,7 @@ export const navGroups: NavGroup[] = [
     items: [
       { labelKey: 'costs.title', to: '/costs', icon: Database, tourId: 'costs' },
       { labelKey: 'catalog.title', to: '/catalog', icon: Boxes },
+      { labelKey: 'project_catalogue.title', to: '/project-catalogue', icon: BookCopy },
       { labelKey: 'nav.cost_explorer', to: '/cost-explorer', icon: Compass },
       { labelKey: 'nav.assemblies', to: '/assemblies', icon: Layers },
       { labelKey: 'nav.cost_match', to: '/cost-match', icon: Link2 },
@@ -420,6 +425,17 @@ export const navGroups: NavGroup[] = [
       { labelKey: 'nav.cad_bim_explorer', to: '/data-explorer', icon: TableProperties, advancedOnly: true },
     ],
   },
+  // Survey and land: control points, point files, project CRS. Rows come
+  // from the survey module manifests, so the group stays hidden until one
+  // of them is enabled (Settings > Modules or a survey focus profile).
+  {
+    id: 'grp_survey',
+    labelKey: 'sidebar.group.survey',
+    defaultLabel: 'Survey & Land',
+    dynamicGroupKey: 'grp_survey',
+    defaultOpen: true,
+    items: [],
+  },
   // ── 6. MODEL COORDINATION ──────────────────────────────────────────
   // Multi-model BIM/CAD coordination: clash, federations, rule packs,
   // EIR matrix. Distinct from Takeoff so quantity-only users skip it.
@@ -509,8 +525,16 @@ export const navGroups: NavGroup[] = [
         defaultHelp: 'How each bid ended: winning price, money left on the table, hit rate by client, trade and size.',
       },
       { labelKey: 'nav.contracts', to: '/contracts', icon: FileSignature },
+      {
+        labelKey: 'nav.framework_agreements',
+        to: '/framework-agreements',
+        icon: Layers3,
+        helpKey: 'sidebar.help.framework_agreements',
+        defaultHelp: 'Agreed rates ordered job by job, with the cap in view.',
+      },
       { labelKey: 'nav.payment_clock', to: '/payment-clock', icon: Scale },
       { labelKey: 'nav.tax_withholding', to: '/tax-withholding', icon: Percent },
+      { labelKey: 'nav.china_tax', to: '/china-tax', icon: Receipt },
       { labelKey: 'nav.tax_rates', to: '/tax-rates', icon: Landmark },
       { labelKey: 'nav.legal_entities', to: '/admin/legal-entities', icon: Building2, advancedOnly: true },
       { labelKey: 'nav.einvoice_clearance', to: '/einvoice-clearance', icon: Stamp },
@@ -624,6 +648,15 @@ export const navGroups: NavGroup[] = [
     hideInSimple: true,
     items: [
       { labelKey: 'nav.variations', to: '/variations', icon: GitBranch },
+      {
+        labelKey: 'nav.estimate_archive',
+        defaultLabel: 'Sealed estimates',
+        to: '/estimate-archive',
+        icon: Lock,
+        advancedOnly: true,
+        helpKey: 'sidebar.help.estimate_archive',
+        defaultHelp: 'The estimate behind the contract rates, sealed and fingerprinted; price changes from it.',
+      },
       { labelKey: 'moc.title', to: '/moc', icon: Replace, advancedOnly: true },
       { labelKey: 'nav.change_orders', to: '/changeorders', icon: FileEdit, advancedOnly: true },
       { labelKey: 'nav.change_intelligence', to: '/change-intelligence', icon: BrainCircuit, advancedOnly: true },

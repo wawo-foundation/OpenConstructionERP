@@ -325,6 +325,7 @@ BUNDLE_MAP: dict[str, str] = {
     "school-paris": "commercial_rvt",
     # Partner packs
     "commercial-auckland": "commercial_rvt",
+    "survey-riverside-yard": "commercial_rvt",
     "commercial-denver": "commercial_rvt",
     "commercial-sacramento": "commercial_rvt",
     "commercial-london": "commercial_rvt",
@@ -335,6 +336,8 @@ BUNDLE_MAP: dict[str, str] = {
     "hospital-lyon": "commercial_rvt",
     "bhu-punjab": "commercial_rvt",
     "school-karachi": "commercial_rvt",
+    "hk-gov-office-fitout": "commercial_rvt",
+    "hk-residential-tuen-mun": "residential_ifc",
     "infrastructure-capetown": "commercial_rvt",
     "it-park-bangalore": "commercial_rvt",
     "mixed-use-barcelona": "commercial_rvt",

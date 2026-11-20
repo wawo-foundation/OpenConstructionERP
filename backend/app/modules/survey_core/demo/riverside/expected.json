@@ -1,0 +1,181 @@
+{
+  "dataset": "riverside_yard",
+  "project_name": "Riverside Yard (survey demo)",
+  "crs": {
+    "epsg": 32633,
+    "name": "WGS 84 / UTM zone 33N",
+    "chip": "EPSG 32633"
+  },
+  "offsets": {
+    "e": 389000.0,
+    "n": 5819000.0
+  },
+  "demo_profiles_label": "Demo values, not a standard",
+  "survey_register": {
+    "lesson_1": {
+      "search": "32633",
+      "chip": "EPSG 32633"
+    },
+    "lesson_2": {
+      "file": "control.csv",
+      "preset": "PNEZD",
+      "points": 4,
+      "kind": "control"
+    },
+    "lesson_3": {
+      "file": "existing_ground.csv",
+      "preset": "PNEZD",
+      "rows_read": 78,
+      "problems": 1,
+      "problem_rule": "SRV-003",
+      "problem_point": "EG-045",
+      "duplicate_policy": "keep_first",
+      "points_after_import": 77
+    },
+    "lesson_4": {
+      "length_m": 612.4,
+      "f_e_m": 0.042,
+      "f_n_m": -0.031,
+      "misclosure_m": 0.052,
+      "ratio": 11731,
+      "profile_ratio": 10000,
+      "verdict": "pass",
+      "bowditch_leg_m": 158.3,
+      "c_e_m": -0.011,
+      "c_n_m": 0.008,
+      "file": "traverse_legs.csv"
+    },
+    "lesson_5": {
+      "point": "CP2",
+      "e": 389110.0,
+      "n": 5818990.0
+    }
+  },
+  "volumes": {
+    "lesson_1": {
+      "surface": "Existing ground",
+      "point_set": "existing_ground.csv",
+      "points": 77,
+      "area_m2": 6000.0
+    },
+    "lesson_2": {
+      "file": "design_pad.xml",
+      "surface": "Pad",
+      "area_m2": 6000.0,
+      "z": 34.3
+    },
+    "lesson_3": {
+      "name": "Platform earthworks",
+      "code": "V-001",
+      "base": "Existing ground",
+      "compare": "Pad",
+      "method": "grid",
+      "cell_size_m": 10.0,
+      "cut_m3": 1470.0,
+      "fill_m3": 270.0,
+      "net_m3": 1200.0,
+      "net_side": "cut",
+      "coverage_pct": 100
+    },
+    "lesson_4": {
+      "boq_position": "Bulk excavation",
+      "unit": "m3",
+      "quantity": "1470.000",
+      "formula": "survey.volume(V-001)",
+      "finding": "VOL-004"
+    },
+    "lesson_5": {
+      "progress_m3": 1470.0
+    },
+    "lesson_6": {
+      "swell_factor": 1.25,
+      "loose_cut_m3": 1837.5
+    }
+  },
+  "profiles": {
+    "traverse_min_ratio": 10000,
+    "coverage_min_pct": 90,
+    "label": "Demo values, not a standard"
+  },
+  "stockpiles": {
+    "name": "Stockpile A",
+    "code": "SP-001",
+    "material": "Aggregate 0/32",
+    "book_tonnes": 8400.0,
+    "base_file": "stockpile_A_base.csv",
+    "survey_file": "stockpile_A_2026-10-12.csv",
+    "surveyed_on": "2026-10-12",
+    "lesson_1": {
+      "book_tonnes": 8400.0
+    },
+    "lesson_2": {
+      "density_t_m3": 1.6,
+      "density_source": "assumed",
+      "cell_size_m": 5.0,
+      "coverage_pct": 100,
+      "volume_m3": 4992.0,
+      "tonnes": 7987.2,
+      "variance_t": -412.8,
+      "variance_pct": -4.91,
+      "finding": "STK-001"
+    },
+    "lesson_3": {
+      "density_t_m3": 1.62,
+      "density_source": "measured",
+      "tonnes": 8087.04,
+      "variance_t": -312.96,
+      "variance_pct": -3.73,
+      "finding": "STK-002",
+      "tolerance_pct": 3
+    },
+    "lesson_4": {
+      "movement": "WASTE",
+      "quantity_t": 312.96,
+      "signed_t": -312.96,
+      "book_after_t": 8087.04
+    },
+    "lesson_5": {
+      "report_density_source": "measured"
+    }
+  },
+  "mine_survey": {
+    "period": "Oct 2026",
+    "period_label": "2026-10",
+    "unit": "Pit N Bench 2",
+    "unit_type": "bench",
+    "plan_file": "pit_plan_2026-10.csv",
+    "start_file": "pit_2026-10-01.csv",
+    "end_file": "pit_2026-10-31.csv",
+    "truck_file": "truck_loads_2026-10.csv",
+    "lesson_1": {
+      "plan_m3": 12500.0,
+      "plan_t": 25000.0,
+      "density_t_m3": 2.0
+    },
+    "lesson_2": {
+      "cell_size_m": 10.0,
+      "actual_m3": 11870.0,
+      "coverage_pct": 100.0
+    },
+    "lesson_3": {
+      "compliance_pct": 94.96,
+      "band_pct": [
+        95,
+        105
+      ],
+      "finding": "MIN-001"
+    },
+    "lesson_4": {
+      "loads": 620,
+      "payload_t": 40.0,
+      "truck_t": 24800.0,
+      "survey_t": 23740.0,
+      "truck_factor_pct": 4.47,
+      "truck_check_pct": 3,
+      "finding": "MIN-002"
+    },
+    "lesson_5": {
+      "claim_quantity_m3": 11870.0
+    }
+  }
+}

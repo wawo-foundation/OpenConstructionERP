@@ -299,6 +299,10 @@
     "unit_exportable": {
       "fail": "Stavka {ordinal}: jedinica '{unit}' ne stane u GAEB polje QU od 4 znaka i bit će skraćena pri izvozu",
       "suggestion": "Koristite GAEB oznaku jedinice od najviše 4 znaka (m, m2, m3, St, h, psch, kg, t)"
+    },
+    "short_text_length": {
+      "fail": "Stavka {ordinal}: kratki tekst ima {length} znakova; GAEB izvoz skraćuje ga na 70",
+      "suggestion": "Skratite kratki tekst na 70 znakova, a pojedinosti ostavite u dugom tekstu"
     }
   },
   "nrm": {
@@ -412,7 +416,10 @@
       "suggestion": "Dodijelite deveteroznamenkastu šifru GB/T 50500 (npr. 010101001)"
     },
     "valid_code": {
-      "fail": "Nevaljana šifra GB/T 50500 '{code}'; očekuje se 9 ili 12 znamenki"
+      "fail": "Nevaljana šifra GB/T 50500 '{code}'; očekuje se 9 ili 12 znamenki ili dopunska šifra poput 01B001"
+    },
+    "code_unique": {
+      "fail": "Šifra stavke '{code}' koristi se više puta u istom potprojektu"
     }
   },
   "cpwd": {
@@ -931,6 +938,36 @@
     "change_time_within_owner": {
       "fail": "Vremenski utjecaji podugovora za {code} ukupno iznose {sub_days} dana, više od {owner_days} dana koje je odobrio naručitelj",
       "suggestion": "Provjerite zahtjeve podizvođača za vrijeme ili od naručitelja zatražite odgovarajuće produljenje"
+    },
+    "pay_app_over_complete": {
+      "fail": "Stavka {line} nakon ovog razdoblja doseže {percent} % planirane vrijednosti ({completed} od {scheduled})",
+      "suggestion": "Smanjite iznos ovog razdoblja ili zabilježite razlog naplate iznad planirane vrijednosti"
+    },
+    "pay_app_line_negative": {
+      "fail": "Stavka {line} do danas bi iznosila {completed}, dakle manje od nule"
+    },
+    "pay_app_within_agreement": {
+      "fail": "Zahtjevi za plaćanje zajedno iznose {billed}, više od vrijednosti ugovora uvećane za odobrene izmjene od {limit}"
+    },
+    "pay_app_correct": {
+      "suggestion": "Ispravite iznose ovog zahtjeva za plaćanje ili povećajte vrijednost ugovora odobrenom izmjenom"
+    },
+    "required_documents": {
+      "fail": "Potreban dokument: {document} ({state})",
+      "suggestion": "Priložite dokument, potpisan i važeći, ugovoru s podizvođačem",
+      "states": {
+        "missing": "nedostaje",
+        "unsigned": "nije potpisan",
+        "expired": "istekao"
+      }
+    },
+    "document_roles": {
+      "terms_and_conditions": "Uvjeti poslovanja",
+      "safety_agreement": "Sporazum o sigurnosti",
+      "safety_plan": "Plan sigurnosti",
+      "insurance": "Osiguranje",
+      "method_statement": "Opis metode rada",
+      "other": "Ostali dokument"
     }
   },
   "submittal": {
@@ -2014,6 +2051,510 @@
     "crew_without_record": {
       "fail": "Na gradilištu je bila ekipa od {headcount}, ali nisu zabilježeni radovi, pregled ni zastoj.",
       "suggestion": "Dodajte što je ekipa radila ili zastoj koji je zaustavio radove."
+    }
+  },
+  "framework_agreement": {
+    "item_not_in_agreement": {
+      "fail": "Stavka {code} nije aktivna stavka okvirnog sporazuma {agreement}; evidentirajte je kao dodatne radove.",
+      "suggestion": "Uklonite stavku iz narudžbe i evidentirajte rad kao dodatni rad na narudžbi."
+    },
+    "rate_deviates": {
+      "fail": "Cijena {rate} stavke {code} razlikuje se od cijene iz sporazuma {expected}.",
+      "suggestion": "Cijene narudžbe dolaze iz okvirnog sporazuma; ponovno obračunajte stavku prema cjeniku."
+    },
+    "order_outside_validity": {
+      "fail": "Datum narudžbe {date} izvan je roka sporazuma od {from} do {to}.",
+      "suggestion": "Datirajte narudžbu unutar roka ili prvo produljite sporazum."
+    },
+    "rate_period_gap": {
+      "fail": "Nijedno razdoblje cijena ne obuhvaća {date}.",
+      "suggestion": "Dodajte razdoblje cijena koje obuhvaća ovaj datum na kartici Cijene i indeksacija."
+    },
+    "escalation_unresolved": {
+      "fail": "Indeks {series} nema vrijednost za {period}; cijenu nije moguće prilagoditi.",
+      "suggestion": "Unesite vrijednost indeksa za taj mjesec u Indeks cijena, pa ponovno izračunajte narudžbu."
+    },
+    "cap_exceeded": {
+      "fail": "Ova narudžba podiže sporazum na {total} od ograničenja {cap}; preostalo {headroom}.",
+      "suggestion": "Smanjite narudžbu na preostali iznos ili je izdajte uz obrazloženu iznimku."
+    },
+    "cap_threshold": {
+      "fail": "Korištenje sporazuma dosegnulo je {pct} % ograničenja.",
+      "suggestion": "Javite naručitelju na vrijeme kako bi se pripremio sljedeći sporazum."
+    },
+    "item_max_qty": {
+      "fail": "Stavka {code}: dosad naručeno {qty}, što premašuje navedeni maksimum {max}.",
+      "suggestion": "Dogovorite dodatnu količinu s naručiteljem prije sljedeće narudžbe."
+    },
+    "min_at_risk": {
+      "fail": "Preostalo je {days} dana, a naručeno je {pct} % zajamčenog minimuma.",
+      "suggestion": "Otvorite manjak s naručiteljem dok još ima vremena za narudžbu."
+    },
+    "currency_mismatch": {
+      "fail": "Valuta narudžbe {cur} razlikuje se od valute sporazuma {agr}.",
+      "suggestion": "Narudžbe se obračunavaju u valuti sporazuma."
+    },
+    "adjustment_unknown": {
+      "fail": "Uvjet {tag} nema prilagodbu u ovom sporazumu.",
+      "suggestion": "Dodajte prilagodbu na kartici Uvjeti ili uklonite uvjet iz narudžbe."
+    },
+    "direct_claim": {
+      "fail": "Zahtjevi se podnose na narudžbama, a ne na okvirnom sporazumu.",
+      "suggestion": "Otvorite narudžbu u sklopu koje je rad obavljen i podnesite zahtjev tamo."
+    },
+    "duplicate_item": {
+      "fail": "Šifra stavke {code} pojavljuje se dvaput u razdoblju cijena {period}.",
+      "suggestion": "Prije spremanja cjenika zadržite jedan redak po šifri stavke."
+    },
+    "measured_over_ordered": {
+      "fail": "Izmjereno {m} premašuje naručeno {o} na stavci {code}; razmotrite dodatni rad.",
+      "suggestion": "Unesite dodatnu količinu kao izmjenu narudžbe."
+    },
+    "term_over_legal_max": {
+      "fail": "Trajanje od {years} godina premašuje ograničenje od {max} godina prema {source} (paket).",
+      "suggestion": "Provjerite trajanje s naručiteljem; ograničenje navodi paket, ali se ne provodi."
+    }
+  },
+  "estimate_archive": {
+    "arc_hash_mismatch": {
+      "fail": "Otisak se ne podudara: zapis daje {actual}, pečat navodi {sealed}. Smatrajte zapis izmijenjenim."
+    },
+    "arc_total_mismatch": {
+      "fail": "Zapečaćeni zbroj {seal} razlikuje se od ugovora {award} za {diff}."
+    },
+    "arc_no_breakdown": {
+      "fail": "{n} stavki nema raščlambu resursa; njihove cijene kasnije se ne mogu pratiti."
+    },
+    "arc_no_markups": {
+      "fail": "Troškovnik nema dodataka za pečaćenje."
+    },
+    "arc_sealed_after_signing": {
+      "fail": "Zapečaćeno {days} dana nakon potpisa ugovora."
+    },
+    "arc_no_receipt": {
+      "fail": "Druga strana još nije potvrdila otisak."
+    },
+    "arc_open_not_closed": {
+      "fail": "Otvaranje {id} otvoreno je {days} dana bez zapisnika."
+    },
+    "arc_open_no_reason": {
+      "fail": "Otvaranje zahtijeva razlog i referencu."
+    },
+    "arc_open_one_party": {
+      "fail": "Navedena je samo jedna strana; zabilježite zašto nedostaje druga."
+    },
+    "var_basis_no_seal": {
+      "fail": "Stavka {code} vrednovana je na izvornoj osnovi, ali zapečaćeni troškovnik ne postoji."
+    },
+    "var_basis_deviation": {
+      "fail": "Stavka {code}: {field} promijenjeno s {old} na {new} bez napomene."
+    },
+    "var_new_resource_no_evidence": {
+      "fail": "Novi resurs {res} nema datum cijene ni referencu ponude."
+    },
+    "var_markup_not_sealed": {
+      "fail": "Stavka {code} primjenjuje dodatak {m} kojeg nema u pečatu."
+    },
+    "var_abnormal_carried_rate": {
+      "fail": "Preneseni trošak {c} odstupa {pct} % od referentne vrijednosti."
+    },
+    "arc_mutation_refused": {
+      "fail": "Zapečaćeni troškovnik ne može se mijenjati ni brisati. Zapečatite novu verziju koja ga zamjenjuje."
+    },
+    "contents_locked": "Sadržaj ostaje zapečaćen dok ne počne službeno otvaranje.",
+    "market_off": "Zapečaćeni troškovnici nisu dio tržišnog profila ovog projekta.",
+    "contract_required": "Prije pečaćenja procjene kao osnove ugovora potreban je ugovor s klijentom."
+  },
+  "boq_revision": {
+    "superseded_still_editable": {
+      "fail": "Revizija {label} još se može uređivati iako je u međuvremenu izrađena {later}; ovdje napravljene izmjene ne prenose se",
+      "suggestion": "Zaključajte {label} ili nastavite rad u najnovijoj reviziji"
+    }
+  },
+  "schedule_baseline": {
+    "single_approved": {
+      "fail": "Ovaj plan ima više od jednog odobrenog osnovnog plana ({baselines}).",
+      "suggestion": "Odobrite osnovni plan koji treba vrijediti; odobrenje jednog povlači odobrenje ostalih."
+    }
+  },
+  "project_catalogue": {
+    "unit_present": {
+      "fail": "Cijena {code} nema jedinicu mjere.",
+      "suggestion": "Unesite jedinicu na koju se cijena odnosi, na primjer m2, m3 ili h."
+    },
+    "duplicate_code": {
+      "fail": "Šifru {code} u ovom projektu koristi više od jedne cijene.",
+      "suggestion": "Zadržite jednu cijenu po šifri ili varijanti dodijelite vlastitu šifru."
+    },
+    "currency_differs": {
+      "fail": "Cijena {code} je u {currency}, a projekt se procjenjuje u {project_currency}.",
+      "suggestion": "Preračunajte cijenu u valutu projekta ili potvrdite da je strana valuta namjerna."
+    },
+    "override_far": {
+      "fail": "Lokalna cijena za {code} odstupa {percent} % od izvorne cijene {source_rate}.",
+      "suggestion": "Provjerite je li decimalni zarez pomaknut ili zabilježite zašto projektu treba druga cijena."
+    },
+    "source_changed": {
+      "fail": "Izvorna cijena za {code} promijenila se s {old} na {new} otkako ju je projekt preuzeo.",
+      "suggestion": "Preuzmite novu izvornu cijenu ili svjesno zadržite lokalnu."
+    }
+  },
+  "schedule_mspdi_import": {
+    "task_dates": {
+      "missing_dates": "Zadatak {ref} „{name}” nema datum početka ili završetka.",
+      "finish_before_start": "Zadatak {ref} „{name}” završava ({finish}) prije nego što počinje ({start}).",
+      "suggestion": "Ispravite datume u izvornom planu i ponovno ga izvezite. Datumi se pri uvozu nikada ne pogađaju."
+    },
+    "unique_ids": {
+      "duplicate_uid": "ID zadatka {ref} pojavljuje se više puta; zadržava se samo prvi zadatak.",
+      "suggestion": "Dodijelite svakom zadatku jedinstveni ID u izvornom planu."
+    },
+    "links_resolve": {
+      "dangling_link": "Zadatak {ref} „{name}”: prethodnik {predecessor} nije u datoteci, veza se preskače.",
+      "duplicate_link": "Zadatak {ref} \"{name}\": druga veza od prethodnika {predecessor} je preskočena, za par ostaje jedna veza.",
+      "self_link": "Zadatak {ref} „{name}” povezan je sam sa sobom, veza se preskače.",
+      "unknown_link_type": "Zadatak {ref} „{name}”: vrsta veze {type} nije poznata i čita se kao završetak-početak.",
+      "suggestion": "Provjerite logičke veze u izvornom planu."
+    },
+    "values_in_range": {
+      "percent_out_of_range": "Zadatak {ref} „{name}”: {value}% dovršenosti izvan je raspona 0-100 i ograničava se.",
+      "outline_gap": "Zadatak {ref} „{name}” preskače razinu strukture ({level}); smješta se pod najbliži sažeti zadatak iznad.",
+      "suggestion": "Provjerite % dovršenosti i uvlake u izvornom planu."
+    },
+    "calendar_work_days": {
+      "calendar_no_work_days": "Kalendar {calendar} nema nijedan radni dan.",
+      "suggestion": "Označite radne dane ovog kalendara u izvornom planu."
+    }
+  },
+  "schedule_pdf_import": {
+    "no_text_layer": {
+      "fail": "PDF nema tekstualni sloj, tablica se ne može pročitati.",
+      "suggestion": "Izvezite terminski plan kao MS Project XML, XER ili Excel i uvezite tu datoteku."
+    },
+    "dates_parsed": {
+      "fail": "Redak {row}: početak ili završetak nije datum.",
+      "suggestion": "Provjerite stupce datuma i redoslijed dan/mjesec ili ispravite datum u izvoru."
+    },
+    "finish_before_start": {
+      "fail": "Redak {row}: završetak je prije početka.",
+      "suggestion": "Ispravite datume u izvornom planu."
+    },
+    "duration_mismatch": {
+      "fail": "Redak {row}: ispisano trajanje razlikuje se od radnih dana između početka i završetka.",
+      "suggestion": "Datumi se zadržavaju; provjerite stupac trajanja i kalendar projekta."
+    },
+    "unique_ids": {
+      "fail": "Redak {row}: ID aktivnosti koristi drugi redak.",
+      "suggestion": "Dodijelite svakoj aktivnosti jedinstveni ID u izvornom planu."
+    },
+    "links_resolve": {
+      "fail": "Redak {row}: prethodnik nije aktivnost iz tablice.",
+      "suggestion": "Provjerite stupac prethodnika; neriješene veze se preskaču."
+    }
+  },
+  "commercial_control": {
+    "ok": "Provjereno, bez primjedbi",
+    "cvr": {
+      "target_rate_basis": {
+        "fail": "{missing} od {total} cijenjenih stavki nema ciljanu cijenu i budžetirane su po prodajnoj cijeni (npr. {sample})",
+        "suggestion": "Unesite ciljani trošak na tim stavkama kako bi budžet bio trošak kojem se gradilište drži"
+      },
+      "unmapped_cost": {
+        "fail": "{kind} {label} nema WBS ni šifru troška: ugovoreno {committed}, stvarno {actual}",
+        "suggestion": "Knjižite stavku narudžbe, podugovor ili račun na element WBS-a kako bi ga CVR mogao smjestiti"
+      }
+    },
+    "procurement": {
+      "line_over_committed": {
+        "fail": "Stavka {ordinal} je preugovorena: naručeno {committed_qty} od {budget_qty}, {committed_value} prema budžetu od {budget_value}",
+        "suggestion": "Provjerite dvostruku narudžbu ili evidentirajte izmjenu ili prijenos budžeta prije novih obveza"
+      }
+    },
+    "approval_routes": {
+      "bands_contiguous": {
+        "gap": {
+          "fail": "Iznosi od {low} do {high} ne dolaze ni do jednog odobravatelja (korak {step})",
+          "suggestion": "Proširite susjedni raspon ili dodajte korak kako bi svaki iznos imao odobravatelja"
+        },
+        "overlap": {
+          "fail": "Korak {step} preklapa se s nižim rasponom od {low} do {high}; te iznose potpisuju oba odobravatelja",
+          "suggestion": "Neka svaki raspon počinje gdje prethodni završava, osim ako trebaju potpisati oba"
+        },
+        "empty": {
+          "fail": "Korak {step} ima raspon od {low} do {high} koji ne sadrži nijedan iznos",
+          "suggestion": "Postavite minimum ispod maksimuma ili ostavite maksimum prazan za bez gornje granice"
+        }
+      }
+    },
+    "valuation": {
+      "assessed_within_submitted": {
+        "fail": "Redak {line}: procijenjena količina {assessed} veća je od podnesene {submitted}",
+        "suggestion": "Procjenjujte najviše podneseno, a dodatne radove evidentirajte kao izmjenu"
+      },
+      "certified_within_assessed": {
+        "fail": "Redak {line}: ovjerena količina {certified} veća je od procijenjene {assessed}",
+        "suggestion": "Ovjerite najviše procijenjeno ili najprije ponovno procijenite redak"
+      }
+    }
+  },
+  "norm_base": {
+    "code_present": {
+      "fail": "Stavka {ordinal} ne navodi šifru norme {base}. Troškovnik prema normama navodi normu u svakoj stavci.",
+      "suggestion": "Upišite šifru norme u klasifikaciju {classification} stavke."
+    },
+    "code_shape": {
+      "fail": "„{code}” u stavci {ordinal} nije šifra {base}. Očekuje se šifra poput {example}."
+    },
+    "legacy_prefix": {
+      "fail": "„{code}” u stavci {ordinal} koristi ukinuti prefiks {old}. Važeća šifra je {new}."
+    },
+    "resource_breakdown": {
+      "fail": "Stavka norme {code} nema radne sate ili prosječni razred.",
+      "suggestion": "Dodajte resurs rada sa satima po jedinici i prosječnim razredom norme."
+    },
+    "grade_range": {
+      "fail": "Razred {grade} u stavci {ordinal} je izvan raspona {min}–{max} ili nije u koracima od {step}."
+    }
+  },
+  "public_funding": {
+    "markup_cap": {
+      "fail": "{funding}: {markup} iznosi {percent} %, gornja granica je {cap} % izravnih troškova ({source}).",
+      "suggestion": "Smanjite dodatak na gornju granicu ili postavite privatno financiranje ako radove ne plaćaju javna sredstva."
+    },
+    "investor_exact": {
+      "fail": "Troškovnik naručitelja iz {funding}: {markup} treba iznositi točno {cap} % ({source})."
+    },
+    "material_price_evidence": {
+      "fail": "{funding}: materijal {material} u stavci {ordinal} ima {count} od {required} ponuda cijena i nema analize cijena.",
+      "suggestion": "Zabilježite ponude dobavljača za materijal ili priložite izvješće o analizi cijena."
+    }
+  },
+  "vat_rate": {
+    "standard_rate": {
+      "fail": "{markup} iznosi {percent} %; opća stopa PDV-a u {country} je {rate} %.",
+      "suggestion": "Postavite poreznu stavku na opću stopu ili u troškovniku navedite zašto vrijedi druga stopa ili oslobođenje."
+    }
+  },
+  "survey": {
+    "no_crs": {
+      "fail": "Skup točaka {name} nema koordinatni sustav: zadajte EPSG ili lokalnu mrežu prije obujma ili čestica.",
+      "suggestion": "Postavite koordinatni sustav projekta, zatim navedite u kojem je sustavu datoteka izmjerena."
+    },
+    "crs_unconfirmed": {
+      "fail": "Koordinatni sustav prepoznat automatski (pouzdanost {confidence}); potvrdite prije uporabe.",
+      "suggestion": "Otvorite postavljanje koordinatnog sustava projekta i potvrdite prepoznati sustav ili odaberite drugi."
+    },
+    "duplicate_point": {
+      "fail": "Dvostruka oznaka točke {point_id} s različitim koordinatama.",
+      "suggestion": "Zadržite jedno mjerenje: izbrišite skup s pogrešnim i ponovno ga uvezite."
+    },
+    "traverse_misclosure": {
+      "fail": "Poligonski vlak {name} zatvara se s 1:{r}, ispod minimuma profila 1:{min}.",
+      "suggestion": "Provjerite strane zbog grube pogreške, ponovno izmjerite najslabiju stranu ili potvrdite vrijednost profila."
+    },
+    "level_misclosure": {
+      "fail": "Odstupanje nivelmana {f} mm premašuje k·√km uz k = {k} mm.",
+      "suggestion": "Ponovite nivelman ili provjerite visine korištenih repera."
+    }
+  },
+  "volumes": {
+    "no_overlap": {
+      "fail": "Dvije se plohe preklapaju samo na {p} % površine: volumen nema smisla.",
+      "suggestion": "Provjerite jesu li obje plohe u istom koordinatnom sustavu i pokrivaju li isti teren."
+    },
+    "low_coverage": {
+      "fail": "Samo {c} % površine ima podatke u obje plohe (minimum {min} %).",
+      "suggestion": "Dodajte točke gdje ploha nedostaje ili suzite granicu na pokriveno područje."
+    },
+    "coarse_scan": {
+      "fail": "Grubo skeniranje (LOA10) daje ovaj volumen bez navedenog razloga.",
+      "suggestion": "Upotrijebite skeniranje geodetske točnosti ili napišite zašto je ovo dovoljno."
+    },
+    "bank_volume": {
+      "fail": "Količina je volumen u sraslom stanju (u tlu); koeficijent rastresitosti nije primijenjen.",
+      "suggestion": "Pošaljite rastresiti iskop ako se stavka troškovnika mjeri u rastresitom stanju."
+    }
+  },
+  "setting_out": {
+    "stake_off": {
+      "fail": "Točka {id} odstupa {d} mm, tolerancija {t} mm",
+      "suggestion": "Ponovno iskolčite točku i zabilježite je ili izradite nacrt NCR-a."
+    },
+    "record_untraceable": {
+      "fail": "Zapis iskolčenja {id} nema instrument ni točke osnove.",
+      "suggestion": "Unesite instrument i točke osnove na kojima je stajalo stajalište."
+    },
+    "sheet": {
+      "title": "Zapisnik iskolčenja",
+      "project": "Projekt",
+      "crs": "Koordinatni sustav",
+      "request": "Zahtjev",
+      "tolerance": "Tolerancija",
+      "element": "Građevinski element",
+      "generated": "Izrađeno",
+      "point": "Točka",
+      "design_e": "Projekt E",
+      "design_n": "Projekt N",
+      "design_z": "Projekt Z",
+      "measured_e": "Izmjereno E",
+      "measured_n": "Izmjereno N",
+      "verdict": "Rezultat",
+      "by": "Izmjerio",
+      "verdict_pass": "U toleranciji",
+      "verdict_fail": "Izvan tolerancije",
+      "verdict_open": "Otvoreno",
+      "verdict_no_tolerance": "Nema profila",
+      "counts": "U toleranciji: {passed} · Izvan tolerancije: {failed} · Otvoreno: {open}",
+      "findings": "Nalazi",
+      "no_profile": "Nema profila, postavite ga",
+      "d": "d (mm)",
+      "dz": "dZ (mm)"
+    }
+  },
+  "land_parcels": {
+    "area_mismatch": {
+      "fail": "Čestica {id}: izračunata površina {a} m2 razlikuje se od upisane {l} m2 više od tolerancije ({t}).",
+      "suggestion": "Provjerite lomne točke prema izvatku iz registra ili zabilježite zašto se površine razlikuju."
+    },
+    "ring_invalid": {
+      "fail": "Čestica {id}: obris nije zatvoren ili sam sebe siječe.",
+      "suggestion": "Ispravite lomne točke tako da jednom obiđu česticu bez presijecanja."
+    },
+    "zone_not_acquired": {
+      "fail": "Radna zona preklapa još nestečenu česticu {id} ({area} m2).",
+      "suggestion": "Steknite česticu ili dogovorite pristup prije početka radova, ili pomaknite radnu zonu."
+    },
+    "overlap": {
+      "fail": "Čestice {a} i {b} preklapaju se za {area} m2.",
+      "suggestion": "Ispravite zajedničku granicu tako da obje čestice koriste iste točke."
+    },
+    "gap": {
+      "fail": "Procjep od {gap} m između čestica {a} i {b}.",
+      "suggestion": "Neka obje čestice koriste iste lomne točke ili potvrdite da pojas pripada drugoj čestici."
+    },
+    "id_format": {
+      "fail": "Broj {id} ne odgovara formatu {label} (na primjer {example}).",
+      "suggestion": "Prepišite broj točno kako ga piše registar."
+    },
+    "pdf": {
+      "title": "Popis čestica",
+      "project": "Projekt",
+      "crs": "Koordinatni sustav",
+      "method": "Metoda",
+      "method_value": "Površina iz koordinata granice (Gaussova formula), zaokružena na {decimals} decimale, m2",
+      "printed": "Ispisao",
+      "legal": "Upisana površina (m2)",
+      "computed": "Izračunata (m2)",
+      "diff": "Razlika (m2)",
+      "status": "Status čestice",
+      "rights": "Prava",
+      "cost": "Trošak",
+      "findings": "Nalazi",
+      "total": "Ukupno, čestica: {count}",
+      "acquired_of": "Stečeno {acquired} od {total}",
+      "findings_title": "Nalazi",
+      "no_findings": "Nema nalaza.",
+      "disclaimer": "Vlasnici i prava prikazani su kako su zabilježeni u ovom projektu. Popis nije pravno mišljenje niti izvadak iz registra.",
+      "status_needed": "Potrebno",
+      "status_negotiating": "Pregovori",
+      "status_acquired": "Stečeno",
+      "status_expropriation": "Izvlaštenje"
+    }
+  },
+  "monitoring": {
+    "crossed": {
+      "fail": "Točka {id}: pomak {d} mm ili brzina {r} mm/day prešla je razinu {level}",
+      "suggestion": "Provjerite točku i konstrukciju, zatim potvrdite upozorenje bilješkom."
+    },
+    "level": {
+      "ok": "Normalno",
+      "alert": "Upozorenje",
+      "action": "Djelovanje",
+      "alarm": "Razina alarma"
+    },
+    "risk": {
+      "title": "Mjerna točka {id} na razini {level}",
+      "description": "Pomak {d} mm, brzina {r} mm/day u odnosu na {profile}. Nacrt je otvorio monitoring: pregledajte ga i odredite odgovornu osobu."
+    },
+    "report": {
+      "title": "Izvješće o alarmima monitoringa",
+      "project": "Projekt",
+      "crs": "Koordinatni sustav",
+      "profile": "Profil graničnih vrijednosti",
+      "generated": "Generirano",
+      "point": "Točka",
+      "baseline": "Polazna vrijednost (m)",
+      "latest": "Posljednja (m)",
+      "displacement": "Pomak (mm)",
+      "rate": "Brzina (mm/day)",
+      "level": "Razina",
+      "acknowledged": "Potvrđeno",
+      "counts": "Razina alarma: {alarm} · Djelovanje: {action} · Upozorenje: {alert} · Normalno: {ok}",
+      "findings": "Nalazi",
+      "no_profile": "Nema profila, postavite ga",
+      "ack_yes": "Da",
+      "ack_no": "Ne"
+    }
+  },
+  "stockpiles": {
+    "density_assumed": {
+      "fail": "Gustoća je pretpostavljena, a ne izmjerena: tone su pouzdane koliko i ta procjena.",
+      "suggestion": "Izvažite uzorak ili uzmite gustoću iz otpremnica dobavljača."
+    },
+    "variance_high": {
+      "fail": "Izmjera odstupa od knjigovodstvenog stanja za {v} %, iznad tolerancije od {t} %.",
+      "suggestion": "Provjerite gustoću i osnovnu plohu, zatim predložite korekciju i potvrdite je ako je razlika stvarna."
+    }
+  },
+  "mine_survey": {
+    "compliance_outside": {
+      "fail": "Ispunjenje razdoblja {c} % izvan je raspona {lo}-{hi} %.",
+      "suggestion": "Provjerite plan i izmjeru te objasnite razliku u napomeni razdoblja prije potraživanja."
+    },
+    "truck_differs": {
+      "fail": "Tone prema brojanju vožnji razlikuju se od izmjerenih tona za {v} %, iznad provjere od {t} %.",
+      "suggestion": "Provjerite nosivost po vožnji i gustoću, a zatim ponovno usporedite dvije plohe."
+    }
+  },
+  "hongkong": {
+    "sopo_applicability": {
+      "fail": "Ugovor je obuhvaćen Cap. 652 (Security of Payment): odgovor u 30 dana, plaćanje u 60 dana od zahtjeva"
+    },
+    "sopo_private_scope_check": {
+      "fail": "Privatni ugovor obuhvaćen je Cap. 652 samo za novu zgradu ili radove uz odobrenje Building Authority: potvrdite opseg"
+    },
+    "sopo_response_late": {
+      "fail": "Do {date} nije dostavljen odgovor na zahtjev: traženi iznos je sporan i može ići na adjudikaciju"
+    },
+    "sopo_payment_term_exceeds_60": {
+      "fail": "Rok plaćanja od {n} dana premašuje 60 dana dopuštenih Cap. 652"
+    },
+    "sopo_response_term_exceeds_30": {
+      "fail": "Rok odgovora od {n} dana premašuje 30 dana dopuštenih Cap. 652"
+    },
+    "sopo_adjudication_window": {
+      "fail": "Nastao je spor o plaćanju: dostavite obavijest o adjudikaciji do {date}"
+    },
+    "contract_pay_when_paid": {
+      "fail": "Klauzula pay-when-paid: Cap. 652 čini uvjetno plaćanje neprovedivim"
+    },
+    "levy_missing": {
+      "fail": "Radovi premašuju HK$3,000,000, ali troškovnik nema pristojbu CIC (0,5%) ili pristojbu CWR (0,03%)"
+    },
+    "levy_below_threshold": {
+      "fail": "Radovi nisu veći od HK$3,000,000: pristojbe CIC i CWR se ne plaćaju"
+    },
+    "tax_nonzero": {
+      "fail": "Obračunata je stavka PDV-a ili GST-a, ali Hong Kong nema takav porez: postavite nulu"
+    },
+    "retention_over_limit": {
+      "fail": "Zadržani iznos {x} premašuje ugovorno ograničenje {limit}"
+    },
+    "pc_sum_no_attendance": {
+      "fail": "Iznos prime cost nema stavke dobiti i opsluživanja"
+    },
+    "index_attribution": {
+      "fail": "Indeks cijena ArchSD nema naveden izvor: navedite Architectural Services Department"
     }
   }
 }

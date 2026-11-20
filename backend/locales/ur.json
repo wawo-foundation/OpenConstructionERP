@@ -788,7 +788,8 @@
         "no_rejections": "کچھ بھی مسترد نہیں ہوا۔",
         "sig_delivered_by": "ترسیل کنندہ",
         "counterparty_tax_id": "ٹیکس شناختی نمبر",
-        "counterparty_address": "پتہ"
+        "counterparty_address": "پتہ",
+        "delivery_address": "ترسیل کا پتہ"
       },
       "labels": {
         "po_status": {
@@ -861,7 +862,8 @@
         "gross_settled": "طے شدہ مجموعی رقم",
         "no_withholding": "اس ادائیگی سے کوئی رقم نہیں روکی گئی۔",
         "counterparty_tax_id": "ٹیکس شناختی نمبر",
-        "counterparty_address": "پتہ"
+        "counterparty_address": "پتہ",
+        "supply_date": "فراہمی کی تاریخ"
       },
       "labels": {
         "invoice_status": {
@@ -1647,6 +1649,81 @@
         "col_max": "بلند ترین",
         "col_count": "ریڈنگز"
       }
+    },
+    "gantt_pdf": {
+      "strings": {
+        "title": "شیڈول (گینٹ چارٹ)",
+        "project": "منصوبہ",
+        "schedule": "شیڈول",
+        "baseline": "بنیادی منصوبہ",
+        "no_baseline": "کوئی نہیں",
+        "exported": "برآمد کیا گیا",
+        "data_date": "ڈیٹا کی تاریخ",
+        "col_wbs": "WBS",
+        "col_activity": "سرگرمی",
+        "col_start": "آغاز",
+        "col_finish": "اختتام",
+        "col_duration": "دن",
+        "legend_current": "موجودہ منصوبہ",
+        "legend_progress": "پیش رفت",
+        "legend_critical": "اہم راستہ",
+        "legend_baseline": "بنیادی منصوبہ",
+        "legend_actual": "اصل",
+        "legend_milestone": "سنگ میل",
+        "legend_summary": "خلاصہ",
+        "week_short": "ہ{n}",
+        "quarter_short": "س{n}",
+        "sheet_of": "شیٹ {page} از {total}",
+        "no_activities": "اس شیڈول میں ابھی کوئی سرگرمی نہیں۔"
+      }
+    },
+    "contracts": {
+      "strings": {
+        "doc_title": "معاہدہ",
+        "col_code": "کوڈ",
+        "col_title": "عنوان",
+        "col_type": "معاہدے کی قسم",
+        "col_role": "معاہدے کا فریق",
+        "col_counterparty": "دوسرا فریق",
+        "col_original_value": "ابتدائی مالیت",
+        "col_total_value": "معاہدے کی مالیت",
+        "col_retention": "روکی گئی رقم",
+        "col_start": "آغاز کی تاریخ",
+        "col_end": "اختتام کی تاریخ",
+        "col_signed": "دستخط کی تاریخ",
+        "line_code": "کوڈ",
+        "line_description": "تفصیل",
+        "line_unit": "اکائی",
+        "line_quantity": "مقدار",
+        "line_unit_rate": "فی اکائی نرخ",
+        "lines": "کام کی قدر کا شیڈول",
+        "signer_company": "کمپنی کی جانب سے"
+      },
+      "labels": {
+        "status": {
+          "draft": "مسودہ",
+          "active": "فعال",
+          "suspended": "معطل",
+          "completed": "مکمل",
+          "terminated": "فسخ شدہ"
+        },
+        "type": {
+          "lump_sum": "یکمشت رقم",
+          "gmp": "GMP",
+          "cost_plus": "لاگت جمع منافع",
+          "tm": "وقت اور مواد",
+          "unit_price": "فی اکائی قیمت",
+          "design_build": "ڈیزائن اور تعمیر",
+          "combination": "مخلوط",
+          "remeasurement": "دوبارہ پیمائش",
+          "framework": "فریم ورک معاہدہ",
+          "call_off": "کال آف آرڈر"
+        },
+        "party": {
+          "client": "کلائنٹ معاہدہ",
+          "subcontractor": "ذیلی معاہدہ"
+        }
+      }
     }
   },
   "cost_control": {
@@ -2076,7 +2153,11 @@
       "notifications.portal.message_received.title": "پورٹل پر نیا پیغام",
       "notifications.portal.message_received.body": "{buyer_name} نے پیغام بھیجا۔",
       "dispatch.notify.plan_title": "Your daily plan is ready",
-      "dispatch.notify.plan_body": "Plan for {day}: {lines} lines."
+      "dispatch.notify.plan_body": "Plan for {day}: {lines} lines.",
+      "notifications.monitoring.alert.title": "نگرانی کا انتباہ",
+      "notifications.monitoring.action.title": "نگرانی کی کارروائی کی سطح",
+      "notifications.monitoring.alarm.title": "نگرانی کا الارم",
+      "notifications.monitoring.crossed.body": "نقطہ {point}: {displacement} mm، {rate} mm/day۔"
     },
     "schedule_headers": {
       "headers": {
@@ -2702,5 +2783,30 @@
         "gap": "فرق"
       }
     }
-  }
+  },
+  "monitoring.crossed.fail": "نقطہ {id}: نقل مکانی {d} ملی میٹر یا شرح {r} ملی میٹر/دن نے سطح {level} عبور کی",
+  "monitoring.crossed.suggestion": "نقطہ اور ڈھانچہ دیکھیں، پھر نوٹ کے ساتھ الرٹ کی تصدیق کریں۔",
+  "monitoring.level.ok": "OK",
+  "monitoring.level.alert": "انتباہ",
+  "monitoring.level.action": "کارروائی",
+  "monitoring.level.alarm": "الارم",
+  "monitoring.risk.title": "مانیٹرنگ نقطہ {id}، سطح {level} پر",
+  "monitoring.risk.description": "نقل مکانی {d} ملی میٹر، شرح {r} ملی میٹر/دن، {profile} کے مقابلے میں۔ مسودہ مانیٹرنگ نے کھولا: اسے دیکھیں اور ذمہ دار مقرر کریں۔",
+  "monitoring.report.title": "مانیٹرنگ الارم رپورٹ",
+  "monitoring.report.project": "منصوبہ",
+  "monitoring.report.crs": "کوآرڈینیٹ نظام",
+  "monitoring.report.profile": "حد کا پروفائل",
+  "monitoring.report.generated": "تیار کردہ",
+  "monitoring.report.point": "نقطہ",
+  "monitoring.report.baseline": "بنیادی قدر (م)",
+  "monitoring.report.latest": "تازہ ترین قدر (م)",
+  "monitoring.report.displacement": "نقل مکانی (ملی میٹر)",
+  "monitoring.report.rate": "شرح (ملی میٹر/دن)",
+  "monitoring.report.level": "سطح",
+  "monitoring.report.acknowledged": "تصدیق شدہ",
+  "monitoring.report.counts": "الارم: {alarm} · کارروائی: {action} · انتباہ: {alert} · OK: {ok}",
+  "monitoring.report.findings": "نتائج",
+  "monitoring.report.no_profile": "کوئی پروفائل نہیں، ایک مقرر کریں",
+  "monitoring.report.ack_yes": "ہاں",
+  "monitoring.report.ack_no": "نہیں"
 }

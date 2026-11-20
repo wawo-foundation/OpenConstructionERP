@@ -788,7 +788,8 @@
         "no_rejections": "Nothing was rejected.",
         "sig_delivered_by": "Delivered by",
         "counterparty_tax_id": "Tax ID",
-        "counterparty_address": "Address"
+        "counterparty_address": "Address",
+        "delivery_address": "Delivery address"
       },
       "labels": {
         "po_status": {
@@ -861,7 +862,8 @@
         "gross_settled": "Gross amount settled",
         "no_withholding": "Nothing was withheld from this payment.",
         "counterparty_tax_id": "Tax ID",
-        "counterparty_address": "Address"
+        "counterparty_address": "Address",
+        "supply_date": "Date of supply"
       },
       "labels": {
         "invoice_status": {
@@ -1647,6 +1649,81 @@
         "page": "Page {page} of {total}",
         "generated": "Generated {timestamp}"
       }
+    },
+    "gantt_pdf": {
+      "strings": {
+        "title": "Schedule (Gantt chart)",
+        "project": "Project",
+        "schedule": "Schedule",
+        "baseline": "Baseline",
+        "no_baseline": "none",
+        "exported": "Exported",
+        "data_date": "Data date",
+        "col_wbs": "WBS",
+        "col_activity": "Activity",
+        "col_start": "Start",
+        "col_finish": "Finish",
+        "col_duration": "Days",
+        "legend_current": "Current plan",
+        "legend_progress": "Progress",
+        "legend_critical": "Critical path",
+        "legend_baseline": "Baseline plan",
+        "legend_actual": "Actual",
+        "legend_milestone": "Milestone",
+        "legend_summary": "Summary",
+        "week_short": "W{n}",
+        "quarter_short": "Q{n}",
+        "sheet_of": "Sheet {page} of {total}",
+        "no_activities": "This schedule has no activities yet."
+      }
+    },
+    "contracts": {
+      "strings": {
+        "doc_title": "Contract",
+        "col_code": "Code",
+        "col_title": "Title",
+        "col_type": "Contract type",
+        "col_role": "Contract side",
+        "col_counterparty": "Counterparty",
+        "col_original_value": "Original value",
+        "col_total_value": "Contract value",
+        "col_retention": "Retention",
+        "col_start": "Start date",
+        "col_end": "End date",
+        "col_signed": "Signed on",
+        "line_code": "Code",
+        "line_description": "Description",
+        "line_unit": "Unit",
+        "line_quantity": "Quantity",
+        "line_unit_rate": "Unit rate",
+        "lines": "Schedule of values",
+        "signer_company": "For the company"
+      },
+      "labels": {
+        "status": {
+          "draft": "Draft",
+          "active": "Active",
+          "suspended": "Suspended",
+          "completed": "Completed",
+          "terminated": "Terminated"
+        },
+        "type": {
+          "lump_sum": "Lump sum",
+          "gmp": "GMP",
+          "cost_plus": "Cost plus",
+          "tm": "Time and materials",
+          "unit_price": "Unit price",
+          "design_build": "Design and build",
+          "combination": "Combination",
+          "remeasurement": "Remeasurement",
+          "framework": "Framework",
+          "call_off": "Call-off"
+        },
+        "party": {
+          "client": "Client contract",
+          "subcontractor": "Subcontract"
+        }
+      }
     }
   },
   "cost_control": {
@@ -2076,7 +2153,11 @@
       "notifications.variation.submitted.body": "Variation {code} \"{title}\" on {project} was submitted and is waiting for a decision.",
       "notifications.variation.submitted.title": "Variation awaiting decision: {code}",
       "dispatch.notify.plan_title": "Your daily plan is ready",
-      "dispatch.notify.plan_body": "Plan for {day}: {lines} lines."
+      "dispatch.notify.plan_body": "Plan for {day}: {lines} lines.",
+      "notifications.monitoring.alert.title": "Monitoring alert",
+      "notifications.monitoring.action.title": "Monitoring action level",
+      "notifications.monitoring.alarm.title": "Monitoring alarm",
+      "notifications.monitoring.crossed.body": "Point {point}: {displacement} mm, {rate} mm/day."
     },
     "schedule_headers": {
       "headers": {
@@ -2716,5 +2797,30 @@
         "gap": "Gap"
       }
     }
-  }
+  },
+  "monitoring.crossed.fail": "Point {id} displacement {d} mm or rate {r} mm/day crossed {level}",
+  "monitoring.crossed.suggestion": "Check the point and the structure, then acknowledge the alert with a note.",
+  "monitoring.level.ok": "OK",
+  "monitoring.level.alert": "Alert",
+  "monitoring.level.action": "Action",
+  "monitoring.level.alarm": "Alarm",
+  "monitoring.risk.title": "Monitoring point {id} at {level}",
+  "monitoring.risk.description": "Displacement {d} mm, rate {r} mm/day against {profile}. Draft opened by monitoring: review it and name an owner.",
+  "monitoring.report.title": "Monitoring alarm report",
+  "monitoring.report.project": "Project",
+  "monitoring.report.crs": "Coordinate system",
+  "monitoring.report.profile": "Threshold profile",
+  "monitoring.report.generated": "Generated",
+  "monitoring.report.point": "Point",
+  "monitoring.report.baseline": "Baseline (m)",
+  "monitoring.report.latest": "Latest (m)",
+  "monitoring.report.displacement": "Displacement (mm)",
+  "monitoring.report.rate": "Rate (mm/day)",
+  "monitoring.report.level": "Level",
+  "monitoring.report.acknowledged": "Acknowledged",
+  "monitoring.report.counts": "Alarm: {alarm} · Action: {action} · Alert: {alert} · OK: {ok}",
+  "monitoring.report.findings": "Findings",
+  "monitoring.report.no_profile": "No profile, set one",
+  "monitoring.report.ack_yes": "Yes",
+  "monitoring.report.ack_no": "No"
 }

@@ -14,10 +14,11 @@
 # Caddyfile first and here second. Editing this file to make CI green ships a
 # route that still 404s for every visitor.
 #
-# Extracted from: Caddyfile.live (sha256 af336bc96186eea19f2077fce9c218dc0aff8c0a3dea96b70f752a8f05c0d257)
-# Segments: 229
+# Extracted from: Caddyfile.live (sha256 082873b0b72471a48dd750afd2043713e794c924d240cc2192ceb30f7be6e4fc)
+# Segments: 241
 5d
 about
+academy-courses
 accommodation
 accounting-sync
 admin
@@ -41,6 +42,7 @@ bid-management
 bim
 boq
 br-sinapi-exchange
+brand
 buyer-portal
 ca-boq-exchange
 cad-explorer
@@ -48,13 +50,16 @@ cad-takeoff
 capital-plan
 carbon
 cases
+cases-art
 catalog
 cde
 certified-payroll
+cesium
 change-intelligence
 change-orders
 changeorders
 chat
+china-tax
 claims-evidence
 clash
 closeout
@@ -67,6 +72,7 @@ connectors
 construction-control
 contacts
 contracts
+contributors
 coordination
 correspondence
 cost-benchmarks
@@ -98,6 +104,7 @@ einvoice-clearance
 equipment
 es-pbc-exchange
 esg
+estimate-archive
 estimate-basis
 estimate-checks
 estimate-copilot
@@ -112,6 +119,7 @@ forgot-password
 forms
 formwork
 fr-dpgf-exchange
+framework-agreements
 full-evm
 funding
 fx
@@ -173,6 +181,7 @@ price-index
 procurement
 profile
 progress
+project-catalogue
 project-controls
 project-intelligence
 project-route
@@ -180,6 +189,7 @@ projects
 property-dev
 punch-list
 punchlist
+pwa
 qms
 quantities
 quotes
@@ -197,6 +207,7 @@ rfi
 rfq-bidding
 risk-analysis
 risks
+roles
 rom-estimate
 ru-gesn-exchange
 safety
@@ -220,6 +231,7 @@ styles-lab
 subcontractors
 submittals
 supplier-catalogs
+survey
 sustainability
 takeoff
 takeoff-viewer

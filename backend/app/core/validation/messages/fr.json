@@ -299,6 +299,10 @@
     "unit_exportable": {
       "fail": "Position {ordinal} : l'unité '{unit}' dépasse les 4 caractères du champ GAEB QU et serait tronquée à l'export",
       "suggestion": "Utilisez un code d'unité GAEB de 4 caractères au plus (m, m2, m3, St, h, psch, kg, t)"
+    },
+    "short_text_length": {
+      "fail": "Poste {ordinal} : le texte court compte {length} caractères ; l'export GAEB le coupe à 70",
+      "suggestion": "Raccourcissez le texte court à 70 caractères et gardez les détails dans le texte long"
     }
   },
   "nrm": {
@@ -412,7 +416,10 @@
       "suggestion": "Attribuez un code GB/T 50500 à 9 chiffres (par exemple 010101001)"
     },
     "valid_code": {
-      "fail": "Le code GB/T 50500 « {code} » est invalide : 9 ou 12 chiffres attendus"
+      "fail": "Le code GB/T 50500 « {code} » est invalide : 9 ou 12 chiffres ou un code complémentaire tel que 01B001 attendus"
+    },
+    "code_unique": {
+      "fail": "Le code d'article « {code} » est utilisé plusieurs fois dans le même sous-projet"
     }
   },
   "cpwd": {
@@ -931,6 +938,36 @@
     "change_time_within_owner": {
       "fail": "Les impacts de délai des sous-traitants pour {code} totalisent {sub_days} jours, soit plus que les {owner_days} jours accordés par le maître d'ouvrage",
       "suggestion": "Vérifiez les demandes de délai des sous-traitants ou demandez au maître d'ouvrage une prolongation équivalente"
+    },
+    "pay_app_over_complete": {
+      "fail": "La ligne {line} atteint {percent} % de sa valeur prévue après cette période ({completed} sur {scheduled})",
+      "suggestion": "Réduire le montant de cette période ou consigner la raison de la facturation au-delà de la valeur prévue"
+    },
+    "pay_app_line_negative": {
+      "fail": "La ligne {line} totaliserait {completed} à ce jour, soit moins que zéro"
+    },
+    "pay_app_within_agreement": {
+      "fail": "Les situations de travaux totalisent {billed}, au-dessus de la valeur du contrat augmentée des avenants approuvés de {limit}"
+    },
+    "pay_app_correct": {
+      "suggestion": "Corriger les montants de cette situation ou relever la valeur du contrat par un avenant approuvé"
+    },
+    "required_documents": {
+      "fail": "Document requis : {document} ({state})",
+      "suggestion": "Joindre le document, signé et à jour, au contrat de sous-traitance",
+      "states": {
+        "missing": "manquant",
+        "unsigned": "non signé",
+        "expired": "expiré"
+      }
+    },
+    "document_roles": {
+      "terms_and_conditions": "Conditions générales",
+      "safety_agreement": "Accord de sécurité",
+      "safety_plan": "Plan de sécurité",
+      "insurance": "Assurance",
+      "method_statement": "Mémoire technique",
+      "other": "Autre document"
     }
   },
   "submittal": {
@@ -2014,6 +2051,510 @@
     "crew_without_record": {
       "fail": "Une équipe de {headcount} était sur le chantier mais aucun travail, contrôle ou arrêt n'est consigné.",
       "suggestion": "Ajouter ce que l'équipe a fait, ou l'arrêt qui a bloqué les travaux."
+    }
+  },
+  "framework_agreement": {
+    "item_not_in_agreement": {
+      "fail": "La ligne {code} n'est pas un article actif de l'accord-cadre {agreement} ; saisissez-la en travaux supplémentaires.",
+      "suggestion": "Retirez la ligne du bon de commande et saisissez les travaux en supplément sur ce bon."
+    },
+    "rate_deviates": {
+      "fail": "Le prix {rate} de la ligne {code} diffère du prix de l'accord {expected}.",
+      "suggestion": "Les prix d'un bon de commande viennent de l'accord ; revalorisez la ligne depuis le bordereau."
+    },
+    "order_outside_validity": {
+      "fail": "La date du bon {date} est hors de la durée de l'accord du {from} au {to}.",
+      "suggestion": "Datez le bon dans la durée de l'accord ou prolongez d'abord l'accord."
+    },
+    "rate_period_gap": {
+      "fail": "Aucune période de prix ne couvre le {date}.",
+      "suggestion": "Ajoutez une période de prix couvrant cette date dans l'onglet Prix et révision."
+    },
+    "escalation_unresolved": {
+      "fail": "L'indice {series} n'a pas de valeur pour {period} ; le prix ne peut pas être révisé.",
+      "suggestion": "Saisissez la valeur de l'indice pour ce mois dans Indices de prix, puis revalorisez le bon."
+    },
+    "cap_exceeded": {
+      "fail": "Ce bon porte l'accord à {total} pour un plafond de {cap} ; reste {headroom}.",
+      "suggestion": "Réduisez le bon au reste disponible ou émettez-le avec une dérogation motivée."
+    },
+    "cap_threshold": {
+      "fail": "L'accord est consommé à {pct} % du plafond.",
+      "suggestion": "Prévenez le client tôt pour préparer un accord suivant."
+    },
+    "item_max_qty": {
+      "fail": "Article {code} : {qty} commandés à ce jour dépassent le maximum indiqué {max}.",
+      "suggestion": "Convenez de la quantité supplémentaire avec le client avant le prochain bon."
+    },
+    "min_at_risk": {
+      "fail": "Il reste {days} jours et {pct} % du minimum garanti est commandé.",
+      "suggestion": "Évoquez l'écart avec le client tant qu'il reste du temps pour commander."
+    },
+    "currency_mismatch": {
+      "fail": "La devise du bon {cur} diffère de la devise de l'accord {agr}.",
+      "suggestion": "Les bons sont valorisés dans la devise de l'accord."
+    },
+    "adjustment_unknown": {
+      "fail": "La condition {tag} n'a pas d'ajustement dans cet accord.",
+      "suggestion": "Ajoutez l'ajustement dans l'onglet Conditions ou retirez la condition du bon."
+    },
+    "direct_claim": {
+      "fail": "Les situations sont établies sur les bons de commande, pas sur l'accord-cadre.",
+      "suggestion": "Ouvrez le bon sous lequel les travaux ont été faits et établissez la situation là."
+    },
+    "duplicate_item": {
+      "fail": "Le code {code} apparaît deux fois dans la période {period}.",
+      "suggestion": "Gardez une seule ligne par code avant d'enregistrer le bordereau."
+    },
+    "measured_over_ordered": {
+      "fail": "Le métré {m} dépasse la quantité commandée {o} sur la ligne {code} ; envisagez un supplément.",
+      "suggestion": "Saisissez le dépassement en modification du bon."
+    },
+    "term_over_legal_max": {
+      "fail": "La durée de {years} ans dépasse la limite de {max} ans selon {source} (pack).",
+      "suggestion": "Vérifiez la durée avec le client ; la limite est indiquée, pas imposée."
+    }
+  },
+  "estimate_archive": {
+    "arc_hash_mismatch": {
+      "fail": "Empreinte différente : l'enregistrement donne {actual}, le scellé indique {sealed}. Considérez l'enregistrement comme modifié."
+    },
+    "arc_total_mismatch": {
+      "fail": "Le total scellé {seal} diffère du marché {award} de {diff}."
+    },
+    "arc_no_breakdown": {
+      "fail": "{n} postes n'ont pas de sous-détail ; leurs prix ne pourront pas être retracés."
+    },
+    "arc_no_markups": {
+      "fail": "Le devis n'a aucune majoration à sceller."
+    },
+    "arc_sealed_after_signing": {
+      "fail": "Scellé {days} jours après la signature du contrat."
+    },
+    "arc_no_receipt": {
+      "fail": "La contrepartie n'a pas encore accusé réception de l'empreinte."
+    },
+    "arc_open_not_closed": {
+      "fail": "L'ouverture {id} est en cours depuis {days} jours sans procès-verbal."
+    },
+    "arc_open_no_reason": {
+      "fail": "Une ouverture exige un motif et une référence."
+    },
+    "arc_open_one_party": {
+      "fail": "Une seule partie est indiquée ; consignez pourquoi l'autre est absente."
+    },
+    "var_basis_no_seal": {
+      "fail": "Le poste {code} est chiffré sur la base d'origine, mais aucun devis scellé n'existe."
+    },
+    "var_basis_deviation": {
+      "fail": "Poste {code} : {field} modifié de {old} à {new} sans note."
+    },
+    "var_new_resource_no_evidence": {
+      "fail": "La nouvelle ressource {res} n'a ni date de prix ni référence de devis."
+    },
+    "var_markup_not_sealed": {
+      "fail": "Le poste {code} applique la majoration {m}, absente du scellé."
+    },
+    "var_abnormal_carried_rate": {
+      "fail": "Le coût retenu {c} s'écarte de {pct} % de la référence."
+    },
+    "arc_mutation_refused": {
+      "fail": "Un devis scellé ne peut être ni modifié ni supprimé. Scellez une nouvelle version qui le remplace."
+    },
+    "contents_locked": "Le contenu reste scellé jusqu'au début d'une ouverture formelle.",
+    "market_off": "Les devis scellés ne font pas partie du profil de marché de ce projet.",
+    "contract_required": "Un contrat client est nécessaire avant de sceller un estimatif comme base du contrat."
+  },
+  "boq_revision": {
+    "superseded_still_editable": {
+      "fail": "La révision {label} est encore modifiable alors que {later} a été créée depuis ; les modifications faites ici ne sont pas reportées",
+      "suggestion": "Verrouillez {label} pour la figer, ou poursuivez dans la révision la plus récente"
+    }
+  },
+  "schedule_baseline": {
+    "single_approved": {
+      "fail": "Ce planning a plus d'une référence approuvée ({baselines}).",
+      "suggestion": "Approuvez la référence qui doit s'appliquer ; en approuver une retire l'approbation des autres."
+    }
+  },
+  "project_catalogue": {
+    "unit_present": {
+      "fail": "Le prix {code} n'a pas d'unité.",
+      "suggestion": "Indiquez l'unité à laquelle le prix se rapporte, par exemple m2, m3 ou h."
+    },
+    "duplicate_code": {
+      "fail": "Le code {code} est utilisé par plusieurs prix dans ce projet.",
+      "suggestion": "Gardez un prix par code ou donnez à la variante son propre code."
+    },
+    "currency_differs": {
+      "fail": "Le prix {code} est en {currency}, mais le projet est chiffré en {project_currency}.",
+      "suggestion": "Convertissez le prix dans la devise du projet ou confirmez que la devise étrangère est voulue."
+    },
+    "override_far": {
+      "fail": "Le prix local de {code} s'écarte de {percent} % de son prix source {source_rate}.",
+      "suggestion": "Vérifiez une virgule mal placée ou notez pourquoi ce projet a besoin d'un autre prix."
+    },
+    "source_changed": {
+      "fail": "Le prix source de {code} est passé de {old} à {new} depuis sa copie dans le projet.",
+      "suggestion": "Reprenez le nouveau prix source ou conservez sciemment le prix local."
+    }
+  },
+  "schedule_mspdi_import": {
+    "task_dates": {
+      "missing_dates": "La tâche {ref} « {name} » n'a pas de date de début ou de fin.",
+      "finish_before_start": "La tâche {ref} « {name} » se termine ({finish}) avant de commencer ({start}).",
+      "suggestion": "Corrigez les dates dans le planning source et exportez-le à nouveau. Les dates ne sont jamais devinées à l'import."
+    },
+    "unique_ids": {
+      "duplicate_uid": "L'identifiant de tâche {ref} apparaît plusieurs fois ; seule la première tâche est conservée.",
+      "suggestion": "Donnez à chaque tâche un identifiant unique dans le planning source."
+    },
+    "links_resolve": {
+      "dangling_link": "Tâche {ref} « {name} » : le prédécesseur {predecessor} n'est pas dans le fichier, le lien est ignoré.",
+      "duplicate_link": "Tâche {ref} \"{name}\" : un second lien depuis le prédécesseur {predecessor} est ignoré, un seul lien par paire est conservé.",
+      "self_link": "La tâche {ref} « {name} » est liée à elle-même, le lien est ignoré.",
+      "unknown_link_type": "Tâche {ref} « {name} » : le type de lien {type} est inconnu et est lu comme fin-début.",
+      "suggestion": "Vérifiez les liens logiques dans le planning source."
+    },
+    "values_in_range": {
+      "percent_out_of_range": "Tâche {ref} « {name} » : {value} % achevé est hors de 0-100 et est plafonné.",
+      "outline_gap": "La tâche {ref} « {name} » saute un niveau hiérarchique ({level}) ; elle est placée sous le récapitulatif le plus proche au-dessus.",
+      "suggestion": "Vérifiez le % achevé et l'indentation dans le planning source."
+    },
+    "calendar_work_days": {
+      "calendar_no_work_days": "Le calendrier {calendar} n'a aucun jour ouvré.",
+      "suggestion": "Indiquez les jours ouvrés de ce calendrier dans le planning source."
+    }
+  },
+  "schedule_pdf_import": {
+    "no_text_layer": {
+      "fail": "Le PDF n'a pas de couche texte, son tableau ne peut pas être lu.",
+      "suggestion": "Exportez le planning en XML MS Project, XER ou Excel et importez ce fichier."
+    },
+    "dates_parsed": {
+      "fail": "Ligne {row} : un début ou une fin n'est pas une date.",
+      "suggestion": "Vérifiez les colonnes de dates et l'ordre jour/mois, ou corrigez la date dans la source."
+    },
+    "finish_before_start": {
+      "fail": "Ligne {row} : la fin est antérieure au début.",
+      "suggestion": "Corrigez les dates dans le planning source."
+    },
+    "duration_mismatch": {
+      "fail": "Ligne {row} : la durée imprimée diffère des jours ouvrés entre le début et la fin.",
+      "suggestion": "Les dates sont conservées ; vérifiez la colonne de durée et le calendrier du projet."
+    },
+    "unique_ids": {
+      "fail": "Ligne {row} : l'ID de la tâche est utilisé par une autre ligne.",
+      "suggestion": "Donnez un ID unique à chaque tâche dans le planning source."
+    },
+    "links_resolve": {
+      "fail": "Ligne {row} : un prédécesseur n'est pas une tâche du tableau.",
+      "suggestion": "Vérifiez la colonne des prédécesseurs ; les liens non résolus sont ignorés."
+    }
+  },
+  "commercial_control": {
+    "ok": "Vérifié, aucun problème",
+    "cvr": {
+      "target_rate_basis": {
+        "fail": "{missing} sur {total} postes chiffrés n'ont pas de prix objectif et sont budgétés au prix de vente (par exemple {sample})",
+        "suggestion": "Saisissez le prix de revient objectif sur ces postes pour que le budget corresponde au coût imposé au chantier"
+      },
+      "unmapped_cost": {
+        "fail": "{kind} {label} n'a ni WBS ni code de coût : engagé {committed}, réel {actual}",
+        "suggestion": "Imputez la ligne de commande, la sous-traitance ou la facture à un élément du WBS pour que le CVR puisse la placer"
+      }
+    },
+    "procurement": {
+      "line_over_committed": {
+        "fail": "Le poste {ordinal} est surengagé : {committed_qty} sur {budget_qty} commandés, {committed_value} pour un budget de {budget_value}",
+        "suggestion": "Vérifiez une éventuelle double commande ou enregistrez un avenant ou un transfert de budget avant d'engager davantage"
+      }
+    },
+    "approval_routes": {
+      "bands_contiguous": {
+        "gap": {
+          "fail": "Les montants de {low} jusqu'à {high} n'atteignent aucun approbateur (étape {step})",
+          "suggestion": "Élargissez une tranche voisine ou ajoutez une étape pour que chaque montant ait un approbateur"
+        },
+        "overlap": {
+          "fail": "L'étape {step} chevauche une tranche inférieure de {low} jusqu'à {high} ; les deux approbateurs signent ces montants",
+          "suggestion": "Faites commencer chaque tranche là où finit la précédente, sauf si les deux doivent signer"
+        },
+        "empty": {
+          "fail": "L'étape {step} a une tranche de {low} à {high} qui ne contient aucun montant",
+          "suggestion": "Mettez le minimum sous le maximum, ou laissez le maximum vide pour aucun plafond"
+        }
+      }
+    },
+    "valuation": {
+      "assessed_within_submitted": {
+        "fail": "Ligne {line} : la quantité évaluée {assessed} dépasse la quantité présentée {submitted}",
+        "suggestion": "Évaluez au plus ce qui a été présenté et enregistrez les travaux en plus comme avenant"
+      },
+      "certified_within_assessed": {
+        "fail": "Ligne {line} : la quantité certifiée {certified} dépasse la quantité évaluée {assessed}",
+        "suggestion": "Certifiez au plus ce qui a été évalué, ou réévaluez d'abord la ligne"
+      }
+    }
+  },
+  "norm_base": {
+    "code_present": {
+      "fail": "La ligne {ordinal} ne cite aucun code de norme {base}. Une estimation fondée sur des normes cite une norme à chaque ligne.",
+      "suggestion": "Saisissez le code de norme dans la classification {classification} de la ligne."
+    },
+    "code_shape": {
+      "fail": "« {code} » à la ligne {ordinal} n'est pas un code {base}. Code attendu du type {example}."
+    },
+    "legacy_prefix": {
+      "fail": "« {code} » à la ligne {ordinal} utilise l'ancien préfixe {old}. Le code en vigueur est {new}."
+    },
+    "resource_breakdown": {
+      "fail": "La ligne de norme {code} n'a pas d'heures de main-d'œuvre ou pas de qualification moyenne.",
+      "suggestion": "Ajoutez la ressource main-d'œuvre avec ses heures par unité et la qualification moyenne de la norme."
+    },
+    "grade_range": {
+      "fail": "La qualification {grade} à la ligne {ordinal} est hors de {min} à {max} ou pas par pas de {step}."
+    }
+  },
+  "public_funding": {
+    "markup_cap": {
+      "fail": "{funding} : {markup} est de {percent} %, le plafond est de {cap} % des coûts directs ({source}).",
+      "suggestion": "Ramenez le taux au plafond, ou indiquez un financement privé si aucun fonds public ne paie les travaux."
+    },
+    "investor_exact": {
+      "fail": "Estimation du maître d'ouvrage sur {funding} : {markup} doit être exactement de {cap} % ({source})."
+    },
+    "material_price_evidence": {
+      "fail": "{funding} : le matériau {material} à la ligne {ordinal} a {count} offres de prix sur {required} et aucune analyse de prix.",
+      "suggestion": "Enregistrez les offres des fournisseurs pour le matériau ou joignez le rapport d'analyse des prix."
+    }
+  },
+  "vat_rate": {
+    "standard_rate": {
+      "fail": "{markup} est à {percent} % ; le taux normal de TVA en {country} est de {rate} %.",
+      "suggestion": "Mettez la ligne de taxe au taux normal, ou indiquez sur le devis pourquoi un autre taux ou une exonération s'applique."
+    }
+  },
+  "survey": {
+    "no_crs": {
+      "fail": "Le semis de points {name} n'a pas de SCR : déclarez un EPSG ou un repère local avant les cubatures ou les parcelles.",
+      "suggestion": "Définissez le système de coordonnées du projet, puis indiquez dans quel système ce fichier a été mesuré."
+    },
+    "crs_unconfirmed": {
+      "fail": "SCR détecté automatiquement (confiance {confidence}) ; confirmez-le avant usage.",
+      "suggestion": "Ouvrez Définir le SCR du projet et confirmez le système détecté ou choisissez-en un autre."
+    },
+    "duplicate_point": {
+      "fail": "Matricule de point {point_id} en double avec des coordonnées différentes.",
+      "suggestion": "Gardez une seule mesure : supprimez le semis contenant la mauvaise et réimportez-le."
+    },
+    "traverse_misclosure": {
+      "fail": "Le cheminement {name} ferme à 1:{r}, sous le minimum du profil 1:{min}.",
+      "suggestion": "Cherchez une faute sur les côtés, réobservez le côté le plus faible ou confirmez la valeur du profil."
+    },
+    "level_misclosure": {
+      "fail": "L'écart de fermeture du nivellement {f} mm dépasse k·√km avec k = {k} mm.",
+      "suggestion": "Refaites le nivellement ou vérifiez les altitudes des repères utilisés."
+    }
+  },
+  "volumes": {
+    "no_overlap": {
+      "fail": "Les deux surfaces ne se recouvrent que sur {p} % de la zone : le volume n'a pas de sens.",
+      "suggestion": "Vérifiez que les deux surfaces sont dans le même système de coordonnées et couvrent le même terrain."
+    },
+    "low_coverage": {
+      "fail": "Seuls {c} % de la zone ont des données dans les deux surfaces (minimum {min} %).",
+      "suggestion": "Ajoutez des points là où une surface manque ou réduisez le contour à la zone couverte."
+    },
+    "coarse_scan": {
+      "fail": "Un scan grossier (LOA10) alimente ce volume sans raison indiquée.",
+      "suggestion": "Utilisez un scan de précision topographique ou expliquez pourquoi ce scan suffit."
+    },
+    "bank_volume": {
+      "fail": "La quantité est un volume en place (dans le sol) ; le foisonnement n'est pas appliqué.",
+      "suggestion": "Envoyez plutôt le déblai foisonné si la ligne du métré est mesurée en matériau foisonné."
+    }
+  },
+  "setting_out": {
+    "stake_off": {
+      "fail": "Implantation {id} décalée de {d} mm, tolérance {t} mm",
+      "suggestion": "Implantez de nouveau le point et enregistrez-le, ou créez un brouillon de NCR."
+    },
+    "record_untraceable": {
+      "fail": "Le relevé d'implantation {id} n'indique ni instrument ni points d'appui.",
+      "suggestion": "Saisissez l'instrument et les points d'appui de la station."
+    },
+    "sheet": {
+      "title": "Fiche d'implantation",
+      "project": "Projet",
+      "crs": "Système de coordonnées",
+      "request": "Demande",
+      "tolerance": "Tolérance",
+      "element": "Élément",
+      "generated": "Généré le",
+      "point": "Point implanté",
+      "design_e": "E projet",
+      "design_n": "N projet",
+      "design_z": "Z projet",
+      "measured_e": "E mesuré",
+      "measured_n": "N mesuré",
+      "verdict": "Résultat",
+      "by": "Mesuré par",
+      "verdict_pass": "Conforme",
+      "verdict_fail": "Non conforme",
+      "verdict_open": "Ouvert",
+      "verdict_no_tolerance": "Aucun profil",
+      "counts": "Conforme : {passed} · Non conforme : {failed} · Ouvert : {open}",
+      "findings": "Constats",
+      "no_profile": "Aucun profil, définissez-en un",
+      "d": "d (mm)",
+      "dz": "dZ (mm)"
+    }
+  },
+  "land_parcels": {
+    "area_mismatch": {
+      "fail": "Parcelle {id} : la surface calculée {a} m2 diffère de la surface cadastrale {l} m2 de plus que la tolérance ({t}).",
+      "suggestion": "Vérifiez les points de limite par rapport à l'extrait du registre, ou notez pourquoi les deux surfaces diffèrent."
+    },
+    "ring_invalid": {
+      "fail": "Parcelle {id} : contour non fermé ou qui se recoupe.",
+      "suggestion": "Corrigez les points de limite pour qu'ils fassent une seule fois le tour de la parcelle sans se croiser."
+    },
+    "zone_not_acquired": {
+      "fail": "La zone de travaux recouvre la parcelle {id} non encore acquise ({area} m2).",
+      "suggestion": "Acquérez la parcelle ou convenez d'un accès avant le début des travaux, ou déplacez la zone de travaux."
+    },
+    "overlap": {
+      "fail": "Les parcelles {a} et {b} se chevauchent sur {area} m2.",
+      "suggestion": "Corrigez la limite commune pour que les deux parcelles utilisent les mêmes points."
+    },
+    "gap": {
+      "fail": "Interstice de {gap} m entre les parcelles {a} et {b}.",
+      "suggestion": "Faites utiliser les mêmes points de limite aux deux parcelles, ou confirmez que la bande appartient à une autre parcelle."
+    },
+    "id_format": {
+      "fail": "La référence {id} ne respecte pas le format {label} (par exemple {example}).",
+      "suggestion": "Recopiez la référence exactement comme le registre l'écrit."
+    },
+    "pdf": {
+      "title": "État parcellaire",
+      "project": "Projet",
+      "crs": "Système de coordonnées",
+      "method": "Méthode",
+      "method_value": "Surface depuis les coordonnées des limites (formule du lacet), arrondie à {decimals} décimales, m2",
+      "printed": "Imprimé par",
+      "legal": "Surface cadastrale (m2)",
+      "computed": "Calculée (m2)",
+      "diff": "Écart (m2)",
+      "status": "Statut",
+      "rights": "Droits",
+      "cost": "Coût",
+      "findings": "Constats",
+      "total": "Total, {count} parcelles",
+      "acquired_of": "Acquises {acquired} sur {total}",
+      "findings_title": "Constats",
+      "no_findings": "Aucun constat.",
+      "disclaimer": "Les propriétaires et les droits sont présentés tels qu'enregistrés dans ce projet. Cet état n'est ni un avis juridique ni un extrait du registre.",
+      "status_needed": "Nécessaire",
+      "status_negotiating": "En négociation",
+      "status_acquired": "Acquise",
+      "status_expropriation": "Procédure d'expropriation"
+    }
+  },
+  "monitoring": {
+    "crossed": {
+      "fail": "Point {id} : déplacement {d} mm ou vitesse {r} mm/day a dépassé {level}",
+      "suggestion": "Vérifiez le point et l'ouvrage, puis accusez réception de l'alerte avec une note."
+    },
+    "level": {
+      "ok": "Conforme",
+      "alert": "Alerte",
+      "action": "Seuil d'action",
+      "alarm": "Alarme"
+    },
+    "risk": {
+      "title": "Point de surveillance {id} au niveau {level}",
+      "description": "Déplacement {d} mm, vitesse {r} mm/day par rapport à {profile}. Brouillon ouvert par la surveillance : vérifiez-le et désignez un responsable."
+    },
+    "report": {
+      "title": "Rapport d'alarmes de surveillance",
+      "project": "Projet",
+      "crs": "Système de coordonnées",
+      "profile": "Profil de seuils",
+      "generated": "Généré",
+      "point": "Point de mesure",
+      "baseline": "Référence (m)",
+      "latest": "Dernière (m)",
+      "displacement": "Déplacement (mm)",
+      "rate": "Vitesse (mm/day)",
+      "level": "Niveau",
+      "acknowledged": "Pris en compte",
+      "counts": "Alarme : {alarm} · Seuil d'action : {action} · Alerte : {alert} · Conforme : {ok}",
+      "findings": "Constats",
+      "no_profile": "Aucun profil, en définir un",
+      "ack_yes": "Oui",
+      "ack_no": "Non"
+    }
+  },
+  "stockpiles": {
+    "density_assumed": {
+      "fail": "La densité est supposée et non mesurée : les tonnes ne valent que ce que vaut cette estimation.",
+      "suggestion": "Pesez un échantillon ou prenez la densité sur les bons de livraison du fournisseur."
+    },
+    "variance_high": {
+      "fail": "Le relevé s'écarte du stock comptable de {v} %, au-delà de la tolérance de {t} %.",
+      "suggestion": "Vérifiez la densité et la surface de base, puis proposez un ajustement et confirmez-le si l'écart est réel."
+    }
+  },
+  "mine_survey": {
+    "compliance_outside": {
+      "fail": "La conformité de la période, {c} %, est hors de la plage {lo}-{hi} %.",
+      "suggestion": "Vérifiez le plan et le levé, puis expliquez l'écart dans la note de période avant la situation."
+    },
+    "truck_differs": {
+      "fail": "Les tonnes comptées par camions diffèrent de {v} % des tonnes levées, au-delà du contrôle de {t} %.",
+      "suggestion": "Vérifiez la charge utile par voyage et la densité, puis comparez de nouveau les deux surfaces."
+    }
+  },
+  "hongkong": {
+    "sopo_applicability": {
+      "fail": "Cap. 652 (Security of Payment) s'applique à ce contrat : réponse sous 30 jours, paiement sous 60 jours après la demande"
+    },
+    "sopo_private_scope_check": {
+      "fail": "Un contrat privé relève de Cap. 652 seulement pour un bâtiment neuf ou des travaux soumis à l'accord de la Building Authority : confirmez le périmètre"
+    },
+    "sopo_response_late": {
+      "fail": "Aucune réponse de paiement signifiée avant le {date} : le montant demandé est contesté et peut aller en adjudication"
+    },
+    "sopo_payment_term_exceeds_60": {
+      "fail": "Le délai de paiement de {n} jours dépasse les 60 jours admis par Cap. 652"
+    },
+    "sopo_response_term_exceeds_30": {
+      "fail": "Le délai de réponse de {n} jours dépasse les 30 jours admis par Cap. 652"
+    },
+    "sopo_adjudication_window": {
+      "fail": "Un litige de paiement est né : signifiez l'avis d'adjudication avant le {date}"
+    },
+    "contract_pay_when_paid": {
+      "fail": "Clause pay-when-paid : Cap. 652 rend les clauses de paiement conditionnel inopposables"
+    },
+    "levy_missing": {
+      "fail": "Les travaux dépassent HK$3,000,000 mais le devis n'a pas la taxe CIC (0,5 %) ou la taxe CWR (0,03 %)"
+    },
+    "levy_below_threshold": {
+      "fail": "Les travaux ne dépassent pas HK$3,000,000 : aucune taxe CIC ou CWR n'est due"
+    },
+    "tax_nonzero": {
+      "fail": "Une ligne TVA ou GST est facturée, mais Hong Kong n'a pas cette taxe : mettez-la à zéro"
+    },
+    "retention_over_limit": {
+      "fail": "La retenue de {x} dépasse la limite contractuelle de {limit}"
+    },
+    "pc_sum_no_attendance": {
+      "fail": "Une somme prime cost n'a pas de postes de bénéfice et d'assistance"
+    },
+    "index_attribution": {
+      "fail": "L'indice des prix ArchSD n'indique pas sa source : citez l'Architectural Services Department"
     }
   }
 }

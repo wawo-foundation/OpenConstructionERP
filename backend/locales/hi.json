@@ -1660,7 +1660,8 @@
         "no_rejections": "कुछ भी अस्वीकृत नहीं हुआ।",
         "sig_delivered_by": "वितरित किया",
         "counterparty_tax_id": "कर पहचान संख्या",
-        "counterparty_address": "पता"
+        "counterparty_address": "पता",
+        "delivery_address": "डिलीवरी का पता"
       },
       "labels": {
         "po_status": {
@@ -1733,7 +1734,8 @@
         "gross_settled": "निपटाई गई सकल राशि",
         "no_withholding": "इस भुगतान में से कोई राशि नहीं रोकी गई।",
         "counterparty_tax_id": "कर पहचान संख्या",
-        "counterparty_address": "पता"
+        "counterparty_address": "पता",
+        "supply_date": "आपूर्ति की तिथि"
       },
       "labels": {
         "invoice_status": {
@@ -1802,6 +1804,81 @@
         "col_min": "न्यूनतम",
         "col_max": "उच्चतम",
         "col_count": "रीडिंग"
+      }
+    },
+    "gantt_pdf": {
+      "strings": {
+        "title": "कार्यक्रम (गैंट चार्ट)",
+        "project": "परियोजना",
+        "schedule": "कार्यक्रम",
+        "baseline": "बेसलाइन",
+        "no_baseline": "कोई नहीं",
+        "exported": "निर्यात",
+        "data_date": "डेटा तिथि",
+        "col_wbs": "WBS",
+        "col_activity": "गतिविधि",
+        "col_start": "प्रारंभ",
+        "col_finish": "समाप्ति",
+        "col_duration": "दिन",
+        "legend_current": "वर्तमान योजना",
+        "legend_progress": "प्रगति",
+        "legend_critical": "क्रिटिकल पाथ",
+        "legend_baseline": "बेसलाइन योजना",
+        "legend_actual": "वास्तविक",
+        "legend_milestone": "माइलस्टोन",
+        "legend_summary": "सारांश",
+        "week_short": "स{n}",
+        "quarter_short": "ति{n}",
+        "sheet_of": "शीट {page} / {total}",
+        "no_activities": "इस कार्यक्रम में अभी कोई गतिविधि नहीं है।"
+      }
+    },
+    "contracts": {
+      "strings": {
+        "doc_title": "अनुबंध",
+        "col_code": "कोड",
+        "col_title": "शीर्षक",
+        "col_type": "अनुबंध का प्रकार",
+        "col_role": "अनुबंध पक्ष",
+        "col_counterparty": "प्रतिपक्ष",
+        "col_original_value": "मूल मूल्य",
+        "col_total_value": "अनुबंध मूल्य",
+        "col_retention": "रिटेंशन राशि",
+        "col_start": "आरंभ तिथि",
+        "col_end": "समाप्ति तिथि",
+        "col_signed": "हस्ताक्षर की तिथि",
+        "line_code": "कोड",
+        "line_description": "विवरण",
+        "line_unit": "इकाई",
+        "line_quantity": "मात्रा",
+        "line_unit_rate": "इकाई दर",
+        "lines": "कार्य मूल्य अनुसूची",
+        "signer_company": "कंपनी की ओर से"
+      },
+      "labels": {
+        "status": {
+          "draft": "मसौदा",
+          "active": "सक्रिय",
+          "suspended": "निलंबित",
+          "completed": "पूर्ण",
+          "terminated": "समाप्त किया गया"
+        },
+        "type": {
+          "lump_sum": "एकमुश्त राशि",
+          "gmp": "GMP",
+          "cost_plus": "लागत-प्लस",
+          "tm": "समय और सामग्री",
+          "unit_price": "इकाई दर",
+          "design_build": "डिज़ाइन और निर्माण",
+          "combination": "संयुक्त",
+          "remeasurement": "पुनर्मापन",
+          "framework": "फ्रेमवर्क अनुबंध",
+          "call_off": "कॉल-ऑफ आदेश"
+        },
+        "party": {
+          "client": "क्लाइंट अनुबंध",
+          "subcontractor": "उप-अनुबंध"
+        }
       }
     }
   },
@@ -2092,7 +2169,11 @@
       "notifications.portal.message_received.title": "पोर्टल पर नया संदेश",
       "notifications.portal.message_received.body": "{buyer_name} ने संदेश भेजा है।",
       "dispatch.notify.plan_title": "Your daily plan is ready",
-      "dispatch.notify.plan_body": "Plan for {day}: {lines} lines."
+      "dispatch.notify.plan_body": "Plan for {day}: {lines} lines.",
+      "notifications.monitoring.alert.title": "मॉनिटरिंग अलर्ट",
+      "notifications.monitoring.action.title": "मॉनिटरिंग एक्शन स्तर",
+      "notifications.monitoring.alarm.title": "मॉनिटरिंग अलार्म",
+      "notifications.monitoring.crossed.body": "बिंदु {point}: {displacement} mm, {rate} mm/day।"
     },
     "schedule_headers": {
       "headers": {
@@ -2703,5 +2784,30 @@
       "file_missing": "फ़ोटो '{name}' की फ़ाइल स्टोरेज में नहीं है",
       "file_missing_fix": "फ़ोटो दोबारा अपलोड करें या बैकअप से बहाल करें"
     }
-  }
+  },
+  "monitoring.crossed.fail": "बिंदु {id}: विस्थापन {d} मिमि या दर {r} मिमि/दिन ने {level} सीमा पार की",
+  "monitoring.crossed.suggestion": "बिंदु और संरचना की जाँच करें, फिर नोट के साथ अलर्ट स्वीकार करें।",
+  "monitoring.level.ok": "OK",
+  "monitoring.level.alert": "चेतावनी",
+  "monitoring.level.action": "कार्रवाई",
+  "monitoring.level.alarm": "अलार्म",
+  "monitoring.risk.title": "मॉनिटरिंग बिंदु {id}, स्तर {level} पर",
+  "monitoring.risk.description": "विस्थापन {d} मिमि, दर {r} मिमि/दिन, {profile} के मुकाबले। मॉनिटरिंग ने मसौदा खोला: उसकी समीक्षा करें और ज़िम्मेदार व्यक्ति तय करें।",
+  "monitoring.report.title": "मॉनिटरिंग अलार्म रिपोर्ट",
+  "monitoring.report.project": "प्रोजेक्ट",
+  "monitoring.report.crs": "निर्देशांक प्रणाली",
+  "monitoring.report.profile": "सीमा प्रोफ़ाइल",
+  "monitoring.report.generated": "बनाई गई",
+  "monitoring.report.point": "बिंदु",
+  "monitoring.report.baseline": "आधार मान (मी)",
+  "monitoring.report.latest": "नवीनतम मान (मी)",
+  "monitoring.report.displacement": "विस्थापन (मिमि)",
+  "monitoring.report.rate": "दर (मिमि/दिन)",
+  "monitoring.report.level": "स्तर",
+  "monitoring.report.acknowledged": "स्वीकृत",
+  "monitoring.report.counts": "अलार्म: {alarm} · कार्रवाई: {action} · चेतावनी: {alert} · OK: {ok}",
+  "monitoring.report.findings": "निष्कर्ष",
+  "monitoring.report.no_profile": "कोई प्रोफ़ाइल नहीं, एक तय करें",
+  "monitoring.report.ack_yes": "हाँ",
+  "monitoring.report.ack_no": "नहीं"
 }

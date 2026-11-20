@@ -7,6 +7,72 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 > **Tip:** This file is long. Use your browser's **Find** (Ctrl+F) to jump to a version number, or see the [Releases page](https://github.com/datadrivenconstruction/OpenConstructionERP/releases) for a per-release view with download links.
 
+## [19.9.0] - 2026-11-19
+
+Tendering, contracts and purchase orders answer the questions users raised this week, the CRM tracks deal activities, and a survey family of modules arrives. A tender package shows its contents before it goes out, a bid entered by hand can be priced line by line, contracts print to PDF and keep client and subcontract values apart, and purchase orders can be edited by everyone allowed to change them.
+
+### Added
+
+- Tender package contents. A Contents tab shows every line with quantity, unit, budget rate and total, the invited firms and the documents issued, before anything is sent. The budget can be entered by hand next to the computed one, and resource types or single components of a line can be left out, for example material the owner supplies.
+- Bids entered by hand. A bid added from a quote can be priced line by line, or the firm gets a portal link already filled with those prices; its submission updates the same bid. The bidder page shows the issuing company's logo.
+- Tender packages can be deleted while they are drafts, and cancelled once sent; a cancelled tender keeps its bids readable and stops its links from accepting prices.
+- Contracts. A draft contract can be deleted, a contract prints to PDF from a document layout you can restyle, and the register separates client contracts from subcontracts with one total per side.
+- Purchase orders. Cash on delivery and Net 7 and 15 payment terms, and a cost centre or cost code on every order line.
+- CRM deal activities with type, due date and assignee, deal delete and a Bidding stage. The assignee picker lists the company's contacts, project team first.
+- Survey modules: a survey register with project coordinate systems and point import, surfaces and cut and fill volumes, setting-out with stakeout verdicts, stockpile surveys, deformation and settlement monitoring, land parcels and rights, and mine survey reconciliation, with a surveyor role.
+- Langtext in the bill editor: long descriptions are readable and editable in place, two lines by default.
+- Schedule PDF import reads the activity table of a schedule PDF into tasks.
+- Country packs: Hong Kong SAR as a preview (payment clock, levies, Traditional Chinese), the 2024 edition of the Chinese bill of quantities standard with provincial fee programmes, and the Ukrainian norm codes and graded labour rates.
+- Commercial management: target-rate budgets, a commitment grid, approval bands and the cost value reconciliation.
+- Document layouts for invoices, payment records, change orders and purchase orders, with pack legal notes and a clause library in settings.
+
+### Fixed
+
+- Creating an RFQ no longer fails with a server error, and an RFQ can be scoped from the resources of a bill.
+- The Edit action on purchase orders was shown only to managers although editors may change orders; it is now shown to every role allowed to edit.
+- The offers settings request no longer fails on a fresh installation when two first requests arrive together.
+- Automatic notification mail is capped per recipient and per day, and overdue reminders no longer start again after a demo reset. Verification and password reset mail are never capped.
+- A missing invoice field required by the German pack is a warning instead of a block.
+
+## [19.8.0] - 2026-11-17
+
+Estimates can be sealed, agreed rates can price call-off orders, and the schedule and the bill of quantities keep a numbered history. A sealed estimate freezes the original estimate behind the contract rates, a framework agreement prices its call-off orders from the agreed rates with a cap meter, and a bill of quantities and a schedule each get numbered revisions you can open and compare. Documents are issued from templates with firm wording, supplier invoices arrive by scan-to-email, and the desktop app explains why it did not start and offers a repair.
+
+### Added
+
+- Sealed estimates. The original estimate can be sealed behind the contract rates from the estimate, the contract or the variation bill. A register lists the sealed estimates, the seal page shows what was sealed, and a pricing drawer shows how current prices differ from the sealed ones. The feature appears only in markets that seal estimates, and sealed rates and percentages are written in the reader's number format. A client contract is required before an estimate is sealed as the contract basis.
+- Framework agreements. An agreement with a supplier or subcontractor holds the agreed rates and a ceiling; call-off orders are priced from those rates, and a cap meter shows how much of the ceiling is used and how much headroom is left. Fifteen validation rules check the agreement, with messages in every language.
+- Companies, sites and members. One installation can hold several legal entities, each with its own seller details, sites and members, so invoices and letters carry the right company.
+- Documents and templates. Invoices, change orders and site letters are issued from templates with firm wording for documents and e-mails. Invoices carry the mandatory content, meet the EN 16931 minimum and come with a German pack, and a demo invoice template ships in German and English. The Letters tab in Settings is now part of Documents and templates, and tender letters record which template version was printed.
+- Supplier invoice capture. Supplier invoices can be captured from scan-to-email, from the phone camera or by dropping several files at once. A project can also poll its own mailbox: invoices sent to the project's intake address are captured automatically, and a message that fails stays unread for a person to look at. Extracted fields remain suggestions until someone confirms them. The mailbox host may not point at an internal address unless the administrator allows it for an on-premises mail server.
+- Subcontract pay applications and documents. A subcontractor's pay application runs against the schedule of values with previous, this period, to date, retention and balance, and subcontract documents carry a configurable required-documents check.
+- Payroll and booking exports. Field time exports payroll hours by hour type, and every export run is kept as it was. Finance writes a booking batch in the EXTF format used by German accounting software, as part of the German pack.
+- Plant rates. An internal rate catalogue for equipment, and a rate catalogue tab in the frontend, so owned plant is priced from your own rates.
+- Project catalogue. Copy cost items or catalogue resources into a project and edit them there without touching the master data. Each copy remembers its source and the source rate at the time, and shows whether it is in sync, overridden or whether the source has changed. Take the source or keep your own rate one by one or in bulk, price bill lines from a rate and push later changes to the linked lines. Seven validation checks cover the rates.
+- Bill of quantities revisions. A copy of a bill is numbered R1, R2 and so on within its lineage. A Revisions tab in Version History lists the whole lineage with totals, differences, author and the previous and next revision; two picks open the comparison, and a snapshot can be viewed read-only. Field history shows who made a change or says that it was not recorded.
+- Schedule PDF and baselines. The Gantt chart exports as a printable PDF in A3, A4, Letter or Legal, with the activity table, timescale, current, baseline and actual bars, critical path, milestones, data date and legend, paginated predictably. The live plan can be captured as baseline B0, B1 and so on, and one baseline per schedule can be approved while earlier ones stay unchanged.
+- MS Project XML round trip. Import keeps the outline hierarchy, durations, typed links with lag, calendars and baseline dates, and a check report comes first so nothing is written until it is clean. Export writes calendars, outline levels, baseline and the real hours per day. A revision impact card shows, per activity, the linked bill positions, the variations and the time and cost difference.
+- Drawing takeoff. DWG and DXF drawings show line weights with a toggle, justified text keeps its alignment and rotation, dimensions draw with their arrows and values, and filled shapes and hatches keep their holes. Text search also finds text inside blocks.
+- Semantic search by catalogue, region and category. The cost database and the resource catalogue first narrow the list by region, catalogue, category, type, unit and price, and only then rank the remaining items by meaning. Without a vector store the search falls back to text search.
+- Project filters. The project list, the project switcher and analytics filter by phase and by project type, and the analytics summary cards total only the filtered set.
+- Desktop startup screen. When the desktop app cannot start it shows a screen with Copy log, Open log folder and Repair. Repair asks first, clears a stale lock and sets aside a database folder that never started, and deletes nothing. A Windows exit status is named in plain words, and a missing runtime library is checked first.
+- Demo content. Several people can install the same demo, each with their own copy; a country pack's focus now hides every module the pack leaves off; the Ejar export for leasing shows only while its market is in scope.
+- New screens and messages are translated into every language, including sealed estimates, templates, framework agreements, project phases and types, and the sign-up emails.
+
+### Fixed
+
+- A module that no longer loads after an upgrade no longer stops the application. It is marked as disabled with the reason, modules that depend on it are skipped, and everything else starts. A shipped module that fails still stops the start.
+- IFC import keeps each quantity set of an element apart. Before, a second set with the same quantity names could overwrite the element's own length, area or volume.
+- The Client and Customer contact types have different names instead of showing the same one twice.
+- Sign-up in the email-verify mode now ends in a working account: the confirmation link is mailed, and administrators can copy the link from Users and send a real test message from the Email card.
+- Closed and decided variations can no longer be edited.
+- A cost search over a wide result window respects the region and catalogue scope before it trims the results.
+- Lists and numbers in the new screens are written in the reader's language, and the project row in the header stays on one line.
+- The sidebar logo matches the size of the wordmark, and RFI and transmittal pages show one PDF action.
+- Filipino, Indonesian, Uzbek and en-US strings that had been left in English or in the wrong script are translated or corrected.
+- The database folder of the desktop app is recreated when initialization left it half-made.
+- Demo data: removing a demo clears only that owner's rows, so another owner's equipment and subcontractors for the same demo stay.
+
 ## [19.7.0] - 2026-11-16
 
 ### Added

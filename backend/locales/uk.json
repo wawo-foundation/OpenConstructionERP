@@ -1644,7 +1644,8 @@
         "no_rejections": "Нічого не відхилено.",
         "sig_delivered_by": "Доставив",
         "counterparty_tax_id": "ІПН / ЄДРПОУ",
-        "counterparty_address": "Адреса"
+        "counterparty_address": "Адреса",
+        "delivery_address": "Адреса доставки"
       },
       "labels": {
         "po_status": {
@@ -1717,7 +1718,8 @@
         "gross_settled": "Сума з урахуванням утримання",
         "no_withholding": "З цього платежу нічого не утримано.",
         "counterparty_tax_id": "ІПН / ЄДРПОУ",
-        "counterparty_address": "Адреса"
+        "counterparty_address": "Адреса",
+        "supply_date": "Дата постачання"
       },
       "labels": {
         "invoice_status": {
@@ -1786,6 +1788,81 @@
         "col_min": "Мін.",
         "col_max": "Макс.",
         "col_count": "Покази"
+      }
+    },
+    "gantt_pdf": {
+      "strings": {
+        "title": "Графік робіт (діаграма Ганта)",
+        "project": "Проєкт",
+        "schedule": "Графік",
+        "baseline": "Базовий план",
+        "no_baseline": "немає",
+        "exported": "Вивантажено",
+        "data_date": "Дата звіту",
+        "col_wbs": "ІСР",
+        "col_activity": "Робота",
+        "col_start": "Початок",
+        "col_finish": "Закінчення",
+        "col_duration": "Дн.",
+        "legend_current": "Поточний план",
+        "legend_progress": "Виконання",
+        "legend_critical": "Критичний шлях",
+        "legend_baseline": "Базовий план",
+        "legend_actual": "Факт",
+        "legend_milestone": "Віха",
+        "legend_summary": "Сумарна робота",
+        "week_short": "Т{n}",
+        "quarter_short": "{n} кв.",
+        "sheet_of": "Аркуш {page} з {total}",
+        "no_activities": "У цьому графіку ще немає робіт."
+      }
+    },
+    "contracts": {
+      "strings": {
+        "doc_title": "Договір",
+        "col_code": "Код",
+        "col_title": "Найменування",
+        "col_type": "Тип договору",
+        "col_role": "Сторона договору",
+        "col_counterparty": "Контрагент",
+        "col_original_value": "Початкова вартість",
+        "col_total_value": "Вартість договору",
+        "col_retention": "Гарантійне утримання",
+        "col_start": "Дата початку",
+        "col_end": "Дата завершення",
+        "col_signed": "Дата підписання",
+        "line_code": "Код",
+        "line_description": "Опис",
+        "line_unit": "Од. вим.",
+        "line_quantity": "Кількість",
+        "line_unit_rate": "Ціна за одиницю",
+        "lines": "Відомість вартості робіт",
+        "signer_company": "Від імені компанії"
+      },
+      "labels": {
+        "status": {
+          "draft": "Чернетка",
+          "active": "Діє",
+          "suspended": "Призупинено",
+          "completed": "Виконано",
+          "terminated": "Розірвано"
+        },
+        "type": {
+          "lump_sum": "Тверда ціна",
+          "gmp": "GMP",
+          "cost_plus": "Витрати плюс винагорода",
+          "tm": "Час і матеріали",
+          "unit_price": "За одиничними розцінками",
+          "design_build": "Проєктування та будівництво",
+          "combination": "Комбінований",
+          "remeasurement": "З перемірами",
+          "framework": "Рамковий договір",
+          "call_off": "Замовлення за рамковим договором"
+        },
+        "party": {
+          "client": "Договір із замовником",
+          "subcontractor": "Договір субпідряду"
+        }
       }
     }
   },
@@ -2076,7 +2153,11 @@
       "notifications.portal.message_received.title": "Нове повідомлення в порталі",
       "notifications.portal.message_received.body": "{buyer_name} надіслав(ла) повідомлення.",
       "dispatch.notify.plan_title": "Your daily plan is ready",
-      "dispatch.notify.plan_body": "Plan for {day}: {lines} lines."
+      "dispatch.notify.plan_body": "Plan for {day}: {lines} lines.",
+      "notifications.monitoring.alert.title": "Сповіщення моніторингу",
+      "notifications.monitoring.action.title": "Рівень дій моніторингу",
+      "notifications.monitoring.alarm.title": "Тривога моніторингу",
+      "notifications.monitoring.crossed.body": "Точка {point}: {displacement} mm, {rate} mm/day."
     },
     "schedule_headers": {
       "headers": {
@@ -2697,5 +2778,30 @@
         "gap": "Дефіцит"
       }
     }
-  }
+  },
+  "monitoring.crossed.fail": "Точка {id}: зміщення {d} мм або швидкість {r} мм/добу перевищили рівень «{level}»",
+  "monitoring.crossed.suggestion": "Перевірте точку та споруду, потім підтвердіть попередження приміткою.",
+  "monitoring.level.ok": "OK",
+  "monitoring.level.alert": "Попередження",
+  "monitoring.level.action": "Дія",
+  "monitoring.level.alarm": "Тривога",
+  "monitoring.risk.title": "Точка моніторингу {id}, рівень «{level}»",
+  "monitoring.risk.description": "Зміщення {d} мм, швидкість {r} мм/добу відносно профілю «{profile}». Чернетку відкрив моніторинг: перегляньте її та призначте відповідального.",
+  "monitoring.report.title": "Звіт про тривоги моніторингу",
+  "monitoring.report.project": "Проєкт",
+  "monitoring.report.crs": "Система координат",
+  "monitoring.report.profile": "Профіль меж",
+  "monitoring.report.generated": "Сформовано",
+  "monitoring.report.point": "Точка",
+  "monitoring.report.baseline": "Базове значення (м)",
+  "monitoring.report.latest": "Останнє значення (м)",
+  "monitoring.report.displacement": "Зміщення (мм)",
+  "monitoring.report.rate": "Швидкість (мм/добу)",
+  "monitoring.report.level": "Рівень",
+  "monitoring.report.acknowledged": "Підтверджено",
+  "monitoring.report.counts": "Тривога: {alarm} · Дія: {action} · Попередження: {alert} · OK: {ok}",
+  "monitoring.report.findings": "Висновки",
+  "monitoring.report.no_profile": "Профілю немає, задайте його",
+  "monitoring.report.ack_yes": "Так",
+  "monitoring.report.ack_no": "Ні"
 }

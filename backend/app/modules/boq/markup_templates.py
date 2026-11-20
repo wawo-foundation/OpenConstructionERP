@@ -34,6 +34,7 @@ __all__ = [
     "DEFAULT_MARKUP_TEMPLATES",
     "REGION_BY_COUNTRY",
     "REGION_VARIANTS",
+    "EDITION_REGIONS",
     "NON_SINGLE_TAX_REGIONS",
     "PL_KOSZTORYS_NARZUTY",
     "PL_KOSZTORYS_REVIEW_STATUS",
@@ -686,14 +687,54 @@ DEFAULT_MARKUP_TEMPLATES: dict[str, list[dict[str, object]]] = {
     # and the analysis sheet reported sixteen percent of overhead on a Chinese
     # bill whose management fee is eight.
     #
-    # 规费 is a placeholder and is meant to be read as one. The charge is real
-    # and mandatory, but it is set provincially and itemised (社会保险费,
-    # 住房公积金, and where it still applies 工程排污费), so no single national
-    # percentage is right anywhere; five is an order of magnitude to start
-    # editing from. The line is kept rather than dropped: the text of
-    # GB/T 50500-2024 could not be obtained, and not having read a repeal is
-    # not the same as having read a retention.
+    # GB/T 50500-2024 (in force 2025-09-01) prices a bill in four heads:
+    # 分部分项, 措施项目, 其他项目 and 增值税. 规费 is no longer a head of its
+    # own; provinces fold it into labour and the management fee (Shanghai
+    # application rules 2025, Guangdong 粤标定函〔2025〕24号). This stack is
+    # what a new Chinese bill is seeded with. A project on GB 50500-2013 is
+    # seeded with ``CN_GB50500_2013`` below, chosen from the project's stored
+    # edition, and a bill already priced is never re-seeded by an edition.
+    #
+    # 专业工程暂估价 is priced VAT-inclusive. A position flagged
+    # ``tax_inclusive`` stays out of the base of every ``tax`` line, which
+    # is what keeps the VAT line here from taxing it a second time.
     "CN": [
+        {
+            "name": "\u4f01\u4e1a\u7ba1\u7406\u8d39 (Enterprise management fee)",
+            "category": "overhead",
+            "percentage": "8.0",
+            "apply_to": "direct_cost",
+            "sort_order": 0,
+        },
+        {
+            "name": "\u5229\u6da6 (Profit)",
+            "category": "profit",
+            "percentage": "5.0",
+            "apply_to": "direct_cost",
+            "sort_order": 1,
+        },
+        {
+            "name": "\u63aa\u65bd\u9879\u76ee\u8d39 (Preliminaries)",
+            "category": "other",
+            "percentage": "8.0",
+            "apply_to": "direct_cost",
+            "sort_order": 2,
+        },
+        {
+            "name": "\u589e\u503c\u7a0e (VAT)",
+            "category": "tax",
+            "percentage": "9.0",
+            "apply_to": "cumulative",
+            "sort_order": 3,
+        },
+    ],
+    # GB 50500-2013: five heads, 规费 among them. 规费 is a placeholder and is
+    # meant to be read as one. The charge is real and mandatory, but it is set
+    # provincially and itemised (社会保险费, 住房公积金, and where it still
+    # applies 工程排污费), so no single national percentage is right anywhere;
+    # five is an order of magnitude to start editing from. Offered as the CN
+    # variant, and seeded for a project whose edition is 2013.
+    "CN_GB50500_2013": [
         {
             "name": "\u4f01\u4e1a\u7ba1\u7406\u8d39 (Enterprise management fee)",
             "category": "overhead",
@@ -1817,6 +1858,69 @@ DEFAULT_MARKUP_TEMPLATES: dict[str, list[dict[str, object]]] = {
             "sort_order": 4,
         },
     ],
+    # ── Hong Kong SAR ───────────────────────────────────────────────────
+    # Bills are measured to the Hong Kong Standard Method of Measurement for
+    # Building Elements (HKSMM4) in the same lineage as the SG and KE blocks:
+    # preliminaries are a measured section, so the percentage here stands in
+    # for that section on a bill that has not measured it.
+    #
+    # TWO STATUTORY LEVIES ARE THE REASON THIS COUNTRY GETS A ROW. The
+    # Construction Industry Council Ordinance (Cap. 587) levies 0.5 percent and
+    # the Construction Workers Registration Ordinance (Cap. 583) 0.03 percent of
+    # the value of construction operations, paid by the contractor, on works
+    # whose value exceeds HK$3,000,000 (raised from HK$1,000,000 for works
+    # tendered or begun from 30 July 2018; cic.hk, Construction Industry Levy).
+    # Above the threshold the levy is on the whole value, not on the excess,
+    # which is what ``threshold_amount`` does. Both lines are ``not_compounded``:
+    # each is a percentage of the same contract value, so neither enters the
+    # other's base, and 50,000,000 carries 250,000 plus 15,000.
+    #
+    # Hong Kong has no VAT or GST and profits tax is not a bill item, so the
+    # stack has no tax line (see NON_SINGLE_TAX_REGIONS).
+    #
+    # Overhead 10, profit 8 and contingency 5 are working defaults, not
+    # published figures.
+    "HK": [
+        {
+            "name": "Preliminaries",
+            "category": "overhead",
+            "percentage": "10.0",
+            "apply_to": "direct_cost",
+            "sort_order": 0,
+        },
+        {
+            "name": "Main Contractor's Overheads and Profit",
+            "category": "profit",
+            "percentage": "8.0",
+            "apply_to": "direct_cost",
+            "sort_order": 1,
+        },
+        {
+            "name": "Contingency Sum",
+            "category": "contingency",
+            "percentage": "5.0",
+            "apply_to": "direct_cost",
+            "sort_order": 2,
+        },
+        {
+            "name": "Construction Industry Council Levy (Cap. 587)",
+            "category": "other",
+            "percentage": "0.5",
+            "apply_to": "cumulative",
+            "sort_order": 3,
+            "threshold_amount": "3000000",
+            "not_compounded": True,
+        },
+        {
+            "name": "Construction Workers Registration Levy (Cap. 583)",
+            "category": "other",
+            "percentage": "0.03",
+            "apply_to": "cumulative",
+            "sort_order": 4,
+            "threshold_amount": "3000000",
+            "not_compounded": True,
+        },
+    ],
     # ── Morocco ─────────────────────────────────────────────────────────
     # Decree 2-22-431 on public procurement, which prescribes the bordereau des
     # prix and the détail estimatif and the sous-détail des prix behind them;
@@ -2894,6 +2998,7 @@ REGION_BY_COUNTRY: dict[str, str] = {
     "KE": "KE",
     "MA": "MA",
     "SG": "SG",
+    "HK": "HK",
     "ID": "ID",
     "VN": "VN",
     "MY": "MY",
@@ -2915,11 +3020,22 @@ REGION_BY_COUNTRY: dict[str, str] = {
 # reachability test accepts it only when the region it names is itself reached
 # by some country.
 #
-# Italy is the one case: ``IT`` (per price analysis) is the alternative to
+# Italy: ``IT`` (per price analysis) is the alternative to
 # ``IT_PREZZARIO`` (per price list), and the two differ by exactly the spese
 # generali and utile d'impresa that a price-list rate already contains.
+# ``CN_GB50500_2013`` (with a 规费 head) is the alternative to ``CN`` for
+# projects billed under the 2013 edition; ``EDITION_REGIONS`` picks it.
 REGION_VARIANTS: dict[str, str] = {
     "IT": "IT_PREZZARIO",
+    "CN_GB50500_2013": "CN",
+}
+
+# A region whose bill standard changed edition, and the stack each edition is
+# seeded with. Keyed by the edition keys of
+# ``app/core/country_data/item_code_patterns.json``; an edition not named here
+# takes the region's own stack.
+EDITION_REGIONS: dict[str, dict[str, str]] = {
+    "CN": {"gb50500@2013": "CN_GB50500_2013", "gb50500@2024": "CN"},
 }
 
 # Regions whose tax lines a single country VAT rate cannot stand in for, and
@@ -3030,6 +3146,7 @@ NON_SINGLE_TAX_REGIONS: dict[str, str] = {
         "at a rate each province sets (16 percent in Punjab, 15 in Sindh and Khyber Pakhtunkhwa as read) "
         "and lower again for government civil works, so no single number is right for every bill"
     ),
+    "HK": "Hong Kong levies no VAT or GST and profits tax is not a bill item, so the stack carries no tax line",
     "DEFAULT": (
         "the neutral stack names no jurisdiction, so it names no consumption tax either; a caller "
         "that knows the country gets that country's own tax line appended instead, see "

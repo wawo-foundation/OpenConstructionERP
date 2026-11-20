@@ -108,7 +108,13 @@ NAVIGATION_CALLEES = frozenset({"href", "src", "window.open", "EventSource"})
 # 227: three field capture paths in a table chosen by kind (fieldKinds.ts), a feed URL builder that returns a
 # string for a link (DataFeedsSettings.tsx), and two multipart upload wrappers that add a path per call
 # (haul-tickets, owner-schedule). None has a single call to hand the literal to; the routes they reach exist.
-MAX_PREFIX_ONLY = 227
+# 234: the module base const of seven new api.ts files (doc-templates, equipment rate-catalogues, estimate-archive,
+# payroll-export, booking-exports, framework-agreements, project-catalogue); every call built on it is checked in full.
+# 248: the module base const and per-project path builder of the seven survey api.ts files (survey-core, surfaces-
+# volumes, setting-out, land-parcels, monitoring, stockpiles, mine-survey); every call built on them is checked in full.
+# 249: the bidder-link logo address (bid-portal/api.ts) is a URL builder that returns a string for an <img src>;
+# there is no call to hand it to, and the route it names exists.
+MAX_PREFIX_ONLY = 249
 
 # Known unmatched calls that are right as they are. Key format:
 #   "<VERDICT> <METHOD|*> <path as written> @ <file under frontend/src>"

@@ -1644,7 +1644,8 @@
         "no_rejections": "Нищо не е отхвърлено.",
         "sig_delivered_by": "Доставил",
         "counterparty_tax_id": "ИН по ДДС",
-        "counterparty_address": "Адрес"
+        "counterparty_address": "Адрес",
+        "delivery_address": "Адрес за доставка"
       },
       "labels": {
         "po_status": {
@@ -1717,7 +1718,8 @@
         "gross_settled": "Уредена брутна сума",
         "no_withholding": "От това плащане не е удържано задържане.",
         "counterparty_tax_id": "ИН по ДДС",
-        "counterparty_address": "Адрес"
+        "counterparty_address": "Адрес",
+        "supply_date": "Дата на доставка"
       },
       "labels": {
         "invoice_status": {
@@ -1786,6 +1788,81 @@
         "col_min": "Мин.",
         "col_max": "Макс.",
         "col_count": "Показания"
+      }
+    },
+    "gantt_pdf": {
+      "strings": {
+        "title": "График (диаграма на Гант)",
+        "project": "Проект",
+        "schedule": "График",
+        "baseline": "Базов план",
+        "no_baseline": "няма",
+        "exported": "Експортирано",
+        "data_date": "Дата на състоянието",
+        "col_wbs": "СРР",
+        "col_activity": "Дейност",
+        "col_start": "Начало",
+        "col_finish": "Край",
+        "col_duration": "Дни",
+        "legend_current": "Текущ план",
+        "legend_progress": "Напредък",
+        "legend_critical": "Критичен път",
+        "legend_baseline": "Базов план",
+        "legend_actual": "Действително",
+        "legend_milestone": "Ключово събитие",
+        "legend_summary": "Обобщение",
+        "week_short": "С{n}",
+        "quarter_short": "Т{n}",
+        "sheet_of": "Лист {page} от {total}",
+        "no_activities": "Този график все още няма дейности."
+      }
+    },
+    "contracts": {
+      "strings": {
+        "doc_title": "Договор",
+        "col_code": "Код",
+        "col_title": "Наименование",
+        "col_type": "Вид договор",
+        "col_role": "Страна по договора",
+        "col_counterparty": "Контрагент",
+        "col_original_value": "Първоначална стойност",
+        "col_total_value": "Стойност на договора",
+        "col_retention": "Удръжка",
+        "col_start": "Начална дата",
+        "col_end": "Крайна дата",
+        "col_signed": "Подписан на",
+        "line_code": "Код",
+        "line_description": "Описание",
+        "line_unit": "Мярка",
+        "line_quantity": "Количество",
+        "line_unit_rate": "Единична цена",
+        "lines": "Количествено-стойностна сметка",
+        "signer_company": "За дружеството"
+      },
+      "labels": {
+        "status": {
+          "draft": "Чернова",
+          "active": "Действащ",
+          "suspended": "Спрян",
+          "completed": "Приключен",
+          "terminated": "Прекратен"
+        },
+        "type": {
+          "lump_sum": "Фиксирана цена",
+          "gmp": "GMP",
+          "cost_plus": "Разходи плюс",
+          "tm": "Време и материали",
+          "unit_price": "Единични цени",
+          "design_build": "Проектиране и изпълнение",
+          "combination": "Комбиниран",
+          "remeasurement": "Преизмерване",
+          "framework": "Рамков договор",
+          "call_off": "Заявка по рамков договор"
+        },
+        "party": {
+          "client": "Договор с възложител",
+          "subcontractor": "Договор с подизпълнител"
+        }
       }
     }
   },
@@ -2076,7 +2153,11 @@
       "notifications.portal.message_received.title": "Ново съобщение в портала",
       "notifications.portal.message_received.body": "{buyer_name} изпрати съобщение.",
       "dispatch.notify.plan_title": "Your daily plan is ready",
-      "dispatch.notify.plan_body": "Plan for {day}: {lines} lines."
+      "dispatch.notify.plan_body": "Plan for {day}: {lines} lines.",
+      "notifications.monitoring.alert.title": "Сигнал от мониторинг",
+      "notifications.monitoring.action.title": "Ниво на действие при мониторинг",
+      "notifications.monitoring.alarm.title": "Аларма от мониторинг",
+      "notifications.monitoring.crossed.body": "Точка {point}: {displacement} mm, {rate} mm/day."
     },
     "schedule_headers": {
       "headers": {
@@ -2700,5 +2781,30 @@
         "gap": "Недостиг"
       }
     }
-  }
+  },
+  "monitoring.crossed.fail": "Точка {id}: преместване {d} мм или скорост {r} мм/ден премина {level}",
+  "monitoring.crossed.suggestion": "Проверете точката и съоръжението, после потвърдете сигнала с бележка.",
+  "monitoring.level.ok": "OK",
+  "monitoring.level.alert": "Предупреждение",
+  "monitoring.level.action": "Действие",
+  "monitoring.level.alarm": "Аларма",
+  "monitoring.risk.title": "Точка за наблюдение {id} на ниво {level}",
+  "monitoring.risk.description": "Преместване {d} мм, скорост {r} мм/ден спрямо {profile}. Черновата е създадена от мониторинга: прегледайте я и посочете отговорен.",
+  "monitoring.report.title": "Аларменен доклад за мониторинг",
+  "monitoring.report.project": "Проект",
+  "monitoring.report.crs": "Координатна система",
+  "monitoring.report.profile": "Профил с граници",
+  "monitoring.report.generated": "Генериран",
+  "monitoring.report.point": "Точка",
+  "monitoring.report.baseline": "Базова стойност (м)",
+  "monitoring.report.latest": "Последна стойност (м)",
+  "monitoring.report.displacement": "Преместване (мм)",
+  "monitoring.report.rate": "Скорост (мм/ден)",
+  "monitoring.report.level": "Ниво",
+  "monitoring.report.acknowledged": "Потвърдено",
+  "monitoring.report.counts": "Аларма: {alarm} · Действие: {action} · Предупреждение: {alert} · OK: {ok}",
+  "monitoring.report.findings": "Констатации",
+  "monitoring.report.no_profile": "Няма профил, задайте такъв",
+  "monitoring.report.ack_yes": "Да",
+  "monitoring.report.ack_no": "Не"
 }

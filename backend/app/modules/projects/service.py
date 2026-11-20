@@ -118,6 +118,10 @@ from app.modules.projects.schemas import (
 logger = logging.getLogger(__name__)
 
 
+#: Records that must outlive their project: a sealed estimate is kept for its retention period.
+_RETAINED_TABLE_PREFIXES: tuple[str, ...] = ("oe_estimate_archive_",)
+
+
 async def purge_project_children_without_cascade(
     session: AsyncSession,
     project_ids: list[uuid.UUID],
@@ -176,7 +180,7 @@ async def purge_project_children_without_cascade(
     except ImportError:
         logger.debug("approval_routes models unavailable - skipping approval instance purge")
     for table in reversed(Base.metadata.sorted_tables):
-        if table.name == Project.__tablename__:
+        if table.name == Project.__tablename__ or table.name.startswith(_RETAINED_TABLE_PREFIXES):
             continue
         col = table.c.get("project_id")
         if col is None:
@@ -227,8 +231,14 @@ def _remove_project_files(project_id: uuid.UUID, file_paths: list[str]) -> int:
 async def purge_demo_tagged_global_rows(
     session: AsyncSession,
     demo_ids: set[str],
+    owner_ids: set[str] | None = None,
 ) -> dict[str, int]:
     """Delete company-global demo rows tagged for the given demo projects.
+
+    With ``owner_ids`` only rows that belong to those owners go: a row's owner is its
+    ``created_by``, or for a fleet unit the owner of the project it is rented to. Two owners
+    can hold the same demo, and purging one must not take the other's rows. A row nobody
+    owns any more is still swept.
 
     A few company-level registries (the equipment fleet and the
     subcontractor roster) live in tables that carry NO ``project_id`` - a
@@ -272,6 +282,13 @@ async def purge_demo_tagged_global_rows(
         # the rows that point at a contact do so with SET NULL or no key.
         ("app.modules.contacts.models", "Contact"),
     )
+    project_owner: dict[str, str] = {}
+    if owner_ids is not None:
+        from app.modules.projects.models import Project as _Project
+
+        project_owner = {
+            str(pid): str(oid) for pid, oid in (await session.execute(sa_select(_Project.id, _Project.owner_id))).all()
+        }
     for module_path, attr in _targets:
         try:
             import importlib
@@ -286,6 +303,26 @@ async def purge_demo_tagged_global_rows(
             for r in rows
             if isinstance(getattr(r, "metadata_", None), dict) and r.metadata_.get("demo_id") in demo_ids
         ]
+        if owner_ids is not None and pks:
+            rental_owner: dict[Any, str | None] = {}
+            if attr == "Equipment":
+                from app.modules.equipment.models import EquipmentRental
+
+                for eq_id, rental_project in (
+                    await session.execute(
+                        sa_select(EquipmentRental.equipment_id, EquipmentRental.project_id).where(
+                            EquipmentRental.equipment_id.in_(pks)
+                        )
+                    )
+                ).all():
+                    rental_owner.setdefault(eq_id, project_owner.get(str(rental_project)))
+            by_id = {r.id: r for r in rows}
+            pks = [
+                pk
+                for pk in pks
+                if (rental_owner.get(pk) if attr == "Equipment" else getattr(by_id[pk], "created_by", None))
+                in (None, *owner_ids)
+            ]
         if not pks:
             continue
         await session.execute(sa_delete(model).where(model.id.in_(pks)))
@@ -1690,7 +1727,9 @@ class ProjectService:
         # Company-global rows tagged for these demo projects (no project_id,
         # so missed by the sweep above). Shared-by-design registries seeded
         # at boot carry no demo_id and are intentionally left alone.
-        global_deleted = await purge_demo_tagged_global_rows(self.session, demo_ids)
+        global_deleted = await purge_demo_tagged_global_rows(
+            self.session, demo_ids, {str(p.owner_id) for p in rows if p.owner_id}
+        )
 
         result = await self.session.execute(sa_delete(Project).where(Project.id.in_(demo_pks)))
         await self.session.flush()
@@ -1743,6 +1782,17 @@ class ProjectService:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="The typed name does not match the project name.",
             )
+        try:
+            from app.modules.estimate_archive import service as estimate_archive
+
+            retained = await estimate_archive.seals_under_retention(self.session, [project_id])
+        except ImportError:
+            retained = 0
+        if retained:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="This project has a sealed estimate still under retention. Keep the project archived.",
+            )
         project_name = project.name
         from app.core.demo_marker import demo_id_of, retire_demo_ids
 
@@ -1756,7 +1806,7 @@ class ProjectService:
 
         await purge_project_children_without_cascade(self.session, [project_id])
         if demo_id:
-            await purge_demo_tagged_global_rows(self.session, {demo_id})
+            await purge_demo_tagged_global_rows(self.session, {demo_id}, {str(project.owner_id)})
         await self.session.execute(sa_delete(Project).where(Project.id == project_id))
         await self.session.flush()
         self.session.expire_all()

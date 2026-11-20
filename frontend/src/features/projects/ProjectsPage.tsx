@@ -38,6 +38,16 @@ import { invalidateProjectLists } from './invalidateProjectLists';
 import { DemoSeedingHint } from '@/features/processes/DemoSeedingHint';
 import { useDemoScope } from '@/shared/lib/useDemoScope';
 import { DemoScopeNotice } from '@/shared/ui/DemoScopeNotice';
+import { effectiveEntityId } from '@/features/legal-entities/api';
+import { CompanyFilterSelect } from '@/features/legal-entities/CompanyFilterSelect';
+import { useCompaniesUi } from '@/features/legal-entities/useCompanies';
+import { ProjectFacetSelects } from '@/shared/ui/ProjectFacetSelects';
+import {
+  FACET_ALL,
+  applyProjectFacets,
+  isFacetFilterActive,
+  type ProjectFacetFilters,
+} from '@/shared/lib/projectFacets';
 
 const LIVE_DEFAULT_MIGRATED_KEY = 'oe_projects_filters_live_default';
 
@@ -107,9 +117,12 @@ export function isProjectFilterActive(
   searchQuery: string,
   statusFilter: StatusFilter,
   regionFilter: string,
+  facets?: Partial<ProjectFacetFilters>,
 ): boolean {
   // 'active' is the default view, so it is not a filter the user applied.
-  return Boolean(searchQuery) || statusFilter !== 'active' || regionFilter !== 'all';
+  return (
+    Boolean(searchQuery) || statusFilter !== 'active' || regionFilter !== 'all' || isFacetFilterActive(facets)
+  );
 }
 
 // Region tags + colours are derived from actual project data — no
@@ -172,6 +185,9 @@ export function ProjectsPage() {
     status: 'active' as StatusFilter,
     region: 'all',
     sort: 'newest' as SortOption,
+    company: 'all',
+    phase: FACET_ALL,
+    project_type: FACET_ALL,
   });
   // One-time move for browsers that saved the old 'all' default: without it
   // the deleted projects would stay on screen for every existing user.
@@ -191,6 +207,22 @@ export function ProjectsPage() {
   const setStatusFilter = (v: StatusFilter) => setFilters((p) => ({ ...p, status: v }));
   const setRegionFilter = (v: string) => setFilters((p) => ({ ...p, region: v }));
   const setSortOption = (v: SortOption) => setFilters((p) => ({ ...p, sort: v }));
+  // Saved filters from before companies existed carry no `company` key.
+  const companyFilter = filters.company ?? 'all';
+  const setCompanyFilter = (v: string) => setFilters((p) => ({ ...p, company: v }));
+  const companiesUi = useCompaniesUi();
+  // Settings links here with ?company=<id> from the companies table.
+  useEffect(() => {
+    const fromUrl = new URLSearchParams(window.location.search).get('company');
+    if (fromUrl) setFilters((p) => ({ ...p, company: fromUrl }));
+    // Runs once on mount by design.
+  }, []);
+  // Filters saved before #567 have no phase/type; read them as "all".
+  const facetFilters: ProjectFacetFilters = useMemo(
+    () => ({ phase: filters.phase ?? FACET_ALL, project_type: filters.project_type ?? FACET_ALL }),
+    [filters.phase, filters.project_type],
+  );
+  const setFacetFilters = (v: ProjectFacetFilters) => setFilters((p) => ({ ...p, ...v }));
   const [page, setPage] = useState(1);
 
   const {
@@ -378,6 +410,12 @@ export function ProjectsPage() {
       list = list.filter((p) => p.region === regionFilter);
     }
 
+    // Company filter: a project naming no company belongs to the default one.
+    if (companiesUi.multiCompany && companyFilter !== 'all') {
+      list = list.filter((p) => effectiveEntityId(p, companiesUi.defaultEntityId) === companyFilter);
+    }
+    list = applyProjectFacets(list, facetFilters);
+
     // Sort — pinned first, then locale priority (en → de → others)
     // so the US and German demo projects anchor the top of the list,
     // then fall through to the user-selected sort option.
@@ -423,12 +461,12 @@ export function ProjectsPage() {
     });
 
     return list;
-  }, [projects, demoProjectId, searchQuery, statusFilter, regionFilter, sortOption, boqStatsMap, pinnedIds, hasMultipleCurrencies, compareNames]);
+  }, [projects, demoProjectId, searchQuery, statusFilter, regionFilter, companyFilter, companiesUi.multiCompany, companiesUi.defaultEntityId, facetFilters, sortOption, boqStatsMap, pinnedIds, hasMultipleCurrencies, compareNames]);
 
   // Reset page when filters change
   useEffect(() => {
     setPage(1);
-  }, [searchQuery, statusFilter, regionFilter, sortOption]);
+  }, [searchQuery, statusFilter, regionFilter, facetFilters, sortOption]);
 
   // Pagination
   const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
@@ -442,7 +480,7 @@ export function ProjectsPage() {
   // the filter toolbar mounted when a filtered view (e.g. Archived) comes
   // back empty, so the user can always switch back to Active. Without this
   // guard an empty Archived view hid the toolbar and trapped the user (#284).
-  const hasActiveFilter = isProjectFilterActive(searchQuery, statusFilter, regionFilter);
+  const hasActiveFilter = isProjectFilterActive(searchQuery, statusFilter, regionFilter, facetFilters);
 
   // With every project deleted, the default view is empty; the toolbar must
   // still show so the Archived filter (and its Restore buttons) is reachable.
@@ -909,6 +947,8 @@ export function ProjectsPage() {
               </select>
             </div>
 
+            <CompanyFilterSelect value={companyFilter} onChange={setCompanyFilter} />
+
             {/* Region filter */}
             <div className="relative">
               <select
@@ -928,6 +968,9 @@ export function ProjectsPage() {
                 ))}
               </select>
             </div>
+
+            {/* Phase and project type: options come from the projects themselves. */}
+            <ProjectFacetSelects projects={projects ?? []} value={facetFilters} onChange={setFacetFilters} />
 
             {/* Sort buttons */}
             <div className="flex items-center gap-1 shrink-0">
@@ -982,8 +1025,7 @@ export function ProjectsPage() {
             label: t('projects.show_active', { defaultValue: 'Show active projects' }),
             onClick: () => {
               setSearchQuery('');
-              setStatusFilter('active');
-              setRegionFilter('all');
+              setFilters((p) => ({ ...p, status: 'active', region: 'all', company: 'all', phase: FACET_ALL, project_type: FACET_ALL }));
             },
           }}
         />
@@ -1299,6 +1341,7 @@ export function ProjectCard({
     birimfiyat: 'Birim Fiyat',
     nlsfb: 'NL/SfB',
     knr: 'KNR',
+    hksmm4: 'HKSMM4',
   };
 
   // Currency symbol icon — falls back to neutral DollarSign for unknown codes

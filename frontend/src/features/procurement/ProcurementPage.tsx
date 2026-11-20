@@ -55,6 +55,7 @@ import {
 } from './api';
 import { PURCHASING_DOCUMENT_LOCALES } from '@/shared/lib/documentExport';
 import { RecordPdfButton } from '@/shared/ui/RegisterExport';
+import { useLayoutCustomizer } from '@/features/doc-templates';
 import { PORemovalDialog, removalVerbFor } from './PORemovalDialog';
 import { procurementGuide } from './procurementGuide';
 import { SupplierScorecardModal } from './SupplierScorecardModal';
@@ -72,6 +73,8 @@ import { RecordDeliveryModal } from './RecordDeliveryModal';
 import { LineRequirements, changedRequirements } from './LineRequirements';
 import { ConfirmReceiptDialog, type ConfirmableReceipt } from './ConfirmReceiptDialog';
 import { fmtFixed } from '@/shared/lib/formatters';
+import { canUpdatePurchaseOrders } from './poPermissions';
+import { CASH_TERMS, NET_DAY_OPTIONS, isStandardPaymentTerms, paymentTermsToWire, paymentTermsToForm } from './paymentTerms';
 import { orderSource, rfqDeepLink } from '@/shared/lib/awardChainLinks';
 import { RelatedRecordLink } from '@/shared/ui/RelatedRecordLink';
 
@@ -172,6 +175,9 @@ interface POItemResponse {
   // The requisition line this order line was raised from by a conversion,
   // null for a line typed into the order by hand.
   requisition_item_id?: string | null;
+  // Where the cost lands in the books: a cost centre or cost code, and the WBS node.
+  cost_category?: string | null;
+  wbs_id?: string | null;
   sort_order: number;
   required_certificate_type?: string | null;
   requires_inspection?: boolean;
@@ -196,6 +202,7 @@ interface POResponse {
   amount_total: string | number;
   status: string;
   payment_terms: string | null;
+  delivery_address?: string | null;
   notes: string | null;
   invoice_tolerance_pct?: string | null;
   invoice_tolerance_abs?: string | null;
@@ -242,6 +249,10 @@ interface POLineItemForm {
    * sent back without it loses its link to the requisition and the BOQ.
    */
   requisition_item_id?: string | null;
+  /** Cost centre / cost code the line is booked to; free text from the buyer's chart. */
+  cost_category?: string;
+  /** WBS node, carried through an edit untouched so replacing lines does not drop it. */
+  wbs_id?: string | null;
   /** The saved line, when editing; requirement changes on a locked order go to it. */
   id?: string;
   /** What a delivery of the line must arrive with: a certificate type code, or ''. */
@@ -251,7 +262,7 @@ interface POLineItemForm {
 
 /** The figures of a line, without its delivery requirements. */
 function lineFigures(items: POLineItemForm[]) {
-  return items.map((li) => [li.description, li.quantity, li.unit, li.unit_rate, li.amount, li.boq_position_id]);
+  return items.map((li) => [li.description, li.quantity, li.unit, li.unit_rate, li.amount, li.boq_position_id, li.cost_category ?? '']);
 }
 
 
@@ -263,6 +274,7 @@ interface POFormState {
   delivery_date: string;
   currency: string;
   payment_terms: string;
+  delivery_address: string;
   notes: string;
   // How far a supplier invoice may run past the order before the match warns.
   // Empty means no allowance beyond rounding.
@@ -286,14 +298,14 @@ interface POFormState {
  * untouched field look edited.
  */
 function poFormFromResponse(po: POResponse, projectCurrency: string): POFormState {
-  const payTermMatch = (po.payment_terms ?? '').match(/(\d+)/);
   return {
     vendor_contact_id: po.vendor_contact_id ?? '',
     vendor_display: po.vendor_name ?? '',
     po_type: po.po_type === 'blanket' || po.po_type === 'service' ? po.po_type : 'standard',
     delivery_date: po.delivery_date ?? '',
     currency: po.currency_code || projectCurrency || '',
-    payment_terms: payTermMatch?.[1] ?? '30',
+    payment_terms: paymentTermsToForm(po.payment_terms),
+    delivery_address: po.delivery_address ?? '',
     notes: po.notes ?? '',
     invoice_tolerance_pct: po.invoice_tolerance_pct ?? '',
     invoice_tolerance_abs: po.invoice_tolerance_abs ?? '',
@@ -310,6 +322,8 @@ function poFormFromResponse(po: POResponse, projectCurrency: string): POFormStat
             // id to a readable position even when it sorts past the first page.
             boq_position_id: it.boq_position_id ?? null,
             requisition_item_id: it.requisition_item_id ?? null,
+            cost_category: it.cost_category ?? '',
+            wbs_id: it.wbs_id ?? null,
             id: it.id,
             required_certificate_type: it.required_certificate_type ?? '',
             requires_inspection: Boolean(it.requires_inspection),
@@ -697,11 +711,17 @@ function PurchaseOrdersTab({
   focusPoId: string | null;
 }) {
   const { t } = useTranslation();
+  const poLayout = useLayoutCustomizer(
+    'procurement.purchase_order',
+    t('procurement.po_document', { defaultValue: 'Purchase order' }),
+  );
   const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
   const addToast = useToastStore((s) => s.addToast);
   const userRole = useAuthStore((s) => s.userRole);
   const isManager = userRole === 'admin' || userRole === 'manager';
+  // Same bar as the server's `procurement.update`, so Edit is not hidden from editors.
+  const canEditPO = canUpdatePurchaseOrders(userRole);
 
   // 3-way match: rows hovered or focused fetch their match status on demand
   // (we never bulk-fetch on list load to avoid N×fetch on big projects).
@@ -771,6 +791,7 @@ function PurchaseOrdersTab({
     delivery_date: '',
     currency: '',
     payment_terms: '30',
+    delivery_address: '',
     notes: '',
     invoice_tolerance_pct: '',
     invoice_tolerance_abs: '',
@@ -792,7 +813,7 @@ function PurchaseOrdersTab({
   const emptyPoForm = {
     vendor_contact_id: '', vendor_display: '', po_type: 'standard' as 'standard' | 'blanket' | 'service',
     delivery_date: '', currency: '', payment_terms: '30',
-    notes: '', invoice_tolerance_pct: '', invoice_tolerance_abs: '',
+    delivery_address: '', notes: '', invoice_tolerance_pct: '', invoice_tolerance_abs: '',
     items: [{ ...emptyLine }] as POLineItemForm[],
   };
 
@@ -959,7 +980,8 @@ function PurchaseOrdersTab({
         // is the tax, as before the rate existed.
         ...(poRate !== null ? { tax_rate_pct: poRateText } : { tax_amount: poTaxInput || '0' }),
         amount_total: String(poTotal.toFixed(2)),
-        payment_terms: `Net ${data.payment_terms}`,
+        payment_terms: paymentTermsToWire(data.payment_terms),
+        delivery_address: data.delivery_address.trim() || undefined,
         notes: data.notes || undefined,
         invoice_tolerance_pct: data.invoice_tolerance_pct.trim() || undefined,
         invoice_tolerance_abs: data.invoice_tolerance_abs.trim() || undefined,
@@ -975,6 +997,7 @@ function PurchaseOrdersTab({
             // Omitted rather than sent as null when the line is unattributed:
             // the field is optional on POItemCreate and an absent one reads the
             // same as an unlinked line without asking the server to resolve it.
+            cost_category: li.cost_category?.trim() || undefined,
             boq_position_id: li.boq_position_id || undefined,
             required_certificate_type: li.required_certificate_type || undefined,
             requires_inspection: Boolean(li.requires_inspection),
@@ -1026,8 +1049,9 @@ function PurchaseOrdersTab({
       }
       if (data.currency !== base.currency) body.currency_code = data.currency;
       if (data.payment_terms !== base.payment_terms) {
-        body.payment_terms = `Net ${data.payment_terms}`;
+        body.payment_terms = paymentTermsToWire(data.payment_terms);
       }
+      if (data.delivery_address !== base.delivery_address) body.delivery_address = data.delivery_address.trim();
       if (data.notes !== base.notes) body.notes = data.notes || undefined;
       // An emptied allowance is sent as '' so the server clears it.
       if (data.invoice_tolerance_pct !== base.invoice_tolerance_pct) {
@@ -1047,6 +1071,8 @@ function PurchaseOrdersTab({
             unit_rate: li.unit_rate || '0',
             boq_position_id: li.boq_position_id || undefined,
             requisition_item_id: li.requisition_item_id || undefined,
+            cost_category: li.cost_category?.trim() || undefined,
+            wbs_id: li.wbs_id || undefined,
             required_certificate_type: li.required_certificate_type || undefined,
             requires_inspection: Boolean(li.requires_inspection),
             sort_order: idx,
@@ -1444,6 +1470,18 @@ function PurchaseOrdersTab({
                         line={idx + 1}
                         disabled={figuresLocked}
                       />
+                      <input
+                        value={li.cost_category ?? ''}
+                        disabled={figuresLocked}
+                        maxLength={100}
+                        onChange={(e) => updateLineItem(idx, 'cost_category', e.target.value)}
+                        placeholder={t('procurement.cost_code_placeholder', { defaultValue: 'Cost centre / cost code' })}
+                        aria-label={t('procurement.cost_code_for', {
+                          defaultValue: 'Cost centre or cost code for line {{line}}',
+                          line: idx + 1,
+                        })}
+                        className={clsx('oe-input', 'oe-input-sm')}
+                      />
                       <LineRequirements
                         line={idx + 1}
                         certificateType={li.required_certificate_type ?? ''}
@@ -1631,10 +1669,17 @@ function PurchaseOrdersTab({
                       onChange={(e) => setPoForm((f) => ({ ...f, payment_terms: e.target.value }))}
                       className="oe-select oe-input-lg"
                     >
-                      <option value="30">{t('procurement.net_days', { defaultValue: 'Net {{days}} days', days: 30 })}</option>
-                      <option value="45">{t('procurement.net_days', { defaultValue: 'Net {{days}} days', days: 45 })}</option>
-                      <option value="60">{t('procurement.net_days', { defaultValue: 'Net {{days}} days', days: 60 })}</option>
-                      <option value="90">{t('procurement.net_days', { defaultValue: 'Net {{days}} days', days: 90 })}</option>
+                      <option value={CASH_TERMS}>
+                        {t('procurement.payment_cash', { defaultValue: 'Cash on delivery (immediate payment)' })}
+                      </option>
+                      {NET_DAY_OPTIONS.map((d) => (
+                        <option key={d} value={d}>
+                          {t('procurement.net_days', { defaultValue: 'Net {{days}} days', days: Number(d) })}
+                        </option>
+                      ))}
+                      {!isStandardPaymentTerms(poForm.payment_terms) && (
+                        <option value={poForm.payment_terms}>{poForm.payment_terms}</option>
+                      )}
                     </select>
                   </div>
                   {/* Invoice allowance: how far a supplier invoice may run past
@@ -1672,6 +1717,22 @@ function PurchaseOrdersTab({
                       className={inputCls}
                     />
                   </div>
+                </div>
+                {/* Where the goods go: printed on the order the supplier receives. */}
+                <div>
+                  <label htmlFor="po-delivery-address" className="oe-label">
+                    {t('procurement.delivery_address', { defaultValue: 'Delivery address' })}
+                  </label>
+                  <textarea
+                    id="po-delivery-address"
+                    value={poForm.delivery_address}
+                    onChange={(e) => setPoForm((f) => ({ ...f, delivery_address: e.target.value }))}
+                    rows={2}
+                    maxLength={500}
+                    className={clsx('oe-textarea', 'resize-none')}
+                    placeholder={t('procurement.delivery_address_placeholder', { defaultValue: 'Site address, gate, contact on site' })}
+                    data-testid="po-delivery-address"
+                  />
                 </div>
                 {/* Notes */}
                 <div>
@@ -1726,6 +1787,7 @@ function PurchaseOrdersTab({
 
   return (
     <>
+      {poLayout.drawer}
     <Card padding="none">
       {/* Search + New PO button */}
       <div className="px-4 py-3 border-b border-border-light flex flex-col sm:flex-row sm:items-center gap-2">
@@ -1775,7 +1837,7 @@ function PurchaseOrdersTab({
                   }),
                 })}
               </span>
-              {isManager && (
+              {canEditPO && (
                 <Button
                   variant="ghost"
                   size="sm"
@@ -1962,23 +2024,37 @@ function PurchaseOrdersTab({
                       download={(locale) => downloadPurchaseOrderPdf(po.id, locale, po.po_number)}
                       locales={PURCHASING_DOCUMENT_LOCALES}
                       testId={`po-pdf-${po.id}`}
+                      onCustomize={poLayout.open({ recordId: po.id, projectId: projectId || null })}
                     />
+                  {canEditPO && (
+                    <>
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => openEditMut.mutate(po.id)}
+                        disabled={openEditMut.isPending || editPOMut.isPending}
+                        data-testid={`po-edit-${po.id}`}
+                      >
+                        {t('common.edit', { defaultValue: 'Edit' })}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => openEditMut.mutate(po.id)}
+                        disabled={openEditMut.isPending || editPOMut.isPending}
+                        title={t('procurement.edit_po', { defaultValue: 'Edit purchase order' })}
+                        className="!p-1.5 text-content-tertiary hover:text-oe-blue"
+                      >
+                        {openEditMut.isPending && openEditMut.variables === po.id ? (
+                          <Loader2 size={14} className="animate-spin" />
+                        ) : (
+                          <Pencil size={14} />
+                        )}
+                      </Button>
+                    </>
+                  )}
                   {isManager && (
                   <>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => openEditMut.mutate(po.id)}
-                      disabled={openEditMut.isPending || editPOMut.isPending}
-                      title={t('procurement.edit_po', { defaultValue: 'Edit purchase order' })}
-                      className="!p-1.5 text-content-tertiary hover:text-oe-blue"
-                    >
-                      {openEditMut.isPending && openEditMut.variables === po.id ? (
-                        <Loader2 size={14} className="animate-spin" />
-                      ) : (
-                        <Pencil size={14} />
-                      )}
-                    </Button>
                     {/* Commitment gate (TOP-30 #10): a draft PO must be
                         approved before it can be issued. Approval is what
                         commits budget in finance, so draft rows show Approve
@@ -2237,6 +2313,10 @@ function GoodsReceiptsTab({
   onGoToPurchaseOrders: () => void;
 }) {
   const { t } = useTranslation();
+  const grLayout = useLayoutCustomizer(
+    'procurement.goods_receipt',
+    t('procurement.gr_document', { defaultValue: 'Goods receipt' }),
+  );
   const userRole = useAuthStore((s) => s.userRole);
   // Recording + confirming a goods receipt are EDITOR-level permissions
   // (procurement.create / procurement.confirm_receipt), so the controls are
@@ -2329,6 +2409,7 @@ function GoodsReceiptsTab({
 
   return (
     <>
+      {grLayout.drawer}
     <Card padding="none">
       {/* Search + Record Delivery */}
       <div className="px-4 py-3 border-b border-border-light flex flex-col sm:flex-row sm:items-center gap-2">
@@ -2446,6 +2527,7 @@ function GoodsReceiptsTab({
                       }
                       locales={PURCHASING_DOCUMENT_LOCALES}
                       testId={`gr-pdf-${gr.id}`}
+                      onCustomize={grLayout.open({ recordId: gr.id, projectId: projectId || null })}
                     />
                     {/* A draft goods receipt is awaiting confirmation - the
                         load-bearing step that rolls the PO up and moves the

@@ -299,6 +299,10 @@
     "unit_exportable": {
       "fail": "Poziția {ordinal}: unitatea '{unit}' nu încape în câmpul GAEB QU de 4 caractere și ar fi tăiată la export",
       "suggestion": "Folosiți un cod de unitate GAEB de cel mult 4 caractere (m, m2, m3, St, h, psch, kg, t)"
+    },
+    "short_text_length": {
+      "fail": "Poziția {ordinal}: textul scurt are {length} caractere; exportul GAEB îl taie la 70",
+      "suggestion": "Scurtați textul scurt la 70 de caractere și păstrați detaliile în textul lung"
     }
   },
   "nrm": {
@@ -412,7 +416,10 @@
       "suggestion": "Atribuiți un cod GB/T 50500 din 9 cifre (de exemplu, 010101001)"
     },
     "valid_code": {
-      "fail": "Cod GB/T 50500 nevalid '{code}' – sunt necesare 9 sau 12 cifre"
+      "fail": "Cod GB/T 50500 nevalid '{code}' – sunt necesare 9 sau 12 cifre sau un cod suplimentar precum 01B001"
+    },
+    "code_unique": {
+      "fail": "Codul articolului '{code}' este folosit de mai multe ori în același subproiect"
     }
   },
   "cpwd": {
@@ -931,6 +938,36 @@
     "change_time_within_owner": {
       "fail": "Impacturile de timp ale subcontractelor pentru {code} însumează {sub_days} zile, mai mult decât cele {owner_days} zile acordate de beneficiar",
       "suggestion": "Verificați cererile de timp ale subcontractorilor sau cereți beneficiarului o prelungire echivalentă"
+    },
+    "pay_app_over_complete": {
+      "fail": "Linia {line} atinge {percent}% din valoarea programată după această perioadă ({completed} din {scheduled})",
+      "suggestion": "Reduceți suma acestei perioade sau consemnați motivul facturării peste valoarea programată"
+    },
+    "pay_app_line_negative": {
+      "fail": "Linia {line} ar totaliza {completed} până acum, adică sub zero"
+    },
+    "pay_app_within_agreement": {
+      "fail": "Situațiile de plată însumează {billed}, peste valoarea contractului plus modificările aprobate de {limit}"
+    },
+    "pay_app_correct": {
+      "suggestion": "Corectați sumele acestei situații de plată sau măriți valoarea contractului printr-o modificare aprobată"
+    },
+    "required_documents": {
+      "fail": "Document necesar: {document} ({state})",
+      "suggestion": "Atașați documentul, semnat și valabil, la contractul de subcontractare",
+      "states": {
+        "missing": "lipsește",
+        "unsigned": "nesemnat",
+        "expired": "expirat"
+      }
+    },
+    "document_roles": {
+      "terms_and_conditions": "Termeni și condiții",
+      "safety_agreement": "Acord de securitate",
+      "safety_plan": "Plan de securitate",
+      "insurance": "Asigurare",
+      "method_statement": "Metodă de execuție",
+      "other": "Alt document"
     }
   },
   "submittal": {
@@ -2014,6 +2051,510 @@
     "crew_without_record": {
       "fail": "O echipă de {headcount} persoane era pe șantier, dar nu sunt consemnate lucrări, inspecții sau întârzieri.",
       "suggestion": "Adăugați ce a făcut echipa sau întârzierea care a oprit lucrările."
+    }
+  },
+  "framework_agreement": {
+    "item_not_in_agreement": {
+      "fail": "Rândul {code} nu este un articol activ al acordului {agreement}; înregistrați-l ca lucrare suplimentară.",
+      "suggestion": "Eliminați rândul din comandă și înregistrați lucrarea ca suplimentar la comandă."
+    },
+    "rate_deviates": {
+      "fail": "Prețul {rate} al rândului {code} diferă de prețul din acord {expected}.",
+      "suggestion": "Prețurile din comandă provin din acordul-cadru; reprețuiți rândul din lista de prețuri."
+    },
+    "order_outside_validity": {
+      "fail": "Data comenzii {date} este în afara perioadei acordului, de la {from} la {to}.",
+      "suggestion": "Datați comanda în perioada de valabilitate sau prelungiți întâi acordul."
+    },
+    "rate_period_gap": {
+      "fail": "Nicio perioadă de prețuri nu acoperă {date}.",
+      "suggestion": "Adăugați o perioadă de prețuri care acoperă această dată în fila Prețuri și indexare."
+    },
+    "escalation_unresolved": {
+      "fail": "Indicele {series} nu are valoare pentru {period}; prețul nu poate fi ajustat.",
+      "suggestion": "Introduceți valoarea indicelui pentru luna respectivă în Indicele prețurilor și reprețuiți comanda."
+    },
+    "cap_exceeded": {
+      "fail": "Această comandă duce acordul la {total} dintr-un plafon de {cap}; disponibil {headroom}.",
+      "suggestion": "Reduceți comanda la disponibilul rămas sau emiteți-o cu o derogare motivată."
+    },
+    "cap_threshold": {
+      "fail": "Utilizarea acordului a atins {pct} % din plafon.",
+      "suggestion": "Anunțați clientul din timp, pentru a pregăti un acord ulterior."
+    },
+    "item_max_qty": {
+      "fail": "Articolul {code}: {qty} comandate până acum, depășind maximul declarat {max}.",
+      "suggestion": "Conveniți cu clientul cantitatea suplimentară înainte de următoarea comandă."
+    },
+    "min_at_risk": {
+      "fail": "Au rămas {days} zile și {pct} % din minimul garantat este comandat.",
+      "suggestion": "Discutați cu clientul despre deficit cât mai există timp pentru comandă."
+    },
+    "currency_mismatch": {
+      "fail": "Moneda comenzii {cur} diferă de moneda acordului {agr}.",
+      "suggestion": "Comenzile se prețuiesc în moneda acordului."
+    },
+    "adjustment_unknown": {
+      "fail": "Condiția {tag} nu are o ajustare în acest acord.",
+      "suggestion": "Adăugați ajustarea în fila Condiții sau eliminați condiția din comandă."
+    },
+    "direct_claim": {
+      "fail": "Pretențiile se înregistrează pe comenzi subsecvente, nu pe acordul-cadru.",
+      "suggestion": "Deschideți comanda sub care s-a executat lucrarea și înregistrați pretenția acolo."
+    },
+    "duplicate_item": {
+      "fail": "Codul articolului {code} apare de două ori în perioada de prețuri {period}.",
+      "suggestion": "Păstrați un singur rând pentru fiecare cod de articol înainte de a salva lista de prețuri."
+    },
+    "measured_over_ordered": {
+      "fail": "Cantitatea măsurată {m} depășește cantitatea comandată {o} la rândul {code}; luați în calcul un suplimentar.",
+      "suggestion": "Înregistrați cantitatea suplimentară ca modificare a comenzii."
+    },
+    "term_over_legal_max": {
+      "fail": "Durata de {years} ani depășește limita de {max} ani din {source} (pachet).",
+      "suggestion": "Verificați durata cu clientul; limita este indicată de pachet, dar nu este impusă."
+    }
+  },
+  "estimate_archive": {
+    "arc_hash_mismatch": {
+      "fail": "Amprenta nu corespunde: înregistrarea dă {actual}, sigiliul indică {sealed}. Considerați înregistrarea modificată."
+    },
+    "arc_total_mismatch": {
+      "fail": "Totalul sigilat {seal} diferă de atribuire {award} cu {diff}."
+    },
+    "arc_no_breakdown": {
+      "fail": "{n} articole nu au defalcare pe resurse; prețurile lor nu vor putea fi urmărite."
+    },
+    "arc_no_markups": {
+      "fail": "Devizul nu are adaosuri de sigilat."
+    },
+    "arc_sealed_after_signing": {
+      "fail": "Sigilat la {days} zile după semnarea contractului."
+    },
+    "arc_no_receipt": {
+      "fail": "Contrapartea nu a confirmat încă amprenta."
+    },
+    "arc_open_not_closed": {
+      "fail": "Deschiderea {id} este în curs de {days} zile fără proces-verbal."
+    },
+    "arc_open_no_reason": {
+      "fail": "O deschidere necesită un motiv și o referință."
+    },
+    "arc_open_one_party": {
+      "fail": "Este indicată o singură parte; consemnați de ce lipsește cealaltă."
+    },
+    "var_basis_no_seal": {
+      "fail": "Articolul {code} este evaluat pe baza inițială, dar nu există deviz sigilat."
+    },
+    "var_basis_deviation": {
+      "fail": "Articolul {code}: {field} modificat din {old} în {new} fără notă."
+    },
+    "var_new_resource_no_evidence": {
+      "fail": "Resursa nouă {res} nu are dată de preț sau referință de ofertă."
+    },
+    "var_markup_not_sealed": {
+      "fail": "Articolul {code} aplică adaosul {m}, care nu este în sigiliu."
+    },
+    "var_abnormal_carried_rate": {
+      "fail": "Costul preluat {c} se abate cu {pct} % de la referință."
+    },
+    "arc_mutation_refused": {
+      "fail": "Un deviz sigilat nu poate fi modificat sau șters. Sigilați o versiune nouă care îl înlocuiește."
+    },
+    "contents_locked": "Conținutul rămâne sigilat până începe o deschidere formală.",
+    "market_off": "Devizele sigilate nu fac parte din profilul de piață al acestui proiect.",
+    "contract_required": "Este necesar un contract cu clientul înainte de sigilarea devizului ca bază a contractului."
+  },
+  "boq_revision": {
+    "superseded_still_editable": {
+      "fail": "Revizia {label} poate fi încă editată deși între timp a fost creată {later}; modificările făcute aici nu se transferă",
+      "suggestion": "Blocați {label} pentru a o îngheța sau continuați în cea mai recentă revizie"
+    }
+  },
+  "schedule_baseline": {
+    "single_approved": {
+      "fail": "Acest grafic are mai multe planuri de referință aprobate ({baselines}).",
+      "suggestion": "Aprobați planul de referință care trebuie să se aplice; aprobarea unuia retrage aprobarea celorlalte."
+    }
+  },
+  "project_catalogue": {
+    "unit_present": {
+      "fail": "Tariful {code} nu are unitate de măsură.",
+      "suggestion": "Introduceți unitatea la care se referă prețul, de exemplu m2, m3 sau h."
+    },
+    "duplicate_code": {
+      "fail": "Codul {code} este folosit de mai multe tarife în acest proiect.",
+      "suggestion": "Păstrați un tarif pe cod sau dați variantei un cod propriu."
+    },
+    "currency_differs": {
+      "fail": "Tariful {code} este în {currency}, dar proiectul este evaluat în {project_currency}.",
+      "suggestion": "Convertiți tariful în moneda proiectului sau confirmați că moneda străină este intenționată."
+    },
+    "override_far": {
+      "fail": "Tariful local pentru {code} diferă cu {percent} % de tariful sursă {source_rate}.",
+      "suggestion": "Verificați dacă virgula zecimală s-a deplasat sau notați de ce proiectul are nevoie de alt preț."
+    },
+    "source_changed": {
+      "fail": "Tariful sursă pentru {code} s-a schimbat de la {old} la {new} de când proiectul l-a copiat.",
+      "suggestion": "Preluați noul tarif sursă sau păstrați în mod deliberat tariful local."
+    }
+  },
+  "schedule_mspdi_import": {
+    "task_dates": {
+      "missing_dates": "Sarcina {ref} „{name}” nu are dată de început sau de sfârșit.",
+      "finish_before_start": "Sarcina {ref} „{name}” se termină ({finish}) înainte să înceapă ({start}).",
+      "suggestion": "Corectați datele în graficul sursă și exportați-l din nou. Datele nu sunt niciodată ghicite la import."
+    },
+    "unique_ids": {
+      "duplicate_uid": "ID-ul de sarcină {ref} apare de mai multe ori; se păstrează doar prima sarcină.",
+      "suggestion": "Dați fiecărei sarcini un ID unic în graficul sursă."
+    },
+    "links_resolve": {
+      "dangling_link": "Sarcina {ref} „{name}”: predecesorul {predecessor} nu este în fișier, legătura este omisă.",
+      "duplicate_link": "Sarcina {ref} \"{name}\": o a doua legătură de la predecesorul {predecessor} este omisă, se păstrează o legătură pe pereche.",
+      "self_link": "Sarcina {ref} „{name}” este legată de ea însăși, legătura este omisă.",
+      "unknown_link_type": "Sarcina {ref} „{name}”: tipul de legătură {type} este necunoscut și se citește ca sfârșit-început.",
+      "suggestion": "Verificați legăturile logice în graficul sursă."
+    },
+    "values_in_range": {
+      "percent_out_of_range": "Sarcina {ref} „{name}”: {value}% finalizat este în afara intervalului 0-100 și este limitat.",
+      "outline_gap": "Sarcina {ref} „{name}” sare un nivel de structură ({level}); este plasată sub cea mai apropiată sarcină rezumat de deasupra.",
+      "suggestion": "Verificați % finalizat și indentarea în graficul sursă."
+    },
+    "calendar_work_days": {
+      "calendar_no_work_days": "Calendarul {calendar} nu are nicio zi lucrătoare.",
+      "suggestion": "Marcați zilele lucrătoare ale acestui calendar în graficul sursă."
+    }
+  },
+  "schedule_pdf_import": {
+    "no_text_layer": {
+      "fail": "PDF-ul nu are strat de text, tabelul nu poate fi citit.",
+      "suggestion": "Exportați graficul ca XML MS Project, XER sau Excel și importați acel fișier."
+    },
+    "dates_parsed": {
+      "fail": "Rândul {row}: un început sau un sfârșit nu este o dată.",
+      "suggestion": "Verificați coloanele de dată și ordinea zi/lună sau corectați data în sursă."
+    },
+    "finish_before_start": {
+      "fail": "Rândul {row}: sfârșitul este înaintea începutului.",
+      "suggestion": "Corectați datele în graficul sursă."
+    },
+    "duration_mismatch": {
+      "fail": "Rândul {row}: durata tipărită diferă de zilele lucrătoare dintre început și sfârșit.",
+      "suggestion": "Datele se păstrează; verificați coloana de durată și calendarul proiectului."
+    },
+    "unique_ids": {
+      "fail": "Rândul {row}: ID-ul activității este folosit de alt rând.",
+      "suggestion": "Dați fiecărei activități un ID unic în graficul sursă."
+    },
+    "links_resolve": {
+      "fail": "Rândul {row}: un predecesor nu este o activitate din tabel.",
+      "suggestion": "Verificați coloana de predecesori; legăturile nerezolvate sunt omise."
+    }
+  },
+  "commercial_control": {
+    "ok": "Verificat, fără probleme",
+    "cvr": {
+      "target_rate_basis": {
+        "fail": "{missing} din {total} articole evaluate nu au preț țintă și sunt bugetate la prețul de vânzare (de exemplu {sample})",
+        "suggestion": "Introduceți costul țintă la aceste articole, ca bugetul să fie costul impus șantierului"
+      },
+      "unmapped_cost": {
+        "fail": "{kind} {label} nu are WBS sau cod de cost: angajat {committed}, realizat {actual}",
+        "suggestion": "Alocați linia de comandă, subcontractul sau factura unui element WBS ca CVR să o poată încadra"
+      }
+    },
+    "procurement": {
+      "line_over_committed": {
+        "fail": "Articolul {ordinal} este supraangajat: comandat {committed_qty} din {budget_qty}, {committed_value} față de un buget de {budget_value}",
+        "suggestion": "Verificați o comandă dublă sau înregistrați o modificare ori un transfer de buget înainte de a angaja mai mult"
+      }
+    },
+    "approval_routes": {
+      "bands_contiguous": {
+        "gap": {
+          "fail": "Sumele de la {low} până la {high} nu ajung la niciun aprobator (pasul {step})",
+          "suggestion": "Extindeți o bandă vecină sau adăugați un pas ca fiecare sumă să aibă aprobator"
+        },
+        "overlap": {
+          "fail": "Pasul {step} se suprapune cu o bandă inferioară de la {low} până la {high}; ambii aprobatori semnează aceste sume",
+          "suggestion": "Faceți ca fiecare bandă să înceapă unde se termină cea anterioară, dacă nu trebuie să semneze amândoi"
+        },
+        "empty": {
+          "fail": "Pasul {step} are o bandă de la {low} la {high} care nu conține nicio sumă",
+          "suggestion": "Setați minimul sub maxim sau lăsați maximul gol pentru nicio limită"
+        }
+      }
+    },
+    "valuation": {
+      "assessed_within_submitted": {
+        "fail": "Linia {line}: cantitatea evaluată {assessed} depășește cea depusă {submitted}",
+        "suggestion": "Evaluați cel mult cât s-a depus și înregistrați lucrările suplimentare ca modificare"
+      },
+      "certified_within_assessed": {
+        "fail": "Linia {line}: cantitatea certificată {certified} depășește cea evaluată {assessed}",
+        "suggestion": "Certificați cel mult cât s-a evaluat sau reevaluați mai întâi linia"
+      }
+    }
+  },
+  "norm_base": {
+    "code_present": {
+      "fail": "Linia {ordinal} nu citează niciun cod de normă {base}. Un deviz pe norme citează o normă pe fiecare linie.",
+      "suggestion": "Introduceți codul normei în clasificarea {classification} a liniei."
+    },
+    "code_shape": {
+      "fail": "„{code}” pe linia {ordinal} nu este un cod {base}. Se așteaptă un cod precum {example}."
+    },
+    "legacy_prefix": {
+      "fail": "„{code}” pe linia {ordinal} folosește prefixul retras {old}. Codul în vigoare este {new}."
+    },
+    "resource_breakdown": {
+      "fail": "Linia de normă {code} nu are ore de manoperă sau nu are categoria medie.",
+      "suggestion": "Adăugați resursa de manoperă cu orele pe unitate și categoria medie a normei."
+    },
+    "grade_range": {
+      "fail": "Categoria {grade} pe linia {ordinal} este în afara intervalului {min}–{max} sau nu în pași de {step}."
+    }
+  },
+  "public_funding": {
+    "markup_cap": {
+      "fail": "{funding}: {markup} este {percent} %, plafonul este {cap} % din costurile directe ({source}).",
+      "suggestion": "Reduceți cota la plafon sau setați finanțarea privată dacă lucrările nu sunt plătite din fonduri publice."
+    },
+    "investor_exact": {
+      "fail": "Devizul beneficiarului din {funding}: {markup} trebuie să fie exact {cap} % ({source})."
+    },
+    "material_price_evidence": {
+      "fail": "{funding}: materialul {material} pe linia {ordinal} are {count} din {required} oferte de preț și nicio analiză de preț.",
+      "suggestion": "Înregistrați ofertele furnizorilor pentru material sau atașați raportul de analiză a prețurilor."
+    }
+  },
+  "vat_rate": {
+    "standard_rate": {
+      "fail": "{markup} este {percent} %; cota standard de TVA în {country} este {rate} %.",
+      "suggestion": "Setați linia de taxă la cota standard sau notați în deviz de ce se aplică altă cotă sau o scutire."
+    }
+  },
+  "survey": {
+    "no_crs": {
+      "fail": "Setul de puncte {name} nu are sistem de coordonate: declarați un EPSG sau o rețea locală înainte de volume sau parcele.",
+      "suggestion": "Setați sistemul de coordonate al proiectului, apoi indicați în ce sistem a fost măsurat fișierul."
+    },
+    "crs_unconfirmed": {
+      "fail": "Sistem de coordonate detectat automat (încredere {confidence}); confirmați înainte de utilizare.",
+      "suggestion": "Deschideți Setare sistem de coordonate al proiectului și confirmați sistemul detectat sau alegeți altul."
+    },
+    "duplicate_point": {
+      "fail": "Număr de punct {point_id} duplicat cu coordonate diferite.",
+      "suggestion": "Păstrați o singură citire: ștergeți setul cu cea greșită și importați-l din nou."
+    },
+    "traverse_misclosure": {
+      "fail": "Drumuirea {name} se închide la 1:{r}, sub minimul profilului 1:{min}.",
+      "suggestion": "Căutați o greșeală grosolană pe laturi, remăsurați latura cea mai slabă sau confirmați valoarea profilului."
+    },
+    "level_misclosure": {
+      "fail": "Neînchiderea nivelmentului {f} mm depășește k·√km cu k = {k} mm.",
+      "suggestion": "Refaceți nivelmentul sau verificați cotele reperelor folosite."
+    }
+  },
+  "volumes": {
+    "no_overlap": {
+      "fail": "Cele două suprafețe se suprapun doar pe {p} % din zonă: volumul nu are sens.",
+      "suggestion": "Verificați că ambele suprafețe sunt în același sistem de coordonate și acoperă același teren."
+    },
+    "low_coverage": {
+      "fail": "Doar {c} % din zonă are date în ambele suprafețe (minim {min} %).",
+      "suggestion": "Adăugați puncte unde lipsește o suprafață sau restrângeți conturul la zona acoperită."
+    },
+    "coarse_scan": {
+      "fail": "O scanare grosieră (LOA10) alimentează acest volum fără motiv declarat.",
+      "suggestion": "Folosiți o scanare de precizie topografică sau scrieți de ce aceasta ajunge."
+    },
+    "bank_volume": {
+      "fail": "Cantitatea este volum în stare naturală (în teren); coeficientul de afânare nu este aplicat.",
+      "suggestion": "Trimiteți săpătura afânată dacă articolul din antemăsurătoare se măsoară afânat."
+    }
+  },
+  "setting_out": {
+    "stake_off": {
+      "fail": "Punctul trasat {id} deviază {d} mm, toleranță {t} mm",
+      "suggestion": "Trasați din nou punctul și înregistrați-l sau creați o ciornă NCR."
+    },
+    "record_untraceable": {
+      "fail": "Înregistrarea de trasare {id} nu are instrument sau puncte de sprijin.",
+      "suggestion": "Introduceți instrumentul și punctele de sprijin ale stației."
+    },
+    "sheet": {
+      "title": "Fișă de trasare",
+      "project": "Proiect",
+      "crs": "Sistem de coordonate",
+      "request": "Cerere",
+      "tolerance": "Toleranță",
+      "element": "Element de construcție",
+      "generated": "Generat",
+      "point": "Punct",
+      "design_e": "E proiect",
+      "design_n": "N proiect",
+      "design_z": "Z proiect",
+      "measured_e": "E măsurat",
+      "measured_n": "N măsurat",
+      "verdict": "Rezultat",
+      "by": "Măsurat de",
+      "verdict_pass": "Conform",
+      "verdict_fail": "Neconform",
+      "verdict_open": "Deschis",
+      "verdict_no_tolerance": "Fără profil",
+      "counts": "Conform: {passed} · Neconform: {failed} · Deschis: {open}",
+      "findings": "Constatări",
+      "no_profile": "Fără profil, setați unul",
+      "d": "d (mm)",
+      "dz": "dZ (mm)"
+    }
+  },
+  "land_parcels": {
+    "area_mismatch": {
+      "fail": "Parcela {id}: suprafața calculată {a} m2 diferă de cea din acte {l} m2 cu mai mult decât toleranța ({t}).",
+      "suggestion": "Verificați punctele de contur cu extrasul din registru sau notați de ce diferă suprafețele."
+    },
+    "ring_invalid": {
+      "fail": "Parcela {id}: contur neînchis sau care se autointersectează.",
+      "suggestion": "Corectați punctele de contur astfel încât să ocolească parcela o singură dată fără să se intersecteze."
+    },
+    "zone_not_acquired": {
+      "fail": "Zona de lucru se suprapune cu parcela {id} încă neachiziționată ({area} m2).",
+      "suggestion": "Achiziționați parcela sau stabiliți accesul înainte de începerea lucrărilor, sau mutați zona de lucru."
+    },
+    "overlap": {
+      "fail": "Parcelele {a} și {b} se suprapun pe {area} m2.",
+      "suggestion": "Corectați limita comună astfel încât ambele parcele să folosească aceleași puncte."
+    },
+    "gap": {
+      "fail": "Spațiu de {gap} m între parcelele {a} și {b}.",
+      "suggestion": "Folosiți aceleași puncte de contur la ambele parcele sau confirmați că fâșia aparține altei parcele."
+    },
+    "id_format": {
+      "fail": "Numărul {id} nu respectă formatul {label} (de exemplu {example}).",
+      "suggestion": "Copiați numărul exact cum îl scrie registrul."
+    },
+    "pdf": {
+      "title": "Lista parcelelor",
+      "project": "Proiect",
+      "crs": "Sistem de coordonate",
+      "method": "Metodă",
+      "method_value": "Suprafață din coordonatele conturului (formula lui Gauss), rotunjită la {decimals} zecimale, m2",
+      "printed": "Tipărit de",
+      "legal": "Suprafață din acte (m2)",
+      "computed": "Calculată (m2)",
+      "diff": "Diferență (m2)",
+      "status": "Stare",
+      "rights": "Drepturi",
+      "cost": "Cost total",
+      "findings": "Constatări",
+      "total": "Total, {count} parcele",
+      "acquired_of": "Achiziționate {acquired} din {total}",
+      "findings_title": "Constatări",
+      "no_findings": "Nicio constatare.",
+      "disclaimer": "Proprietarii și drepturile sunt afișate așa cum sunt înregistrate în acest proiect. Lista nu este o opinie juridică și nici un extras de carte funciară.",
+      "status_needed": "Necesară",
+      "status_negotiating": "Negociere",
+      "status_acquired": "Achiziționată",
+      "status_expropriation": "Expropriere"
+    }
+  },
+  "monitoring": {
+    "crossed": {
+      "fail": "Punctul {id}: deplasare {d} mm sau viteză {r} mm/day a depășit {level}",
+      "suggestion": "Verificați punctul și structura, apoi confirmați alerta cu o notă."
+    },
+    "level": {
+      "ok": "Normal",
+      "alert": "Alertă",
+      "action": "Acțiune",
+      "alarm": "Alarmă"
+    },
+    "risk": {
+      "title": "Punct de monitorizare {id} la {level}",
+      "description": "Deplasare {d} mm, viteză {r} mm/day față de {profile}. Ciorna a fost deschisă de monitorizare: verificați-o și desemnați un responsabil."
+    },
+    "report": {
+      "title": "Raport de alarme de monitorizare",
+      "project": "Proiect",
+      "crs": "Sistem de coordonate",
+      "profile": "Profil de praguri",
+      "generated": "Generat",
+      "point": "Punct",
+      "baseline": "Valoare inițială (m)",
+      "latest": "Ultima (m)",
+      "displacement": "Deplasare (mm)",
+      "rate": "Viteză (mm/day)",
+      "level": "Nivel",
+      "acknowledged": "Confirmat",
+      "counts": "Alarmă: {alarm} · Acțiune: {action} · Alertă: {alert} · Normal: {ok}",
+      "findings": "Constatări",
+      "no_profile": "Niciun profil, setați unul",
+      "ack_yes": "Da",
+      "ack_no": "Nu"
+    }
+  },
+  "stockpiles": {
+    "density_assumed": {
+      "fail": "Densitatea este presupusă, nu măsurată: tonele sunt la fel de sigure ca această estimare.",
+      "suggestion": "Cântăriți o probă sau luați densitatea din avizele furnizorului."
+    },
+    "variance_high": {
+      "fail": "Măsurătoarea diferă de stocul contabil cu {v} %, peste toleranța de {t} %.",
+      "suggestion": "Verificați densitatea și suprafața de bază, apoi propuneți o ajustare și confirmați-o dacă diferența e reală."
+    }
+  },
+  "mine_survey": {
+    "compliance_outside": {
+      "fail": "Conformitatea perioadei, {c} %, este în afara intervalului {lo}-{hi} %.",
+      "suggestion": "Verificați planul și măsurătoarea și explicați diferența în nota perioadei înainte de situația de lucrări."
+    },
+    "truck_differs": {
+      "fail": "Tonele din numărarea camioanelor diferă cu {v} % de tonele măsurate, peste verificarea de {t} %.",
+      "suggestion": "Verificați încărcătura pe cursă și densitatea, apoi comparați din nou cele două suprafețe."
+    }
+  },
+  "hongkong": {
+    "sopo_applicability": {
+      "fail": "Contractul intră sub Cap. 652 (Security of Payment): răspuns în 30 de zile, plată în 60 de zile de la cerere"
+    },
+    "sopo_private_scope_check": {
+      "fail": "Un contract privat intră sub Cap. 652 doar pentru o clădire nouă sau lucrări cu aprobarea Building Authority: confirmați domeniul"
+    },
+    "sopo_response_late": {
+      "fail": "Nu s-a comunicat niciun răspuns de plată până la {date}: suma cerută este contestată și poate merge la adjudecare"
+    },
+    "sopo_payment_term_exceeds_60": {
+      "fail": "Termenul de plată de {n} zile depășește cele 60 de zile permise de Cap. 652"
+    },
+    "sopo_response_term_exceeds_30": {
+      "fail": "Termenul de răspuns de {n} zile depășește cele 30 de zile permise de Cap. 652"
+    },
+    "sopo_adjudication_window": {
+      "fail": "A apărut un litigiu de plată: comunicați notificarea de adjudecare până la {date}"
+    },
+    "contract_pay_when_paid": {
+      "fail": "Clauză pay-when-paid: Cap. 652 face plata condiționată inaplicabilă"
+    },
+    "levy_missing": {
+      "fail": "Lucrările depășesc HK$3,000,000, dar devizul nu are taxa CIC (0,5%) sau taxa CWR (0,03%)"
+    },
+    "levy_below_threshold": {
+      "fail": "Lucrările nu depășesc HK$3,000,000: nu se datorează taxă CIC sau CWR"
+    },
+    "tax_nonzero": {
+      "fail": "Se aplică o linie de TVA sau GST, dar Hong Kong nu are această taxă: setați zero"
+    },
+    "retention_over_limit": {
+      "fail": "Reținerea de {x} depășește limita contractuală de {limit}"
+    },
+    "pc_sum_no_attendance": {
+      "fail": "O sumă prime cost nu are poziții de profit și asistență"
+    },
+    "index_attribution": {
+      "fail": "Indicele de prețuri ArchSD nu are sursa: menționați Architectural Services Department"
     }
   }
 }

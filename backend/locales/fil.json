@@ -1644,7 +1644,8 @@
         "no_rejections": "Walang tinanggihan.",
         "sig_delivered_by": "Inihatid ni",
         "counterparty_tax_id": "Tax ID",
-        "counterparty_address": "Address"
+        "counterparty_address": "Address",
+        "delivery_address": "Address ng paghahatid"
       },
       "labels": {
         "po_status": {
@@ -1717,7 +1718,8 @@
         "gross_settled": "Kabuuang halagang nabayaran",
         "no_withholding": "Walang ibinawas sa pagbabayad na ito.",
         "counterparty_tax_id": "Tax ID",
-        "counterparty_address": "Address"
+        "counterparty_address": "Address",
+        "supply_date": "Petsa ng paghahatid"
       },
       "labels": {
         "invoice_status": {
@@ -1786,6 +1788,81 @@
         "col_min": "Pinakamababa",
         "col_max": "Pinakamataas",
         "col_count": "Mga reading"
+      }
+    },
+    "gantt_pdf": {
+      "strings": {
+        "title": "Iskedyul (Gantt chart)",
+        "project": "Proyekto",
+        "schedule": "Iskedyul",
+        "baseline": "Baseline",
+        "no_baseline": "wala",
+        "exported": "Na-export",
+        "data_date": "Petsa ng datos",
+        "col_wbs": "WBS",
+        "col_activity": "Gawain",
+        "col_start": "Simula",
+        "col_finish": "Tapos",
+        "col_duration": "Araw",
+        "legend_current": "Kasalukuyang plano",
+        "legend_progress": "Progreso",
+        "legend_critical": "Critical path",
+        "legend_baseline": "Baseline na plano",
+        "legend_actual": "Aktwal",
+        "legend_milestone": "Milestone",
+        "legend_summary": "Buod",
+        "week_short": "L{n}",
+        "quarter_short": "Q{n}",
+        "sheet_of": "Pahina {page} ng {total}",
+        "no_activities": "Wala pang gawain ang iskedyul na ito."
+      }
+    },
+    "contracts": {
+      "strings": {
+        "doc_title": "Kontrata",
+        "col_code": "Code",
+        "col_title": "Pamagat",
+        "col_type": "Uri ng kontrata",
+        "col_role": "Panig ng kontrata",
+        "col_counterparty": "Katapat na partido",
+        "col_original_value": "Orihinal na halaga",
+        "col_total_value": "Halaga ng kontrata",
+        "col_retention": "Retention",
+        "col_start": "Petsa ng simula",
+        "col_end": "Petsa ng pagtatapos",
+        "col_signed": "Petsa ng lagda",
+        "line_code": "Code",
+        "line_description": "Paglalarawan",
+        "line_unit": "Yunit",
+        "line_quantity": "Dami",
+        "line_unit_rate": "Halaga kada yunit",
+        "lines": "Schedule of values",
+        "signer_company": "Para sa kompanya"
+      },
+      "labels": {
+        "status": {
+          "draft": "Draft",
+          "active": "Aktibo",
+          "suspended": "Nakasuspinde",
+          "completed": "Tapos na",
+          "terminated": "Winakasan"
+        },
+        "type": {
+          "lump_sum": "Lump sum",
+          "gmp": "GMP",
+          "cost_plus": "Cost plus",
+          "tm": "Time and materials",
+          "unit_price": "Unit price",
+          "design_build": "Design and build",
+          "combination": "Kombinasyon",
+          "remeasurement": "Remeasurement",
+          "framework": "Framework",
+          "call_off": "Call-off"
+        },
+        "party": {
+          "client": "Kontrata sa kliyente",
+          "subcontractor": "Subkontrata"
+        }
       }
     }
   },
@@ -2076,7 +2153,11 @@
       "notifications.portal.message_received.title": "Bagong mensahe sa portal",
       "notifications.portal.message_received.body": "Nagpadala ng mensahe si {buyer_name}.",
       "dispatch.notify.plan_title": "Your daily plan is ready",
-      "dispatch.notify.plan_body": "Plan for {day}: {lines} lines."
+      "dispatch.notify.plan_body": "Plan for {day}: {lines} lines.",
+      "notifications.monitoring.alert.title": "Babala ng monitoring",
+      "notifications.monitoring.action.title": "Antas ng aksyon sa monitoring",
+      "notifications.monitoring.alarm.title": "Alarma ng monitoring",
+      "notifications.monitoring.crossed.body": "Punto {point}: {displacement} mm, {rate} mm/day."
     },
     "schedule_headers": {
       "headers": {
@@ -2709,5 +2790,30 @@
         "gap": "Gap"
       }
     }
-  }
+  },
+  "monitoring.crossed.fail": "Punto {id}: displacement {d} mm o rate {r} mm/araw ang lumampas sa {level}",
+  "monitoring.crossed.suggestion": "Suriin ang punto at ang istruktura, at kumpirmahin ang alerto gamit ang tala.",
+  "monitoring.level.ok": "OK",
+  "monitoring.level.alert": "Babala",
+  "monitoring.level.action": "Aksyon",
+  "monitoring.level.alarm": "Alarma",
+  "monitoring.risk.title": "Punto ng pagmamanman {id} sa {level}",
+  "monitoring.risk.description": "Displacement {d} mm, rate {r} mm/araw laban sa {profile}. Binuksan ng monitoring ang draft: suriin ito at magtalaga ng may-ari.",
+  "monitoring.report.title": "Alarm report ng monitoring",
+  "monitoring.report.project": "Proyekto",
+  "monitoring.report.crs": "Coordinate system",
+  "monitoring.report.profile": "Threshold profile",
+  "monitoring.report.generated": "Nabuo",
+  "monitoring.report.point": "Punto",
+  "monitoring.report.baseline": "Baseline (m)",
+  "monitoring.report.latest": "Pinakahuli (m)",
+  "monitoring.report.displacement": "Displacement (mm)",
+  "monitoring.report.rate": "Rate (mm/araw)",
+  "monitoring.report.level": "Antas",
+  "monitoring.report.acknowledged": "Kinumpirma",
+  "monitoring.report.counts": "Alarma: {alarm} · Aksyon: {action} · Babala: {alert} · OK: {ok}",
+  "monitoring.report.findings": "Mga natuklasan",
+  "monitoring.report.no_profile": "Walang profile, magtakda ng isa",
+  "monitoring.report.ack_yes": "Oo",
+  "monitoring.report.ack_no": "Hindi"
 }

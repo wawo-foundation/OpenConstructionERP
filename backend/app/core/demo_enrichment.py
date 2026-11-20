@@ -231,12 +231,17 @@ async def enrich_projects(project_ids: list[uuid.UUID]) -> dict[str, Any]:
         from app.modules.economics.seed import seed_economics_demo
         from app.modules.einvoice_clearance.seed import seed_einvoice_clearance_demo
         from app.modules.engineering_brief.seed import seed_engineering_brief_demo
+        from app.modules.equipment.rate_seed import seed_rate_catalogue_demo
         from app.modules.equipment.telematics_seed import seed_telematics_demo
+        from app.modules.estimate_archive.seed import seed_estimate_archive_demo
         from app.modules.estimate_basis.seed import seed_estimate_basis_demo
         from app.modules.field_time.clock_seed import seed_field_clock_demo
+        from app.modules.field_time.payroll_seed import seed_payroll_export_demo
         from app.modules.field_time.seed import seed_field_time_demo
+        from app.modules.finance.booking_seed import seed_booking_export_demo
         from app.modules.finance.einvoice_settings_seed import seed_einvoice_settings_demo
         from app.modules.forms.submissions_seed import seed_forms_submissions_demo
+        from app.modules.framework_agreements.seed import seed_framework_agreements_demo
         from app.modules.full_evm.seed import seed_full_evm_demo
         from app.modules.hse_advanced.seed import seed_hse_advanced_demo
         from app.modules.hse_frame.seed import seed_hse_frame_demo
@@ -356,7 +361,11 @@ async def enrich_projects(project_ids: list[uuid.UUID]) -> dict[str, Any]:
 
         # (name, marker model gating a restart-safe skip, coroutine builder).
         # A None marker means the seeder self-guards against duplicates.
+        from app.modules.legal_entities.seed import seed_legal_entities_demo
+
         _module_seeders = [
+            # First: the companies own the projects, so documents seeded below carry the right seller.
+            ("legal_entities", None, lambda s: seed_legal_entities_demo(s, _demo_pids)),
             ("crm", None, lambda s: seed_crm_demo(s)),
             ("service", None, lambda s: seed_service_demo(s, _demo_pids)),
             ("bid_management", None, lambda s: seed_bid_management_demo(s, _demo_pids)),
@@ -370,6 +379,7 @@ async def enrich_projects(project_ids: list[uuid.UUID]) -> dict[str, Any]:
             # seeder guards per project itself now.
             ("schedule_advanced", None, lambda s: seed_schedule_advanced_demo(s, _focus_pids)),
             ("variations", None, lambda s: seed_variations_demo(s, _demo_pids)),
+            ("estimate_archive", None, lambda s: seed_estimate_archive_demo(s, _demo_pids)),
             ("rfq_bidding", None, lambda s: seed_rfq_demo(s, _demo_pids)),
             ("takt", None, lambda s: seed_takt_demo(s, _demo_pids)),
             ("dispatch", None, lambda s: seed_dispatch_demo(s, _demo_pids)),
@@ -379,6 +389,10 @@ async def enrich_projects(project_ids: list[uuid.UUID]) -> dict[str, Any]:
             # boot before this list) so plant hours price off a real rental.
             # Self-guards per project on an existing timesheet.
             ("field_time", None, lambda s: seed_field_time_demo(s, _demo_pids)),
+            # Sample payroll export profiles and payroll references on the seeded workers.
+            ("payroll_export", None, lambda s: seed_payroll_export_demo(s, _demo_pids)),
+            # Sample booking export connector and approved supplier invoices.
+            ("booking_export", None, lambda s: seed_booking_export_demo(s, _demo_pids)),
             # Site geofences and two weeks of clock events for up to three demo
             # projects with a crew, after field time so its seeded approved
             # timesheets exist and the clock adds drafts only. Self-guards per
@@ -386,6 +400,8 @@ async def enrich_projects(project_ids: list[uuid.UUID]) -> dict[str, Any]:
             ("field_clock", None, lambda s: seed_field_clock_demo(s, _demo_pids)),
             # After the clock, so the machines and the fence check use the site fence it drew.
             ("telematics", None, lambda s: seed_telematics_demo(s, _focus_pids or _demo_pids)),
+            # Synthetic plant rate catalogues and the showcase excavator linked to one of them.
+            ("rate_catalogue", None, lambda s: seed_rate_catalogue_demo(s, _demo_pids)),
             ("site_sensors", None, lambda s: seed_site_sensors_demo(s, _focus_pids or _demo_pids)),
             # One payroll export period (overtime, a night shift, locked, exported,
             # posted, one refused edit) on its own week, after field time.
@@ -467,6 +483,7 @@ async def enrich_projects(project_ids: list[uuid.UUID]) -> dict[str, Any]:
             # schedule, of DIN 276 cost groups or Leistungsverzeichnis
             # positions, picked by the trade each contract's title names.
             ("contracts", None, lambda s: seed_contracts_demo(s, _demo_pids)),
+            ("framework_agreements", None, lambda s: seed_framework_agreements_demo(s, _demo_pids)),
             # The cost-value reconciliation register: closed months, the month
             # running, the cashflow curve and the interim applications raised
             # against them. Scales itself from the project's priced bill, so it
@@ -716,6 +733,17 @@ async def enrich_projects(project_ids: list[uuid.UUID]) -> dict[str, Any]:
                         logger.info("cash-flow forecast demo seed: %s rows for %s", _written, _pid)
             except Exception:
                 logger.warning("cash-flow forecast demo seed skipped for %s (non-fatal)", _pid, exc_info=True)
+
+        # One customised invoice template (German and English) for the whole workspace;
+        # skipped once any invoice template exists, so the user's own wording is never touched.
+        try:
+            from app.modules.doc_templates.seed import seed_doc_templates_demo
+
+            async with async_session_factory() as _ds:
+                if await seed_doc_templates_demo(_ds):
+                    await _ds.commit()
+        except Exception:
+            logger.warning("document templates demo seed skipped (non-fatal)", exc_info=True)
 
         # QMS seeds one project at a time and is not internally idempotent; loop
         # the projects, skipping any that already carry an ITP plan so a re-run

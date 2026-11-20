@@ -5,7 +5,7 @@ import { Suspense, lazy, useState, useCallback, useEffect, useLayoutEffect, useC
 import { Routes, Route, Navigate, Outlet, useLocation, useMatch, useParams } from 'react-router-dom';
 import { AppLayout } from './layout';
 import { DashboardPage } from '@/features/dashboard';
-import { LoginPage, RegisterPage, ForgotPasswordPage, ResetPasswordPage, AuthedHome } from '@/features/auth';
+import { LoginPage, RegisterPage, ForgotPasswordPage, ResetPasswordPage, VerifyEmailPage, AuthedHome } from '@/features/auth';
 import { ProjectsPage, CreateProjectPage, ProjectDetailPage, ProjectSettingsPage } from '@/features/projects';
 // Import the lightweight BOQ pages from their source modules directly,
 // NOT via the `@/features/boq` barrel.  The barrel re-exports
@@ -124,6 +124,9 @@ const ReportsPage = lazy(() =>
 );
 const CatalogPage = lazy(() =>
   import('@/features/catalog/CatalogPage').then((m) => ({ default: m.CatalogPage }))
+);
+const ProjectCataloguePage = lazy(() =>
+  import('@/features/project-catalogue').then((m) => ({ default: m.ProjectCataloguePage }))
 );
 const AdvisorPage = lazy(() =>
   import('@/features/ai/AdvisorPage').then((m) => ({ default: m.AdvisorPage }))
@@ -548,11 +551,20 @@ const ResourceLevelingPage = lazy(() =>
 const ContractsPage = lazy(() =>
   import('@/features/contracts').then((m) => ({ default: m.ContractsPage }))
 );
+const FrameworkRegisterPage = lazy(() =>
+  import('@/features/framework-agreements').then((m) => ({ default: m.FrameworkRegisterPage }))
+);
+const FrameworkAgreementPage = lazy(() =>
+  import('@/features/framework-agreements').then((m) => ({ default: m.FrameworkAgreementPage }))
+);
 const PaymentClockPage = lazy(() =>
   import('@/features/payment-clock').then((m) => ({ default: m.PaymentClockPage }))
 );
 const TaxWithholdingPage = lazy(() =>
   import('@/features/tax-withholding').then((m) => ({ default: m.TaxWithholdingPage }))
+);
+const ChinaTaxPage = lazy(() =>
+  import('@/features/china-tax').then((m) => ({ default: m.ChinaTaxPage }))
 );
 const LegalEntitiesPage = lazy(() =>
   import('@/features/legal-entities').then((m) => ({ default: m.LegalEntitiesPage }))
@@ -664,6 +676,10 @@ const PropertyDevDashboardFullView = lazy(() =>
 const BidManagementPage = lazy(() =>
   import('@/features/bid-management').then((m) => ({ default: m.BidManagementPage }))
 );
+const EstimateArchivePage = lazy(() =>
+  import('@/features/estimate-archive').then((m) => ({ default: m.EstimateArchivePage })),
+);
+const SealPage = lazy(() => import('@/features/estimate-archive').then((m) => ({ default: m.SealPage })));
 const WinLossPage = lazy(() => import('@/features/win-loss').then((m) => ({ default: m.WinLossPage })));
 const VariationsPage = lazy(() =>
   import('@/features/variations').then((m) => ({ default: m.VariationsPage }))
@@ -1399,6 +1415,8 @@ export default function App() {
             any link end a session. The page drops the local session itself
             once the reset succeeds. */}
         <Route path="/auth/reset" element={<ResetPasswordPage />} />
+        {/* Sign-up confirmation link (emailed, or copied by an admin from Users). */}
+        <Route path="/auth/verify-email" element={<VerifyEmailPage />} />
 
         {/* Onboarding — full-screen, no layout */}
         <Route path="/onboarding" element={
@@ -1488,6 +1506,7 @@ export default function App() {
         <Route path="/costs/import" element={<P title="Import Cost Database"><ImportDatabasePage /></P>} />
 
         <Route path="/catalog" element={<P title="Resource Catalog"><CatalogPage /></P>} />
+        <Route path="/project-catalogue" element={<P title="Project Catalogue"><ProjectCataloguePage /></P>} />
         <Route path="/cost-explorer" element={<P title="Cost Explorer"><CostExplorerPage /></P>} />
 
         <Route path="/rom-estimate" element={<P title="Conceptual Estimate"><RomEstimatePage /></P>} />
@@ -1839,8 +1858,11 @@ export default function App() {
 
         {/* 18-Modules Wave — Commercial */}
         <Route path="/contracts" element={<P title="Contracts"><ContractsPage /></P>} />
+        <Route path="/framework-agreements" element={<P title="Framework Agreements"><FrameworkRegisterPage /></P>} />
+        <Route path="/framework-agreements/:id" element={<P title="Framework Agreements"><FrameworkAgreementPage /></P>} />
         <Route path="/payment-clock" element={<P title="Payment Clock"><PaymentClockPage /></P>} />
         <Route path="/tax-withholding" element={<P title="Withholding Tax"><TaxWithholdingPage /></P>} />
+        <Route path="/china-tax" element={<P title="China VAT"><ChinaTaxPage /></P>} />
         <Route path="/tax-rates" element={<P title="Tax Rates"><TaxRatesPage /></P>} />
         <Route path="/admin/legal-entities" element={<P title="Legal Entities"><LegalEntitiesPage /></P>} />
         <Route path="/einvoice-clearance" element={<P title="E-invoice Clearance"><EInvoiceClearancePage /></P>} />
@@ -1848,6 +1870,7 @@ export default function App() {
         <Route path="/full-evm" element={<P title="Earned Value"><FullEvmPage /></P>} />
         <Route path="/fx" element={<P title="Currencies"><FxPage /></P>} />
         <Route path="/projects/:projectId/contracts" element={<P title="Contracts"><ContractsPage /></P>} />
+        <Route path="/projects/:projectId/framework-agreements" element={<P title="Framework Agreements"><FrameworkRegisterPage /></P>} />
         <Route path="/projects/:projectId/contracts/claims/:claimId" element={<P title="Progress Claim"><ProgressClaimDetailPage /></P>} />
         <Route path="/subcontractors" element={<P title="Subcontractors"><SubcontractorsPage /></P>} />
         {/* A subcontractor is a company relationship; only the agreement
@@ -1922,6 +1945,8 @@ export default function App() {
             its own register tracks contractual variation instructions with
             day-works, instructions, time-impact analysis. */}
         <Route path="/variations" element={<P title="Variations"><VariationsPage /></P>} />
+        <Route path="/estimate-archive" element={<P title="Sealed estimates"><EstimateArchivePage /></P>} />
+        <Route path="/estimate-archive/:sealId" element={<P title="Sealed estimate"><SealPage /></P>} />
         <Route path="/projects/:projectId/variations" element={<P title="Variations"><VariationsPage /></P>} />
         <Route path="/change-intelligence" element={<P title="Change Intelligence"><ChangeIntelligencePage /></P>} />
         <Route path="/projects/:projectId/change-intelligence" element={<P title="Change Intelligence"><ChangeIntelligencePage /></P>} />

@@ -299,6 +299,10 @@
     "unit_exportable": {
       "fail": "Item {ordinal}: hindi kasya ang unit na '{unit}' sa 4-character na GAEB QU field at mapuputol sa export",
       "suggestion": "Gumamit ng GAEB unit code na hanggang 4 na character (m, m2, m3, St, h, psch, kg, t)"
+    },
+    "short_text_length": {
+      "fail": "Posisyon {ordinal}: ang maikling teksto ay may {length} na karakter; pinuputol ito ng GAEB export sa 70",
+      "suggestion": "Paikliin ang maikling teksto sa 70 karakter at ilagay ang mga detalye sa mahabang teksto"
     }
   },
   "nrm": {
@@ -412,7 +416,10 @@
       "suggestion": "Magtalaga ng 9-digit GB/T 50500 code (halimbawa, 010101001)"
     },
     "valid_code": {
-      "fail": "Hindi wasto ang GB/T 50500 code na '{code}'; inaasahan ang 9 o 12 digit"
+      "fail": "Hindi wasto ang GB/T 50500 code na '{code}'; inaasahan ang 9 o 12 digit o karagdagang code gaya ng 01B001"
+    },
+    "code_unique": {
+      "fail": "Ang item code na '{code}' ay ginamit nang higit sa isang beses sa iisang sub-project"
     }
   },
   "cpwd": {
@@ -931,6 +938,36 @@
     "change_time_within_owner": {
       "fail": "Ang kabuuang epekto sa oras ng mga subcontract para sa {code} ay {sub_days} araw, mas marami kaysa sa {owner_days} araw na ibinigay ng may-ari",
       "suggestion": "Suriin ang mga claim sa oras ng mga subcontractor o humiling sa may-ari ng katumbas na extension"
+    },
+    "pay_app_over_complete": {
+      "fail": "Ang linya {line} ay aabot sa {percent}% ng nakatakdang halaga pagkatapos ng panahong ito ({completed} sa {scheduled})",
+      "suggestion": "Bawasan ang halaga ng panahong ito o itala ang dahilan ng paniningil nang higit sa nakatakdang halaga"
+    },
+    "pay_app_line_negative": {
+      "fail": "Ang linya {line} ay magiging {completed} hanggang ngayon, na mas mababa sa zero"
+    },
+    "pay_app_within_agreement": {
+      "fail": "Ang mga aplikasyon sa bayad ay umaabot sa {billed}, higit sa halaga ng kasunduan at aprubadong pagbabago ({limit})"
+    },
+    "pay_app_correct": {
+      "suggestion": "Ituwid ang mga halaga sa aplikasyon sa bayad na ito o itaas ang halaga ng kasunduan sa pamamagitan ng aprubadong pagbabago"
+    },
+    "required_documents": {
+      "fail": "Kinakailangang dokumento: {document} ({state})",
+      "suggestion": "Ikabit ang dokumento, nilagdaan at may bisa, sa kasunduan sa subkontrata",
+      "states": {
+        "missing": "kulang",
+        "unsigned": "hindi nilagdaan",
+        "expired": "nag-expire na"
+      }
+    },
+    "document_roles": {
+      "terms_and_conditions": "Mga tuntunin at kundisyon",
+      "safety_agreement": "Kasunduan sa kaligtasan",
+      "safety_plan": "Plano sa kaligtasan",
+      "insurance": "Seguro",
+      "method_statement": "Paraan ng paggawa",
+      "other": "Ibang dokumento"
     }
   },
   "submittal": {
@@ -2014,6 +2051,510 @@
     "crew_without_record": {
       "fail": "May grupong {headcount} sa site pero walang naitalang trabaho, inspeksyon, o pagkaantala.",
       "suggestion": "Idagdag ang ginawa ng grupo, o ang pagkaantalang nagpatigil ng trabaho."
+    }
+  },
+  "framework_agreement": {
+    "item_not_in_agreement": {
+      "fail": "Ang linyang {code} ay hindi aktibong item ng kasunduan na {agreement}; itala ito bilang extra.",
+      "suggestion": "Alisin ang linya sa order at itala ang trabaho bilang extra sa order."
+    },
+    "rate_deviates": {
+      "fail": "Ang rate ng linyang {code} na {rate} ay iba sa rate ng kasunduan na {expected}.",
+      "suggestion": "Galing sa kasunduan ang mga rate ng order; i-reprice ang linya mula sa price list."
+    },
+    "order_outside_validity": {
+      "fail": "Ang petsa ng order na {date} ay wala sa termino ng kasunduan mula {from} hanggang {to}.",
+      "suggestion": "Lagyan ng petsa ang order sa loob ng termino, o palawigin muna ang kasunduan."
+    },
+    "rate_period_gap": {
+      "fail": "Walang rate period na sumasaklaw sa {date}.",
+      "suggestion": "Magdagdag ng rate period na sumasaklaw sa petsang ito sa tab na Rates and escalation."
+    },
+    "escalation_unresolved": {
+      "fail": "Walang value ang index na {series} para sa {period}; hindi maisaayos ang rate.",
+      "suggestion": "Ilagay ang index value ng buwang iyon sa Price index, saka i-price muli ang order."
+    },
+    "cap_exceeded": {
+      "fail": "Dadalhin ng order na ito ang kasunduan sa {total} ng {cap} na cap; headroom {headroom}.",
+      "suggestion": "Bawasan ang order hanggang sa headroom, o ilabas ito na may makatwirang override."
+    },
+    "cap_threshold": {
+      "fail": "Naabot na ng paggamit ng kasunduan ang {pct} % ng cap.",
+      "suggestion": "Sabihan nang maaga ang kliyente para maihanda ang kasunod na kasunduan."
+    },
+    "item_max_qty": {
+      "fail": "Item {code}: {qty} na ang naorder hanggang ngayon, lampas sa nakasaad na maximum na {max}.",
+      "suggestion": "Pagkasunduan sa kliyente ang dagdag na dami bago ang susunod na order."
+    },
+    "min_at_risk": {
+      "fail": "{days} na araw na lang at {pct} % ng guaranteed minimum ang naorder na.",
+      "suggestion": "Ipaalam sa kliyente ang kakulangan habang may panahon pa para mag-order."
+    },
+    "currency_mismatch": {
+      "fail": "Ang currency ng order na {cur} ay iba sa currency ng kasunduan na {agr}.",
+      "suggestion": "Ang mga order ay pinepresyuhan sa currency ng kasunduan."
+    },
+    "adjustment_unknown": {
+      "fail": "Ang kondisyong {tag} ay walang adjustment sa kasunduang ito.",
+      "suggestion": "Idagdag ang adjustment sa tab na Conditions, o alisin ang kondisyon sa order."
+    },
+    "direct_claim": {
+      "fail": "Sa call-off order itinataas ang claim, hindi sa kasunduan mismo.",
+      "suggestion": "Buksan ang order kung saan ginawa ang trabaho at doon mag-claim."
+    },
+    "duplicate_item": {
+      "fail": "Lumilitaw nang dalawang beses ang item code na {code} sa rate period na {period}.",
+      "suggestion": "Magtira ng isang row bawat item code bago i-save ang price list."
+    },
+    "measured_over_ordered": {
+      "fail": "Ang sinukat na {m} ay lampas sa naorder na {o} sa linyang {code}; isaalang-alang ang extra.",
+      "suggestion": "Itala ang dagdag na dami bilang variation sa order."
+    },
+    "term_over_legal_max": {
+      "fail": "Ang termino na {years} taon ay lampas sa limitasyong {max} taon ayon sa {source} (pack).",
+      "suggestion": "I-check ang termino sa kliyente; ipinapakita ng pack ang limitasyon pero hindi ito ipinatutupad."
+    }
+  },
+  "estimate_archive": {
+    "arc_hash_mismatch": {
+      "fail": "Hindi tugma ang fingerprint: ang rekord ay {actual}, ang selyo ay {sealed}. Ituring na binago ang rekord."
+    },
+    "arc_total_mismatch": {
+      "fail": "Ang selyadong kabuuan na {seal} ay iba sa award na {award} nang {diff}."
+    },
+    "arc_no_breakdown": {
+      "fail": "{n} item ang walang breakdown ng resources; hindi na masusundan ang mga rate nila."
+    },
+    "arc_no_markups": {
+      "fail": "Walang markup sa estimate na isesely."
+    },
+    "arc_sealed_after_signing": {
+      "fail": "Sinelyuhan {days} araw matapos pirmahan ang kontrata."
+    },
+    "arc_no_receipt": {
+      "fail": "Hindi pa kinikilala ng kabilang panig ang fingerprint."
+    },
+    "arc_open_not_closed": {
+      "fail": "Ang pagbubukas na {id} ay bukas na nang {days} araw nang walang minutes."
+    },
+    "arc_open_no_reason": {
+      "fail": "Kailangan ng dahilan at reference ang pagbubukas."
+    },
+    "arc_open_one_party": {
+      "fail": "Isang panig lang ang nakalista; itala kung bakit wala ang kabila."
+    },
+    "var_basis_no_seal": {
+      "fail": "Ang item {code} ay may presyo batay sa orihinal na basehan, pero walang selyadong estimate."
+    },
+    "var_basis_deviation": {
+      "fail": "Item {code}: binago ang {field} mula {old} tungo {new} nang walang tala."
+    },
+    "var_new_resource_no_evidence": {
+      "fail": "Ang bagong resource na {res} ay walang petsa ng presyo o reference ng quote."
+    },
+    "var_markup_not_sealed": {
+      "fail": "Gumagamit ang item {code} ng markup na {m} na wala sa selyo."
+    },
+    "var_abnormal_carried_rate": {
+      "fail": "Ang dinalang gastos na {c} ay lihis nang {pct} % sa benchmark."
+    },
+    "arc_mutation_refused": {
+      "fail": "Hindi mababago o mabubura ang selyadong estimate. Magselyo ng bagong bersyon na papalit dito."
+    },
+    "contents_locked": "Mananatiling selyado ang nilalaman hanggang magsimula ang pormal na pagbubukas.",
+    "market_off": "Hindi bahagi ng market profile ng proyektong ito ang mga nakaselyong tantiya.",
+    "contract_required": "Kailangan ng kontrata sa kliyente bago ma-seal ang estimate bilang batayan ng kontrata."
+  },
+  "boq_revision": {
+    "superseded_still_editable": {
+      "fail": "Maaari pang i-edit ang rebisyon {label} kahit nagawa na ang {later} pagkatapos nito; hindi madadala ang mga pagbabago rito",
+      "suggestion": "I-lock ang {label} o magpatuloy sa pinakabagong rebisyon"
+    }
+  },
+  "schedule_baseline": {
+    "single_approved": {
+      "fail": "Higit sa isa ang aprubadong baseline ng iskedyul na ito ({baselines}).",
+      "suggestion": "Aprubahan ang baseline na dapat umiral; ang pag-apruba sa isa ay bumabawi sa apruba ng iba."
+    }
+  },
+  "project_catalogue": {
+    "unit_present": {
+      "fail": "Walang yunit ang rate na {code}.",
+      "suggestion": "Ilagay ang yunit kung saan nakapresyo ang rate, gaya ng m2, m3 o oras."
+    },
+    "duplicate_code": {
+      "fail": "Ginagamit ang code na {code} ng higit sa isang rate sa proyektong ito.",
+      "suggestion": "Panatilihin ang isang rate bawat code, o bigyan ang variant ng sariling code."
+    },
+    "currency_differs": {
+      "fail": "Nasa {currency} ang rate na {code}, pero naka-presyo ang proyekto sa {project_currency}.",
+      "suggestion": "I-convert ang rate sa currency ng proyekto, o kumpirmahing sinadya ang dayuhang currency."
+    },
+    "override_far": {
+      "fail": "Ang lokal na rate ng {code} ay {percent} % ang layo sa source rate na {source_rate}.",
+      "suggestion": "Suriin kung nausog ang decimal point, o itala kung bakit kailangan ng proyekto ng ibang presyo."
+    },
+    "source_changed": {
+      "fail": "Nagbago ang source rate ng {code} mula {old} tungong {new} mula nang kopyahin ito ng proyekto.",
+      "suggestion": "Kunin ang bagong source rate, o sadyang panatilihin ang lokal na rate."
+    }
+  },
+  "schedule_mspdi_import": {
+    "task_dates": {
+      "missing_dates": "Walang petsa ng simula o tapos ang gawain {ref} \"{name}\".",
+      "finish_before_start": "Natatapos ({finish}) ang gawain {ref} \"{name}\" bago ito magsimula ({start}).",
+      "suggestion": "Itama ang mga petsa sa pinagmulang iskedyul at i-export itong muli. Hindi kailanman hinuhulaan ang mga petsa sa pag-import."
+    },
+    "unique_ids": {
+      "duplicate_uid": "Lumalabas nang higit sa isang beses ang ID ng gawain na {ref}; ang unang gawain lamang ang pinapanatili.",
+      "suggestion": "Bigyan ang bawat gawain ng natatanging ID sa pinagmulang iskedyul."
+    },
+    "links_resolve": {
+      "dangling_link": "Gawain {ref} \"{name}\": wala sa file ang naunang gawain na {predecessor}, nilaktawan ang link.",
+      "duplicate_link": "Gawain {ref} \"{name}\": nilaktawan ang ikalawang link mula sa predecessor {predecessor}, isang link bawat pares ang itinatago.",
+      "self_link": "Naka-link sa sarili nito ang gawain {ref} \"{name}\", nilaktawan ang link.",
+      "unknown_link_type": "Gawain {ref} \"{name}\": hindi kilala ang uri ng link na {type} at binabasa bilang finish-to-start.",
+      "suggestion": "Suriin ang mga lohikal na link sa pinagmulang iskedyul."
+    },
+    "values_in_range": {
+      "percent_out_of_range": "Gawain {ref} \"{name}\": ang {value}% kumpleto ay labas sa 0-100 at nililimitahan.",
+      "outline_gap": "Lumalaktaw ng isang outline level ({level}) ang gawain {ref} \"{name}\"; inilalagay ito sa ilalim ng pinakamalapit na summary sa itaas.",
+      "suggestion": "Suriin ang % kumpleto at ang indentation sa pinagmulang iskedyul."
+    },
+    "calendar_work_days": {
+      "calendar_no_work_days": "Walang araw ng trabaho ang kalendaryong {calendar}.",
+      "suggestion": "Markahan ang mga araw ng trabaho ng kalendaryong ito sa pinagmulang iskedyul."
+    }
+  },
+  "schedule_pdf_import": {
+    "no_text_layer": {
+      "fail": "Walang text layer ang PDF, kaya hindi mabasa ang talahanayan nito.",
+      "suggestion": "I-export ang iskedyul bilang MS Project XML, XER o Excel at i-import ang file na iyon."
+    },
+    "dates_parsed": {
+      "fail": "Hilera {row}: ang simula o pagtatapos ay hindi petsa.",
+      "suggestion": "Suriin ang mga column ng petsa at ang ayos ng araw/buwan, o itama ang petsa sa pinagmulan."
+    },
+    "finish_before_start": {
+      "fail": "Hilera {row}: ang pagtatapos ay bago ang simula.",
+      "suggestion": "Itama ang mga petsa sa pinagmulang iskedyul."
+    },
+    "duration_mismatch": {
+      "fail": "Hilera {row}: ang nakalimbag na tagal ay iba sa mga araw ng trabaho mula simula hanggang pagtatapos.",
+      "suggestion": "Pinapanatili ang mga petsa; suriin ang column ng tagal at ang kalendaryo ng proyekto."
+    },
+    "unique_ids": {
+      "fail": "Hilera {row}: ginagamit ng ibang hilera ang ID ng aktibidad.",
+      "suggestion": "Bigyan ng natatanging ID ang bawat aktibidad sa pinagmulang iskedyul."
+    },
+    "links_resolve": {
+      "fail": "Hilera {row}: ang isang predecessor ay hindi aktibidad ng talahanayan.",
+      "suggestion": "Suriin ang column ng predecessor; nilalaktawan ang mga link na hindi matukoy."
+    }
+  },
+  "commercial_control": {
+    "ok": "Nasuri, walang isyu",
+    "cvr": {
+      "target_rate_basis": {
+        "fail": "{missing} sa {total} na may presyong item ang walang target rate at naka-budget sa presyo ng benta (halimbawa {sample})",
+        "suggestion": "Ilagay ang target na gastos sa mga item na ito para ang budget ay ang gastos na pinanghahawakan ng site"
+      },
+      "unmapped_cost": {
+        "fail": "Walang WBS o cost code ang {kind} {label}: committed {committed}, aktwal {actual}",
+        "suggestion": "I-book ang order line, subcontract o invoice sa isang WBS element para mailagay ito ng CVR"
+      }
+    },
+    "procurement": {
+      "line_over_committed": {
+        "fail": "Sobra ang commitment sa item {ordinal}: {committed_qty} sa {budget_qty} ang na-order, {committed_value} laban sa budget na {budget_value}",
+        "suggestion": "Suriin kung may dobleng order, o magtala ng variation o budget transfer bago mag-commit pa"
+      }
+    },
+    "approval_routes": {
+      "bands_contiguous": {
+        "gap": {
+          "fail": "Ang mga halagang mula {low} hanggang {high} ay walang naaabot na approver (hakbang {step})",
+          "suggestion": "Palawakin ang katabing band o magdagdag ng hakbang para may approver ang bawat halaga"
+        },
+        "overlap": {
+          "fail": "Nagsasapaw ang hakbang {step} sa mas mababang band mula {low} hanggang {high}, kaya parehong approver ang pipirma sa mga halagang iyon",
+          "suggestion": "Simulan ang bawat band kung saan nagtatapos ang nauna, maliban kung dapat pumirma ang dalawa"
+        },
+        "empty": {
+          "fail": "Ang hakbang {step} ay may band mula {low} hanggang {high} na walang lamang halaga",
+          "suggestion": "Itakda ang minimum na mas mababa sa maximum, o iwanang blangko ang maximum kung walang kisame"
+        }
+      }
+    },
+    "valuation": {
+      "assessed_within_submitted": {
+        "fail": "Linya {line}: ang tinasang dami na {assessed} ay lampas sa isinumiteng {submitted}",
+        "suggestion": "Tasahin nang hindi lalampas sa isinumite at itala ang dagdag na gawa bilang variation"
+      },
+      "certified_within_assessed": {
+        "fail": "Linya {line}: ang sertipikadong dami na {certified} ay lampas sa tinasang {assessed}",
+        "suggestion": "Sertipikahan nang hindi lalampas sa tinasa, o tasahin muna muli ang linya"
+      }
+    }
+  },
+  "norm_base": {
+    "code_present": {
+      "fail": "Walang code ng pamantayang {base} ang linya {ordinal}. Ang tantiyang batay sa pamantayan ay may pamantayan sa bawat linya.",
+      "suggestion": "Ilagay ang code ng pamantayan sa klasipikasyong {classification} ng linya."
+    },
+    "code_shape": {
+      "fail": "Ang \"{code}\" sa linya {ordinal} ay hindi code ng {base}. Inaasahan ang code na tulad ng {example}."
+    },
+    "legacy_prefix": {
+      "fail": "Ang \"{code}\" sa linya {ordinal} ay gumagamit ng retiradong prefix na {old}. Ang kasalukuyang code ay {new}."
+    },
+    "resource_breakdown": {
+      "fail": "Walang oras ng paggawa o karaniwang grado ang linya ng pamantayang {code}.",
+      "suggestion": "Idagdag ang resource ng paggawa kasama ang oras bawat yunit at ang karaniwang grado ng pamantayan."
+    },
+    "grade_range": {
+      "fail": "Ang gradong {grade} sa linya {ordinal} ay labas sa {min} hanggang {max} o hindi pa-{step}."
+    }
+  },
+  "public_funding": {
+    "markup_cap": {
+      "fail": "{funding}: ang {markup} ay {percent} %, ang hangganan ay {cap} % ng direktang gastos ({source}).",
+      "suggestion": "Ibaba ang dagdag hanggang sa hangganan, o itakda sa pribado ang pondo kung walang pampublikong pera ang nagbabayad sa trabaho."
+    },
+    "investor_exact": {
+      "fail": "Tantiya ng may-ari gamit ang {funding}: ang {markup} ay dapat eksaktong {cap} % ({source})."
+    },
+    "material_price_evidence": {
+      "fail": "{funding}: ang materyal na {material} sa linya {ordinal} ay may {count} sa {required} alok na presyo at walang pagsusuri ng presyo.",
+      "suggestion": "Itala ang mga alok ng supplier para sa materyal o ilakip ang ulat ng pagsusuri ng presyo."
+    }
+  },
+  "vat_rate": {
+    "standard_rate": {
+      "fail": "Ang {markup} ay {percent} %; ang karaniwang rate ng VAT sa {country} ay {rate} %.",
+      "suggestion": "Itakda ang linya ng buwis sa karaniwang rate, o itala sa estimate kung bakit ibang rate o exemption ang umiiral."
+    }
+  },
+  "survey": {
+    "no_crs": {
+      "fail": "Walang CRS ang point set na {name}: magtakda ng EPSG o lokal na grid bago ang volume o parcel.",
+      "suggestion": "Itakda ang coordinate system ng proyekto, saka sabihin kung saang system sinukat ang file na ito."
+    },
+    "crs_unconfirmed": {
+      "fail": "Awtomatikong natukoy ang CRS (kumpiyansa {confidence}); kumpirmahin bago gamitin.",
+      "suggestion": "Buksan ang Itakda ang CRS ng proyekto at kumpirmahin ang natukoy na system o pumili ng iba."
+    },
+    "duplicate_point": {
+      "fail": "Dobleng point id {point_id} na may magkaibang coordinate.",
+      "suggestion": "Panatilihin ang isang sukat: burahin ang point set na may mali at i-import ito muli."
+    },
+    "traverse_misclosure": {
+      "fail": "Ang traverse na {name} ay sumasara sa 1:{r}, mas mababa sa minimum ng profile na 1:{min}.",
+      "suggestion": "Suriin ang mga leg para sa malaking mali, sukatin muli ang pinakamahinang leg, o kumpirmahin ang halaga ng profile."
+    },
+    "level_misclosure": {
+      "fail": "Ang misclosure ng leveling na {f} mm ay lampas sa k·√km na may k = {k} mm.",
+      "suggestion": "Ulitin ang leveling o suriin ang taas ng mga benchmark na ginamit."
+    }
+  },
+  "volumes": {
+    "no_overlap": {
+      "fail": "Nagpapatong lang ang dalawang surface sa {p} % ng lugar: walang saysay ang volume.",
+      "suggestion": "Tiyaking nasa iisang coordinate system ang dalawang surface at sakop ang iisang lupa."
+    },
+    "low_coverage": {
+      "fail": "{c} % lang ng lugar ang may datos sa parehong surface (minimum {min} %).",
+      "suggestion": "Magdagdag ng mga punto kung saan walang surface, o paliitin ang hangganan sa saklaw na lugar."
+    },
+    "coarse_scan": {
+      "fail": "Isang magaspang na scan (LOA10) ang pinagmulan ng volume na ito nang walang dahilan.",
+      "suggestion": "Gumamit ng scan na pang-survey ang katumpakan, o isulat kung bakit sapat ang scan na ito."
+    },
+    "bank_volume": {
+      "fail": "Ang dami ay bank volume (nasa lupa); hindi inilapat ang swell factor.",
+      "suggestion": "Ipadala na lang ang maluwag na hukay kung sinusukat ang linya ng BOQ bilang maluwag na materyal."
+    }
+  },
+  "setting_out": {
+    "stake_off": {
+      "fail": "Ang stake {id} ay lihis nang {d} mm, tolerance {t} mm",
+      "suggestion": "I-stake muli ang punto at itala, o gumawa ng NCR draft."
+    },
+    "record_untraceable": {
+      "fail": "Walang instrumento o control point ang stakeout record {id}.",
+      "suggestion": "Ilagay ang instrumento at ang mga control point na pinagtayuan ng istasyon."
+    },
+    "sheet": {
+      "title": "Sheet ng pagtatakda",
+      "project": "Proyekto",
+      "crs": "Sistema ng koordinado",
+      "request": "Kahilingan",
+      "tolerance": "Pinahihintulutang paglihis",
+      "element": "Elemento",
+      "generated": "Ginawa",
+      "point": "Punto",
+      "design_e": "Disenyong E",
+      "design_n": "Disenyong N",
+      "design_z": "Disenyong Z",
+      "measured_e": "Sinukat na E",
+      "measured_n": "Sinukat na N",
+      "verdict": "Resulta",
+      "by": "Sinukat ni",
+      "verdict_pass": "Pasado",
+      "verdict_fail": "Bagsak",
+      "verdict_open": "Bukas",
+      "verdict_no_tolerance": "Walang profile",
+      "counts": "Pasado: {passed} · Bagsak: {failed} · Bukas: {open}",
+      "findings": "Mga natuklasan",
+      "no_profile": "Walang profile, magtakda ng isa",
+      "d": "d (mm)",
+      "dz": "dZ (mm)"
+    }
+  },
+  "land_parcels": {
+    "area_mismatch": {
+      "fail": "Lote {id}: ang kinalkulang sukat na {a} m2 ay naiiba sa sukat sa titulo na {l} m2 nang higit sa tolerance ({t}).",
+      "suggestion": "Suriin ang mga punto ng hangganan laban sa kopya ng rehistro, o itala kung bakit magkaiba ang mga sukat."
+    },
+    "ring_invalid": {
+      "fail": "Lote {id}: hindi sarado ang hangganan o tumatawid sa sarili.",
+      "suggestion": "Ayusin ang mga punto para umikot nang isang beses sa lote nang hindi nagtatawiran."
+    },
+    "zone_not_acquired": {
+      "fail": "Sumasaklaw ang work zone sa loteng {id} na hindi pa nakukuha ({area} m2).",
+      "suggestion": "Kunin ang lote o magkasundo sa pagpasok bago magsimula ang gawain, o ilipat ang work zone."
+    },
+    "overlap": {
+      "fail": "Nagpapatong ang mga lote {a} at {b} nang {area} m2.",
+      "suggestion": "Ayusin ang magkasanib na hangganan para parehong lote ang gumamit ng parehong mga punto."
+    },
+    "gap": {
+      "fail": "Puwang na {gap} m sa pagitan ng mga lote {a} at {b}.",
+      "suggestion": "Gamitin ang parehong mga punto sa dalawang lote, o kumpirmahing ang guhit ay bahagi ng ibang lote."
+    },
+    "id_format": {
+      "fail": "Ang numerong {id} ay hindi tugma sa format na {label} (halimbawa {example}).",
+      "suggestion": "Kopyahin ang numero nang eksakto kung paano ito isinulat ng rehistro."
+    },
+    "pdf": {
+      "title": "Talaan ng lote",
+      "project": "Proyekto",
+      "crs": "Sistema ng coordinate",
+      "method": "Paraan",
+      "method_value": "Sukat mula sa mga coordinate ng hangganan (pormula ni Gauss), ni-round sa {decimals} decimal, m2",
+      "printed": "Inimprenta ni",
+      "legal": "Sukat sa titulo (m2)",
+      "computed": "Kinalkula (m2)",
+      "diff": "Pagkakaiba (m2)",
+      "status": "Katayuan",
+      "rights": "Mga karapatan",
+      "cost": "Gastos",
+      "findings": "Mga natuklasan",
+      "total": "Kabuuan, {count} lote",
+      "acquired_of": "Nakuha na {acquired} sa {total}",
+      "findings_title": "Mga natuklasan",
+      "no_findings": "Walang natuklasan.",
+      "disclaimer": "Ipinapakita ang mga may-ari at karapatan ayon sa pagkakatala sa proyektong ito. Hindi legal na opinyon o kopya ng rehistro ang talaang ito.",
+      "status_needed": "Kailangan",
+      "status_negotiating": "Nakikipag-usap",
+      "status_acquired": "Nakuha na",
+      "status_expropriation": "Ekspropriasyon"
+    }
+  },
+  "monitoring": {
+    "crossed": {
+      "fail": "Lumampas sa {level} ang punto {id}: paggalaw {d} mm o bilis {r} mm/day",
+      "suggestion": "Suriin ang punto at estruktura, saka kumpirmahin ang alerto gamit ang tala."
+    },
+    "level": {
+      "ok": "Normal",
+      "alert": "Alerto",
+      "action": "Aksyon",
+      "alarm": "Alarma"
+    },
+    "risk": {
+      "title": "Punto ng monitoring {id} sa {level}",
+      "description": "Paggalaw {d} mm, bilis {r} mm/day laban sa {profile}. Binuksan ng monitoring ang draft: suriin ito at magtalaga ng may-ari."
+    },
+    "report": {
+      "title": "Ulat ng alarma sa monitoring",
+      "project": "Proyekto",
+      "crs": "Sistema ng coordinate",
+      "profile": "Profile ng threshold",
+      "generated": "Nabuo noong",
+      "point": "Punto",
+      "baseline": "Batayan (m)",
+      "latest": "Pinakabago (m)",
+      "displacement": "Paggalaw (mm)",
+      "rate": "Bilis (mm/day)",
+      "level": "Antas",
+      "acknowledged": "Kinilala",
+      "counts": "Alarma: {alarm} · Aksyon: {action} · Alerto: {alert} · Normal: {ok}",
+      "findings": "Mga natuklasan",
+      "no_profile": "Walang profile, magtakda ng isa",
+      "ack_yes": "Oo",
+      "ack_no": "Hindi"
+    }
+  },
+  "stockpiles": {
+    "density_assumed": {
+      "fail": "Ipinagpalagay ang density, hindi sinukat: ang tonelada ay kasing-lakas lang ng hulang iyon.",
+      "suggestion": "Magtimbang ng sample o kunin ang density sa delivery notes ng supplier."
+    },
+    "variance_high": {
+      "fail": "Ang survey ay {v} % ang pagitan sa book stock, higit sa tolerance na {t} %.",
+      "suggestion": "Suriin ang density at base surface, saka magmungkahi ng adjustment at kumpirmahin kung totoo ang pagkakaiba."
+    }
+  },
+  "mine_survey": {
+    "compliance_outside": {
+      "fail": "Ang compliance ng panahon na {c} % ay labas sa saklaw na {lo}-{hi} %.",
+      "suggestion": "Suriin ang plano at ang survey, at ipaliwanag ang pagkakaiba sa tala ng panahon bago ang claim."
+    },
+    "truck_differs": {
+      "fail": "Ang tonelada mula sa bilang ng trak ay may {v} % na pagkakaiba sa tonelada ng survey, lampas sa {t} % na tseke.",
+      "suggestion": "Suriin ang karga bawat biyahe at ang density, saka ihambing muli ang dalawang surface."
+    }
+  },
+  "hongkong": {
+    "sopo_applicability": {
+      "fail": "Saklaw ng Cap. 652 (Security of Payment) ang kontratang ito: tugon sa loob ng 30 araw, bayad sa loob ng 60 araw mula sa claim"
+    },
+    "sopo_private_scope_check": {
+      "fail": "Saklaw lang ng Cap. 652 ang pribadong kontrata para sa bagong gusali o gawaing kailangan ng pag-apruba ng Building Authority: kumpirmahin ang saklaw"
+    },
+    "sopo_response_late": {
+      "fail": "Walang tugon sa bayad na naihatid bago ang {date}: pinagtatalunan ang halaga at maaaring dalhin sa adjudication"
+    },
+    "sopo_payment_term_exceeds_60": {
+      "fail": "Ang {n} araw na panahon ng bayad ay lampas sa 60 araw na pinapayagan ng Cap. 652"
+    },
+    "sopo_response_term_exceeds_30": {
+      "fail": "Ang {n} araw na panahon ng tugon ay lampas sa 30 araw na pinapayagan ng Cap. 652"
+    },
+    "sopo_adjudication_window": {
+      "fail": "May alitan sa bayad: ihatid ang abiso ng adjudication bago ang {date}"
+    },
+    "contract_pay_when_paid": {
+      "fail": "Sugnay na pay-when-paid: ginagawang hindi maipapatupad ng Cap. 652 ang kondisyonal na bayad"
+    },
+    "levy_missing": {
+      "fail": "Lampas sa HK$3,000,000 ang gawa ngunit walang CIC levy (0.5%) o CWR levy (0.03%) ang bill"
+    },
+    "levy_below_threshold": {
+      "fail": "Hindi lampas sa HK$3,000,000 ang gawa: walang CIC o CWR levy"
+    },
+    "tax_nonzero": {
+      "fail": "May linya ng VAT o GST, ngunit walang ganitong buwis sa Hong Kong: gawing zero"
+    },
+    "retention_over_limit": {
+      "fail": "Ang retention na {x} ay lampas sa limitasyon ng kontrata na {limit}"
+    },
+    "pc_sum_no_attendance": {
+      "fail": "Walang item ng tubo at attendance ang prime cost sum"
+    },
+    "index_attribution": {
+      "fail": "Walang source attribution ang ArchSD price index: banggitin ang Architectural Services Department"
     }
   }
 }

@@ -1644,7 +1644,8 @@
         "no_rejections": "Intet blev afvist.",
         "sig_delivered_by": "Leveret af",
         "counterparty_tax_id": "CVR-/momsnr.",
-        "counterparty_address": "Adresse"
+        "counterparty_address": "Adresse",
+        "delivery_address": "Leveringsadresse"
       },
       "labels": {
         "po_status": {
@@ -1717,7 +1718,8 @@
         "gross_settled": "Bruttobeløb afregnet",
         "no_withholding": "Der blev ikke tilbageholdt noget fra denne betaling.",
         "counterparty_tax_id": "CVR-/momsnr.",
-        "counterparty_address": "Adresse"
+        "counterparty_address": "Adresse",
+        "supply_date": "Leveringsdato"
       },
       "labels": {
         "invoice_status": {
@@ -1786,6 +1788,81 @@
         "col_min": "Laveste",
         "col_max": "Højeste",
         "col_count": "Målinger"
+      }
+    },
+    "gantt_pdf": {
+      "strings": {
+        "title": "Tidsplan (Gantt-diagram)",
+        "project": "Projekt",
+        "schedule": "Tidsplan",
+        "baseline": "Basisplan",
+        "no_baseline": "ingen",
+        "exported": "Eksporteret",
+        "data_date": "Statusdato",
+        "col_wbs": "WBS",
+        "col_activity": "Aktivitet",
+        "col_start": "Start",
+        "col_finish": "Slut",
+        "col_duration": "Dage",
+        "legend_current": "Aktuel plan",
+        "legend_progress": "Fremdrift",
+        "legend_critical": "Kritisk vej",
+        "legend_baseline": "Basisplan",
+        "legend_actual": "Faktisk",
+        "legend_milestone": "Milepæl",
+        "legend_summary": "Sammenfatning",
+        "week_short": "U{n}",
+        "quarter_short": "K{n}",
+        "sheet_of": "Ark {page} af {total}",
+        "no_activities": "Denne tidsplan har endnu ingen aktiviteter."
+      }
+    },
+    "contracts": {
+      "strings": {
+        "doc_title": "Kontrakt",
+        "col_code": "Kode",
+        "col_title": "Titel",
+        "col_type": "Kontrakttype",
+        "col_role": "Kontraktside",
+        "col_counterparty": "Modpart",
+        "col_original_value": "Oprindelig værdi",
+        "col_total_value": "Kontraktværdi",
+        "col_retention": "Tilbageholdelse",
+        "col_start": "Startdato",
+        "col_end": "Slutdato",
+        "col_signed": "Underskrevet den",
+        "line_code": "Kode",
+        "line_description": "Beskrivelse",
+        "line_unit": "Enhed",
+        "line_quantity": "Mængde",
+        "line_unit_rate": "Enhedspris",
+        "lines": "Værdiopgørelse",
+        "signer_company": "For virksomheden"
+      },
+      "labels": {
+        "status": {
+          "draft": "Kladde",
+          "active": "Aktiv",
+          "suspended": "Suspenderet",
+          "completed": "Afsluttet",
+          "terminated": "Opsagt"
+        },
+        "type": {
+          "lump_sum": "Fast pris",
+          "gmp": "GMP",
+          "cost_plus": "Omkostninger plus",
+          "tm": "Tid og materialer",
+          "unit_price": "Enhedspriser",
+          "design_build": "Totalentreprise",
+          "combination": "Kombination",
+          "remeasurement": "Afregning efter opmåling",
+          "framework": "Rammeaftale",
+          "call_off": "Afrop"
+        },
+        "party": {
+          "client": "Bygherrekontrakt",
+          "subcontractor": "Underentreprisekontrakt"
+        }
       }
     }
   },
@@ -2076,7 +2153,11 @@
       "notifications.portal.message_received.title": "Ny portalbesked",
       "notifications.portal.message_received.body": "{buyer_name} har sendt en besked.",
       "dispatch.notify.plan_title": "Your daily plan is ready",
-      "dispatch.notify.plan_body": "Plan for {day}: {lines} lines."
+      "dispatch.notify.plan_body": "Plan for {day}: {lines} lines.",
+      "notifications.monitoring.alert.title": "Overvågningsvarsel",
+      "notifications.monitoring.action.title": "Overvågning: handlingsniveau",
+      "notifications.monitoring.alarm.title": "Overvågningsalarm",
+      "notifications.monitoring.crossed.body": "Punkt {point}: {displacement} mm, {rate} mm/day."
     },
     "schedule_headers": {
       "headers": {
@@ -2698,5 +2779,30 @@
         "gap": "Forskel"
       }
     }
-  }
+  },
+  "monitoring.crossed.fail": "Punkt {id}: forskydning {d} mm eller hastighed {r} mm/døgn overskred {level}",
+  "monitoring.crossed.suggestion": "Kontroller punktet og konstruktionen, og bekræft derefter alarmen med en note.",
+  "monitoring.level.ok": "OK",
+  "monitoring.level.alert": "Advarsel",
+  "monitoring.level.action": "Handling",
+  "monitoring.level.alarm": "Alarm",
+  "monitoring.risk.title": "Målepunkt {id} på niveau {level}",
+  "monitoring.risk.description": "Forskydning {d} mm, hastighed {r} mm/døgn i forhold til {profile}. Udkast oprettet af overvågningen: gennemgå det og angiv en ansvarlig.",
+  "monitoring.report.title": "Alarmrapport for overvågning",
+  "monitoring.report.project": "Projekt",
+  "monitoring.report.crs": "Koordinatsystem",
+  "monitoring.report.profile": "Grænseværdiprofil",
+  "monitoring.report.generated": "Genereret",
+  "monitoring.report.point": "Punkt",
+  "monitoring.report.baseline": "Udgangsværdi (m)",
+  "monitoring.report.latest": "Seneste værdi (m)",
+  "monitoring.report.displacement": "Forskydning (mm)",
+  "monitoring.report.rate": "Hastighed (mm/døgn)",
+  "monitoring.report.level": "Niveau",
+  "monitoring.report.acknowledged": "Bekræftet",
+  "monitoring.report.counts": "Alarm: {alarm} · Handling: {action} · Advarsel: {alert} · OK: {ok}",
+  "monitoring.report.findings": "Fund",
+  "monitoring.report.no_profile": "Ingen profil, angiv en",
+  "monitoring.report.ack_yes": "Ja",
+  "monitoring.report.ack_no": "Nej"
 }

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiGet, ApiError } from '@/shared/lib/api';
 import { useToastStore } from '@/stores/useToastStore';
 import { fmtCurrency, fmtNumber, fmtPercent } from '@/shared/lib/formatters';
@@ -33,6 +33,9 @@ import { getNumberLocale } from '@/stores/usePreferencesStore';
 import { compareNames } from '@/shared/lib/collator';
 import { PerformanceTab } from './PerformanceTab';
 import { downloadCsv } from './performance';
+import { EMPTY_FACETS, analyticsFacetParams, applyProjectFacets, isFacetFilterActive, type ProjectFacetFilters } from '@/shared/lib/projectFacets';
+import { ProjectFacetSelects } from '@/shared/ui/ProjectFacetSelects';
+import { useProjectStatusLabel } from '@/features/projects/ProjectStatusBadge';
 
 /* ── Helpers ─────────────────────────────────────────────────────────── */
 
@@ -75,6 +78,9 @@ interface ProjectAnalytics {
   gross_floor_area?: number | null;
   cost_per_sqm?: number | null;
   phase?: string | null;
+  /** The project's own status; ``status`` above is budget health. */
+  project_status?: string | null;
+  project_type?: string | null;
 }
 
 interface CurrencyTotal {
@@ -86,6 +92,10 @@ interface CurrencyTotal {
 
 interface AnalyticsOverview {
   total_projects: number;
+  /** Projects in scope before the phase/type filter. */
+  unfiltered_total?: number;
+  /** Phase/type of every in-scope project, so the filter options do not shrink with the filter. */
+  facet_projects?: { phase?: string | null; project_type?: string | null }[];
   projects_with_budget: number;
   total_planned: number;
   total_actual: number;
@@ -109,6 +119,9 @@ export function AnalyticsPage() {
   const [sortDir, setSortDir] = useState<SortDir>('desc');
   const [regionFilter, setRegionFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [projectStatusFilter, setProjectStatusFilter] = useState('');
+  const [facets, setFacets] = useState<ProjectFacetFilters>(EMPTY_FACETS);
+  const projectStatusLabel = useProjectStatusLabel();
   const [search, setSearch] = useState('');
   // Debounced copy of the raw search box value. The expensive filter/sort
   // memo (and table re-render) keys off this, so typing only recomputes once
@@ -147,8 +160,10 @@ export function AnalyticsPage() {
   );
 
   const { data, isLoading, isError, refetch, isFetching } = useQuery<AnalyticsOverview>({
-    queryKey: ['analytics', 'overview'],
-    queryFn: () => apiGet<AnalyticsOverview>('/v1/projects/analytics/overview/'),
+    // Phase/type go to the server so every summary card is totalled over the same project set as the rows.
+    queryKey: ['analytics', 'overview', facets.phase, facets.project_type],
+    queryFn: () => apiGet<AnalyticsOverview>(`/v1/projects/analytics/overview/${analyticsFacetParams(facets)}`),
+    placeholderData: keepPreviousData,
   });
 
   // Debounce the search box (300ms), mirroring the costs browser pattern.
@@ -162,11 +177,18 @@ export function AnalyticsPage() {
     return [...new Set(data.projects.map(p => p.region).filter(Boolean))].sort();
   }, [data?.projects]);
 
+  const projectStatuses = useMemo(() => {
+    if (!data?.projects) return [];
+    return [...new Set(data.projects.map(p => p.project_status).filter((s): s is string => !!s))].sort();
+  }, [data?.projects]);
+
   const sortedProjects = useMemo(() => {
     if (!data?.projects) return [];
     let filtered = data.projects;
     if (regionFilter) filtered = filtered.filter(p => p.region === regionFilter);
     if (statusFilter) filtered = filtered.filter(p => p.status === statusFilter);
+    if (projectStatusFilter) filtered = filtered.filter(p => p.project_status === projectStatusFilter);
+    filtered = applyProjectFacets(filtered, facets);
     if (debouncedSearch) {
       const q = debouncedSearch.toLowerCase();
       filtered = filtered.filter(p => p.name.toLowerCase().includes(q));
@@ -180,14 +202,14 @@ export function AnalyticsPage() {
       }
       return sortDir === 'asc' ? cmp : -cmp;
     });
-  }, [data?.projects, sortField, sortDir, regionFilter, statusFilter, debouncedSearch]);
+  }, [data?.projects, sortField, sortDir, regionFilter, statusFilter, projectStatusFilter, facets, debouncedSearch]);
 
   // Reset to the first page whenever the result set changes (new filter,
   // search, sort, or freshly fetched data) so the user never lands on an
   // out-of-range page showing nothing.
   useEffect(() => {
     setPage(0);
-  }, [debouncedSearch, regionFilter, statusFilter, sortField, sortDir, data?.projects]);
+  }, [debouncedSearch, regionFilter, statusFilter, projectStatusFilter, facets, sortField, sortDir, data?.projects]);
 
   // Total pages for the current filtered set (at least one, even when empty).
   const pageCount = Math.max(1, Math.ceil(sortedProjects.length / PAGE_SIZE));
@@ -219,7 +241,11 @@ export function AnalyticsPage() {
       t('analytics.col_variance_pct', { defaultValue: 'Var. %' }),
       t('analytics.col_cost_per_sqm', { defaultValue: 'Cost/m²' }),
       t('analytics.col_status', { defaultValue: 'Status' }),
+      t('analytics.col_project_status', { defaultValue: 'Project status' }),
+      t('projects.phase_label', { defaultValue: 'Phase' }),
+      t('projects.project_type', { defaultValue: 'Project type' }),
     ];
+    const quote = (v: string | null | undefined) => `"${String(v ?? '').replace(/"/g, '""')}"`;
     const rows = sortedProjects.map(p => [
       `"${p.name.replace(/"/g, '""')}"`,
       p.region,
@@ -230,6 +256,9 @@ export function AnalyticsPage() {
       p.variance_pct == null ? '' : fmtPercent(Number(p.variance_pct)),
       p.cost_per_sqm != null ? Number(p.cost_per_sqm).toFixed(0) : '',
       p.status,
+      quote(p.project_status),
+      quote(p.phase),
+      quote(p.project_type),
     ].join(','));
     downloadCsv([headers.join(','), ...rows].join('\n'), 'analytics_export.csv');
   }, [sortedProjects, t]);
@@ -315,7 +344,7 @@ export function AnalyticsPage() {
   }
 
   /* ── No data at all — guide the user ────────────────────────────────── */
-  if (!data || data.total_projects === 0) {
+  if (!data || (data.total_projects === 0 && !isFacetFilterActive(facets))) {
     return (
       <div className="space-y-6">
         <Breadcrumb
@@ -436,6 +465,15 @@ export function AnalyticsPage() {
         </div>
       ) : (
       <div role="tabpanel" id="analytics-panel-overview" aria-labelledby="analytics-tab-overview" className="space-y-5">
+      {isFacetFilterActive(facets) && (
+        <p className="text-xs text-content-secondary" data-testid="analytics-filtered-hint">
+          {t('analytics.filtered_hint', {
+            defaultValue: 'Filtered: {{shown}} of {{total}} projects',
+            shown: data?.total_projects ?? 0,
+            total: data?.unfiltered_total ?? data?.total_projects ?? 0,
+          })}
+        </p>
+      )}
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <KPICard
@@ -584,6 +622,23 @@ export function AnalyticsPage() {
             <option value="on_budget">{t('analytics.on_budget', { defaultValue: 'On Budget' })}</option>
             <option value="over_budget">{t('analytics.over_budget', { defaultValue: 'Over Budget' })}</option>
           </select>
+          {projectStatuses.length > 0 && (
+            <select
+              value={projectStatusFilter}
+              onChange={(e) => setProjectStatusFilter(e.target.value)}
+              className="oe-select w-44"
+              aria-label={t('analytics.filter_project_status', { defaultValue: 'Filter by project status' })}
+            >
+              <option value="">{t('analytics.all_project_statuses', { defaultValue: 'All project statuses' })}</option>
+              {projectStatuses.map(s => <option key={s} value={s}>{projectStatusLabel(s)}</option>)}
+            </select>
+          )}
+          <ProjectFacetSelects
+            projects={data?.facet_projects ?? data?.projects ?? []}
+            value={facets}
+            onChange={setFacets}
+            selectClassName="oe-select w-44"
+          />
           <span className="text-2xs text-content-tertiary ml-auto">
             {sortedProjects.length} {t('analytics.of_total', { defaultValue: 'of' })} {data?.projects.length ?? 0}
           </span>
@@ -599,7 +654,7 @@ export function AnalyticsPage() {
                 'Try adjusting your search query or filters to find projects.',
             })}
             action={
-              (search || regionFilter || statusFilter) ? (
+              (search || regionFilter || statusFilter || projectStatusFilter || isFacetFilterActive(facets)) ? (
                 <Button
                   variant="secondary"
                   size="sm"
@@ -607,6 +662,8 @@ export function AnalyticsPage() {
                     setSearch('');
                     setRegionFilter('');
                     setStatusFilter('');
+                    setProjectStatusFilter('');
+                    setFacets(EMPTY_FACETS);
                   }}
                 >
                   {t('analytics.clear_filters', { defaultValue: 'Clear Filters' })}
